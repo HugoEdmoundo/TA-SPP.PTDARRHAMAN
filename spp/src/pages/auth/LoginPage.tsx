@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { Button, Card } from '../../components/ui';
-import { Lock, User, Shield, UserCheck, ArrowRight } from 'lucide-react';
+import { Lock, User, Shield, UserCheck, ArrowRight, Sparkles, Rocket, Users } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -38,6 +38,12 @@ export const LoginPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDemoLogin = (demoUsername: string, demoPassword: string, role: 'ADMIN' | 'WALI') => {
+    setUsername(demoUsername);
+    setPassword(demoPassword);
+    setSelectedRole(role);
   };
 
   return (
@@ -135,9 +141,30 @@ export const LoginPage: React.FC = () => {
           </Button>
         </form>
 
-        <p className="text-center text-xs text-slate mt-6">
-          Hubungi admin untuk membuat akun.
-        </p>
+        <div className="mt-8 pt-6 border-t border-dashed border-slate/20 text-center">
+          <div className="flex items-center justify-center gap-1.5 mb-3 text-xs font-extrabold text-gold-dark uppercase tracking-wider">
+            <Sparkles className="w-4 h-4 text-gold-accent" />
+            <span>Akses Cepat Demo</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('admin', 'admin123', 'ADMIN')}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-light/60 hover:bg-emerald-primary hover:text-white text-emerald-primary text-xs font-bold border border-emerald-primary/20 transition-all active:scale-95 text-center shadow-2xs group"
+            >
+              <Rocket className="w-3.5 h-3.5 text-emerald-primary group-hover:text-white transition-colors" />
+              <span>Demo Admin</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('wali', 'wali123', 'WALI')}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gold-bg hover:bg-gold-accent hover:text-obsidian text-gold-dark text-xs font-bold border border-gold-accent/40 transition-all active:scale-95 text-center shadow-2xs group"
+            >
+              <Users className="w-3.5 h-3.5 text-gold-dark group-hover:text-obsidian transition-colors" />
+              <span>Demo Wali</span>
+            </button>
+          </div>
+        </div>
       </Card>
     </div>
   );
