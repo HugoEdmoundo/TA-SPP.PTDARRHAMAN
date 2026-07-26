@@ -3,4 +3,10 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from main import app  # noqa: E402, F401
+try:
+    from main import app
+except Exception as e:
+    print(f"IMPORT ERROR: {e}", file=sys.stderr)
+    import traceback
+    traceback.print_exc(file=sys.stderr)
+    raise
