@@ -8,7 +8,7 @@ from sqlmodel import Session, select
 from sqlalchemy import or_
 
 from app.database import get_session
-from app.models import Student, User, ParentStudent, AuditLog, StudentStatus
+from app.models import Student, User, ParentStudent, AuditLog, StudentStatus, AcademicYear
 from app.schemas.students import (
     StudentCreate,
     StudentUpdate,
@@ -89,6 +89,10 @@ def create_student(
         )
         
     student = Student.model_validate(payload)
+    if student.academic_year_id and not student.academic_year:
+        ay = session.get(AcademicYear, student.academic_year_id)
+        if ay:
+            student.academic_year = ay.name
     session.add(student)
     session.commit()
     session.refresh(student)
@@ -222,6 +226,10 @@ def confirm_import_students(
             continue
 
         student = Student.model_validate(item)
+        if student.academic_year_id and not student.academic_year:
+            ay = session.get(AcademicYear, student.academic_year_id)
+            if ay:
+                student.academic_year = ay.name
         session.add(student)
         imported_count += 1
 
@@ -282,6 +290,10 @@ def update_student(
     update_data = payload.model_dump(exclude_unset=True)
     for key, val in update_data.items():
         setattr(student, key, val)
+    if student.academic_year_id and not payload.academic_year:
+        ay = session.get(AcademicYear, student.academic_year_id)
+        if ay:
+            student.academic_year = ay.name
     student.updated_at = datetime.utcnow()
 
     session.add(student)
@@ -331,6 +343,36 @@ def delete_student(
     session.commit()
 
     return {"status": "ok", "message": f"Siswa NIS '{student.nis}' berhasil dinonaktifkan."}
+
+
+@router.put("/{id}/activate", status_code=status.HTTP_200_OK)
+def activate_student(
+    id: int,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """Mengaktifkan kembali siswa yang nonaktif."""
+    student = session.get(Student, id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Siswa tidak ditemukan.")
+
+    student.is_active = True
+    student.status = StudentStatus.active
+    student.updated_at = datetime.utcnow()
+    session.add(student)
+    session.commit()
+
+    audit = AuditLog(
+        user_id=admin.id,
+        action="ACTIVATE_STUDENT",
+        entity_type="student",
+        entity_id=student.id,
+        detail=f"Admin mengaktifkan kembali siswa NIS {student.nis}.",
+    )
+    session.add(audit)
+    session.commit()
+
+    return {"status": "ok", "message": f"Siswa NIS '{student.nis}' berhasil diaktifkan kembali."}
 
 
 @router.post("/{id}/photo", response_model=Dict[str, str])

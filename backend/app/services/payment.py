@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import List, Optional, Tuple
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
+from sqlalchemy import or_
 
 from app.models import (
     Student, Bill, Payment, Receipt, GatewayTransaction, AuditLog, SchoolSetting, PaymentStatus, SppSetting
@@ -175,11 +176,14 @@ def process_payment_items(
             paid_spp = sum(p.amount for p in existing_spp)
             
             # Ambil nominal SPP dari master tabel SppSetting
+            conds = [SppSetting.academic_year.ilike(f"%{item.year}%")]
+            if student.academic_year:
+                conds.append(SppSetting.academic_year == student.academic_year)
+            if student.academic_year_id:
+                conds.append(SppSetting.academic_year_id == student.academic_year_id)
+
             spp_set = session.exec(
-                select(SppSetting).where(
-                    (SppSetting.academic_year == student.academic_year) |
-                    (SppSetting.academic_year.ilike(f"%{item.year}%"))
-                ).order_by(SppSetting.id.desc())
+                select(SppSetting).where(or_(*conds)).order_by(SppSetting.id.desc())
             ).first()
             if not spp_set:
                 spp_set = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()

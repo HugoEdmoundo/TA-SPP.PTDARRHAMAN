@@ -15,6 +15,7 @@ class StudentSimpleRead(BaseModel):
 class NonSppBillCreate(BaseModel):
     student_ids: List[int] = Field(..., min_length=1, description="Daftar ID siswa yang akan dibuatkan tagihan ini")
     category: str = Field(..., max_length=50, example="Seragam")
+    category_id: Optional[int] = None
     label: str = Field(..., max_length=100, example="Seragam Batik & Olahraga Kelas 10")
     description: Optional[str] = Field(None, example="Pembayaran seragam untuk tahun ajaran baru")
     amount: Decimal = Field(..., gt=0, example=750000)
@@ -24,6 +25,7 @@ class NonSppBillCreate(BaseModel):
 
 class BillUpdate(BaseModel):
     category: Optional[str] = Field(None, max_length=50)
+    category_id: Optional[int] = None
     label: Optional[str] = Field(None, max_length=100)
     description: Optional[str] = None
     amount: Optional[Decimal] = Field(None, gt=0)

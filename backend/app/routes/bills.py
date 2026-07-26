@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 from sqlalchemy import or_
 
 from app.database import get_session
-from app.models import Bill, Student, User, AuditLog
+from app.models import Bill, Student, User, AuditLog, BillCategory
 from app.schemas.bills import NonSppBillCreate, BillUpdate, BillRead
 from app.dependencies import require_admin
 
@@ -24,6 +24,12 @@ def create_non_spp_bills(
     created_bills = []
     skipped_ids = []
 
+    cat_name = payload.category
+    if payload.category_id and not cat_name:
+        bc = session.get(BillCategory, payload.category_id)
+        if bc:
+            cat_name = bc.name
+
     for sid in payload.student_ids:
         student = session.get(Student, sid)
         if not student:
@@ -33,7 +39,8 @@ def create_non_spp_bills(
         bill = Bill(
             student_id=sid,
             bill_type="non_spp",
-            category=payload.category,
+            category=cat_name,
+            category_id=payload.category_id,
             label=payload.label,
             description=payload.description,
             amount=payload.amount,
@@ -73,6 +80,7 @@ def list_non_spp_bills(
     status: Optional[str] = Query(None, description="Filter status (unpaid/partial/paid)"),
     student_id: Optional[int] = Query(None, description="Filter berdasarkan ID siswa"),
     category: Optional[str] = Query(None, description="Filter berdasarkan kategori (Seragam, Denda, dll)"),
+    category_id: Optional[int] = Query(None, description="Filter berdasarkan ID kategori"),
     search: Optional[str] = Query(None, description="Cari label atau deskripsi tagihan"),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
@@ -85,7 +93,9 @@ def list_non_spp_bills(
         query = query.where(Bill.status == status)
     if student_id:
         query = query.where(Bill.student_id == student_id)
-    if category:
+    if category_id:
+        query = query.where(Bill.category_id == category_id)
+    elif category:
         query = query.where(Bill.category == category)
     if search:
         pattern = f"%{search}%"
@@ -134,6 +144,11 @@ def update_non_spp_bill(
     update_data = payload.model_dump(exclude_unset=True)
     for key, val in update_data.items():
         setattr(bill, key, val)
+
+    if payload.category_id and not payload.category:
+        bc = session.get(BillCategory, payload.category_id)
+        if bc:
+            bill.category = bc.name
 
     bill.updated_at = datetime.utcnow()
     session.add(bill)

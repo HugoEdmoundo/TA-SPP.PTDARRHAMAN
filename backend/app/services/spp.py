@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 from sqlmodel import Session, select
+from sqlalchemy import or_
 from app.models import Student, SppSetting, Payment, StudentStatus, PaymentStatus
 
 
@@ -13,12 +14,14 @@ def get_student_spp_status(session: Session, student_id: int, year: int) -> List
         return []
 
     # Cari nominal SPP berdasarkan tahun ajaran siswa atau tahun yang diminta
-    # Coba cari persis berdasarkan academic_year siswa, atau string tahun
+    conds = [SppSetting.academic_year.ilike(f"%{year}%")]
+    if student.academic_year:
+        conds.append(SppSetting.academic_year == student.academic_year)
+    if student.academic_year_id:
+        conds.append(SppSetting.academic_year_id == student.academic_year_id)
+
     spp_setting = session.exec(
-        select(SppSetting).where(
-            (SppSetting.academic_year == student.academic_year) |
-            (SppSetting.academic_year.ilike(f"%{year}%"))
-        ).order_by(SppSetting.id.desc())
+        select(SppSetting).where(or_(*conds)).order_by(SppSetting.id.desc())
     ).first()
 
     # Jika tidak ada setting spesifik, ambil setting terbaru atau fallback default 500.000

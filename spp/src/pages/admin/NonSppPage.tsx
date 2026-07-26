@@ -3,8 +3,8 @@ import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, 
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
-import { FileText, Plus, Search, Edit2, Trash2, CheckCircle2, AlertCircle, Clock, Users } from 'lucide-react';
-import type { Student } from '../../types';
+import { FileText, Plus, Search, Edit2, Trash2, CheckCircle2, AlertCircle, Clock, Users, Tag } from 'lucide-react';
+import type { Student, BillCategory } from '../../types';
 
 export const NonSppPage: React.FC = () => {
   const { user } = useAuth();
@@ -14,6 +14,13 @@ export const NonSppPage: React.FC = () => {
 
   const [bills, setBills] = useState<any[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
+  const [categoriesList, setCategoriesList] = useState<BillCategory[]>([
+    { id: 1, code: 'seragam', name: 'Seragam', default_amount: 500000, is_active: true },
+    { id: 2, code: 'buku', name: 'Buku', default_amount: 350000, is_active: true },
+    { id: 3, code: 'kegiatan', name: 'Kegiatan', default_amount: 250000, is_active: true },
+    { id: 4, code: 'denda', name: 'Denda', default_amount: 50000, is_active: true },
+    { id: 5, code: 'lainnya', name: 'Lainnya', default_amount: 100000, is_active: true },
+  ]);
   const [isLoading, setIsLoading] = useState(!isDemo);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
@@ -27,6 +34,7 @@ export const NonSppPage: React.FC = () => {
   const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
   const [selectAllStudents, setSelectAllStudents] = useState(false);
   const [category, setCategory] = useState('Seragam');
+  const [categoryId, setCategoryId] = useState<number | undefined>(1);
   const [label, setLabel] = useState('');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(500000);
@@ -41,13 +49,17 @@ export const NonSppPage: React.FC = () => {
       if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
       if (filterCategory !== 'all') url += `&category=${encodeURIComponent(filterCategory)}`;
 
-      const [billsRes, studentsRes] = await Promise.all([
+      const [billsRes, studentsRes, categoriesRes] = await Promise.all([
         api.get(url),
         api.get('/students/?limit=500&is_active=true'),
+        api.get('/settings/bill-categories').catch(() => ({ data: null })),
       ]);
 
       setBills(billsRes.data || []);
       setAllStudents(studentsRes.data || []);
+      if (Array.isArray(categoriesRes.data) && categoriesRes.data.length > 0) {
+        setCategoriesList(categoriesRes.data);
+      }
     } catch (err: any) {
       toastError('Gagal Memuat Tagihan', err?.response?.data?.detail || 'Terjadi kesalahan koneksi.');
     } finally {
@@ -59,20 +71,36 @@ export const NonSppPage: React.FC = () => {
     fetchData();
   }, [searchTerm, filterCategory, isDemo]);
 
+  const handleCategoryChange = (catName: string, isAdd: boolean = true) => {
+    setCategory(catName);
+    const found = categoriesList.find(c => c.name.toLowerCase() === catName.toLowerCase() || c.code.toLowerCase() === catName.toLowerCase());
+    if (found) {
+      setCategoryId(found.id);
+      if (isAdd && found.default_amount && found.default_amount > 0) {
+        setAmount(found.default_amount);
+      }
+    } else {
+      setCategoryId(undefined);
+    }
+  };
+
   const handleOpenAdd = () => {
     setSelectedStudentIds(allStudents.map(s => Number(s.id)));
     setSelectAllStudents(true);
-    setCategory('Seragam');
+    const firstCat = categoriesList[0]?.name || 'Seragam';
+    handleCategoryChange(firstCat, true);
     setLabel('');
     setDescription('');
-    setAmount(500000);
     setDueDate('2026-08-31');
     setShowAddModal(true);
   };
 
   const handleOpenEdit = (bill: any) => {
     setSelectedBill(bill);
-    setCategory(bill.category || 'Seragam');
+    const catName = bill.category || categoriesList[0]?.name || 'Seragam';
+    setCategory(catName);
+    const found = categoriesList.find(c => c.name.toLowerCase() === catName.toLowerCase() || c.id === bill.category_id);
+    setCategoryId(found?.id || bill.category_id);
     setLabel(bill.label);
     setDescription(bill.description || '');
     setAmount(Number(bill.amount) || 0);
@@ -112,6 +140,7 @@ export const NonSppPage: React.FC = () => {
       await api.post('/bills/non-spp', {
         student_ids: selectedStudentIds,
         category,
+        category_id: categoryId,
         label,
         description,
         amount,
@@ -134,6 +163,7 @@ export const NonSppPage: React.FC = () => {
     try {
       await api.put(`/bills/non-spp/${selectedBill.id}`, {
         category,
+        category_id: categoryId,
         label,
         description,
         amount,
@@ -171,7 +201,7 @@ export const NonSppPage: React.FC = () => {
               <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Manajemen Tagihan Non-SPP</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Kelola tagihan buku, seragam, ujian, dan kegiatan khusus santri (Fase 3: B-13 & F-10).</p>
+            <p className="text-xs text-slate mt-1">Kelola tagihan buku, seragam, ujian, dan kegiatan khusus santri terintegrasi Master Kategori.</p>
           </div>
           <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Tambah Tagihan', 'Beralih ke akun Admin Real untuk menerbitkan tagihan ad-hoc secara live.')} className="shrink-0 w-full sm:w-auto justify-center">Tambah Tagihan Non-SPP</Button>
         </div>
@@ -219,13 +249,13 @@ export const NonSppPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Database Real-Time SQLite</span>
+              <span>Database Real-Time & Master Kategori</span>
             </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Manajemen Tagihan Non-SPP</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Terbitkan tagihan ad-hoc (seragam, buku, ujian, denda) untuk santri tertentu atau seluruh kelas sekaligus.</p>
+            <p className="text-xs text-slate mt-1">Terbitkan tagihan ad-hoc (seragam, buku, ujian, denda) terintegrasi dengan Master Kategori Tagihan.</p>
           </div>
           <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd} className="shrink-0 w-full sm:w-auto justify-center">
             Buat Tagihan Baru
@@ -245,11 +275,11 @@ export const NonSppPage: React.FC = () => {
           </div>
 
           <div className="flex gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-            {['all', 'Seragam', 'Buku', 'Kegiatan', 'Denda', 'Lainnya'].map((cat) => (
+            {['all', ...categoriesList.map(c => c.name)].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setFilterCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all capitalize ${filterCategory === cat ? 'bg-emerald-primary text-white shadow-sm' : 'bg-slate/5 text-slate hover:bg-slate/10'}`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all capitalize whitespace-nowrap ${filterCategory === cat ? 'bg-emerald-primary text-white shadow-sm' : 'bg-slate/5 text-slate hover:bg-slate/10'}`}
               >
                 {cat === 'all' ? `Semua (${bills.length})` : cat}
               </button>
@@ -295,7 +325,10 @@ export const NonSppPage: React.FC = () => {
                       <td className="p-3.5 pl-5 font-bold text-obsidian">
                         <div className="text-sm font-heading">{bill.label}</div>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="px-2 py-0.5 rounded bg-slate/10 text-slate text-[10px] font-bold uppercase">{bill.category || 'Umum'}</span>
+                          <span className="px-2 py-0.5 rounded bg-slate/10 text-slate text-[10px] font-bold uppercase flex items-center gap-1">
+                            <Tag className="w-2.5 h-2.5 text-emerald-primary" />
+                            <span>{bill.category || 'Umum'}</span>
+                          </span>
                           {bill.description && <span className="text-[10px] text-slate truncate max-w-[200px] font-normal">{bill.description}</span>}
                         </div>
                       </td>
@@ -374,17 +407,18 @@ export const NonSppPage: React.FC = () => {
             <form onSubmit={handleCreateBill} className="flex flex-col gap-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
+                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan (Master Kategori) *</label>
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => handleCategoryChange(e.target.value, true)}
                     className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
                   >
-                    <option value="Seragam">Seragam</option>
-                    <option value="Buku">Buku / Modul</option>
-                    <option value="Kegiatan">Kegiatan / Ujian</option>
-                    <option value="Denda">Denda / Keterlambatan</option>
-                    <option value="Lainnya">Lainnya</option>
+                    {categoriesList.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name} {cat.default_amount ? `(Default: Rp ${cat.default_amount.toLocaleString('id-ID')})` : ''}
+                      </option>
+                    ))}
+                    {categoriesList.length === 0 && <option value="Seragam">Seragam</option>}
                   </select>
                 </div>
                 <div>
@@ -497,17 +531,18 @@ export const NonSppPage: React.FC = () => {
             <form onSubmit={handleUpdateBill} className="flex flex-col gap-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
+                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan (Master Kategori) *</label>
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => handleCategoryChange(e.target.value, false)}
                     className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
                   >
-                    <option value="Seragam">Seragam</option>
-                    <option value="Buku">Buku / Modul</option>
-                    <option value="Kegiatan">Kegiatan / Ujian</option>
-                    <option value="Denda">Denda / Keterlambatan</option>
-                    <option value="Lainnya">Lainnya</option>
+                    {categoriesList.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                    {categoriesList.length === 0 && <option value="Seragam">Seragam</option>}
                   </select>
                 </div>
                 <div>

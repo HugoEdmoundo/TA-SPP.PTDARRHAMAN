@@ -75,6 +75,7 @@ DEFAULT_SCHOOL_SETTINGS = {
 
 @router.get("/academic-years", response_model=List[AcademicYearRead])
 @router.get("/settings/academic-years", response_model=List[AcademicYearRead])
+@router.get("/api/v1/settings/academic-years", response_model=List[AcademicYearRead])
 def list_academic_years(session: Session = Depends(get_session)):
     """Menampilkan daftar tahun ajaran."""
     return session.exec(select(AcademicYear).order_by(AcademicYear.name.desc())).all()
@@ -82,6 +83,7 @@ def list_academic_years(session: Session = Depends(get_session)):
 
 @router.post("/academic-years", response_model=AcademicYearRead, status_code=status.HTTP_201_CREATED)
 @router.post("/settings/academic-years", response_model=AcademicYearRead, status_code=status.HTTP_201_CREATED)
+@router.post("/api/v1/settings/academic-years", response_model=AcademicYearRead, status_code=status.HTTP_201_CREATED)
 def create_academic_year(
     payload: AcademicYearCreate,
     session: Session = Depends(get_session),
@@ -100,6 +102,7 @@ def create_academic_year(
 
 @router.put("/academic-years/{id}", response_model=AcademicYearRead)
 @router.put("/settings/academic-years/{id}", response_model=AcademicYearRead)
+@router.put("/api/v1/settings/academic-years/{id}", response_model=AcademicYearRead)
 def update_academic_year(
     id: int,
     payload: AcademicYearUpdate,
@@ -123,6 +126,7 @@ def update_academic_year(
 
 @router.delete("/academic-years/{id}", status_code=status.HTTP_200_OK)
 @router.delete("/settings/academic-years/{id}", status_code=status.HTTP_200_OK)
+@router.delete("/api/v1/settings/academic-years/{id}", status_code=status.HTTP_200_OK)
 def delete_academic_year(
     id: int,
     session: Session = Depends(get_session),
@@ -142,6 +146,7 @@ def delete_academic_year(
 
 @router.get("/bill-categories", response_model=List[BillCategoryRead])
 @router.get("/settings/bill-categories", response_model=List[BillCategoryRead])
+@router.get("/api/v1/settings/bill-categories", response_model=List[BillCategoryRead])
 def list_bill_categories(session: Session = Depends(get_session)):
     """Menampilkan daftar kategori tagihan."""
     return session.exec(select(BillCategory).order_by(BillCategory.name.asc())).all()
@@ -149,6 +154,7 @@ def list_bill_categories(session: Session = Depends(get_session)):
 
 @router.post("/bill-categories", response_model=BillCategoryRead, status_code=status.HTTP_201_CREATED)
 @router.post("/settings/bill-categories", response_model=BillCategoryRead, status_code=status.HTTP_201_CREATED)
+@router.post("/api/v1/settings/bill-categories", response_model=BillCategoryRead, status_code=status.HTTP_201_CREATED)
 def create_bill_category(
     payload: BillCategoryCreate,
     session: Session = Depends(get_session),
@@ -167,6 +173,7 @@ def create_bill_category(
 
 @router.put("/bill-categories/{id}", response_model=BillCategoryRead)
 @router.put("/settings/bill-categories/{id}", response_model=BillCategoryRead)
+@router.put("/api/v1/settings/bill-categories/{id}", response_model=BillCategoryRead)
 def update_bill_category(
     id: int,
     payload: BillCategoryUpdate,
@@ -191,6 +198,7 @@ def update_bill_category(
 
 @router.delete("/bill-categories/{id}", status_code=status.HTTP_200_OK)
 @router.delete("/settings/bill-categories/{id}", status_code=status.HTTP_200_OK)
+@router.delete("/api/v1/settings/bill-categories/{id}", status_code=status.HTTP_200_OK)
 def delete_bill_category(
     id: int,
     session: Session = Depends(get_session),
