@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 import os
 import sys
+import traceback
 
 
 @asynccontextmanager
@@ -71,19 +72,26 @@ try:
 except Exception:
     pass
 
-from app.routes import auth, users, students, sse, spp, bills, events, my, payments, receipts, reports, audit, dashboard, settings
+try:
+    from app.routes import auth, users, students, sse, spp, bills, events, my, payments, receipts, reports, audit, dashboard, settings
 
-app.include_router(settings.router, tags=["Settings"])
-app.include_router(sse.router, prefix="/sse", tags=["SSE / Real-Time"])
-app.include_router(auth.router, prefix="/auth", tags=["Auth"])
-app.include_router(users.router, prefix="/users", tags=["Users"])
-app.include_router(students.router, prefix="/students", tags=["Students"])
-app.include_router(spp.router, prefix="/spp", tags=["SPP"])
-app.include_router(bills.router, prefix="/bills", tags=["Bills (Non-SPP)"])
-app.include_router(events.router, prefix="/events", tags=["Events (Patungan)"])
-app.include_router(my.router, prefix="/my", tags=["Wali Portal"])
-app.include_router(payments.router, prefix="/payments", tags=["Payments (Fase 4)"])
-app.include_router(receipts.router, prefix="/receipts", tags=["Receipts (PDF/PNG - Fase 5)"])
-app.include_router(reports.router, prefix="/reports", tags=["Reports (Fase 5)"])
-app.include_router(audit.router, prefix="/audit-logs", tags=["Audit Trail (Fase 5)"])
-app.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard Stats (Fase 6 - B-26)"])
+    app.include_router(settings.router, tags=["Settings"])
+    app.include_router(sse.router, prefix="/sse", tags=["SSE / Real-Time"])
+    app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+    app.include_router(users.router, prefix="/users", tags=["Users"])
+    app.include_router(students.router, prefix="/students", tags=["Students"])
+    app.include_router(spp.router, prefix="/spp", tags=["SPP"])
+    app.include_router(bills.router, prefix="/bills", tags=["Bills (Non-SPP)"])
+    app.include_router(events.router, prefix="/events", tags=["Events (Patungan)"])
+    app.include_router(my.router, prefix="/my", tags=["Wali Portal"])
+    app.include_router(payments.router, prefix="/payments", tags=["Payments (Fase 4)"])
+    app.include_router(receipts.router, prefix="/receipts", tags=["Receipts (PDF/PNG - Fase 5)"])
+    app.include_router(reports.router, prefix="/reports", tags=["Reports (Fase 5)"])
+    app.include_router(audit.router, prefix="/audit-logs", tags=["Audit Trail (Fase 5)"])
+    app.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard Stats (Fase 6 - B-26)"])
+except Exception as e:
+    traceback.print_exc(file=sys.stderr)
+
+    @app.get("/debug/routes-error")
+    def routes_error():
+        return {"error": str(e)}
