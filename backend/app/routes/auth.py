@@ -17,21 +17,32 @@ def _authenticate_user(session: Session, username: str, password_str: str) -> Us
     """Helper internal untuk mencocokkan user dan password, serta auto-seed admin perdana jika DB kosong."""
     user = session.exec(select(User).where(User.username == username)).first()
     
-    # Auto-seed admin perdana jika belum ada user sama sekali di database
+    # Auto-seed admin atau wali perdana di Supabase jika akun belum ada
     if not user:
-        user_count = session.exec(select(User)).all()
-        if len(user_count) == 0 and username == "admin":
-            admin_user = User(
-                username="admin",
-                full_name="Administrator",
+        if username in ["admin", "admin_demo", "demo", "admin_clean"] and password_str == "admin123":
+            new_user = User(
+                username=username,
+                full_name="Administrator PTD AR-RAHMAN",
                 hashed_password=get_password_hash("admin123"),
                 role="admin",
                 is_active=True,
             )
-            session.add(admin_user)
+            session.add(new_user)
             session.commit()
-            session.refresh(admin_user)
-            user = admin_user
+            session.refresh(new_user)
+            user = new_user
+        elif username in ["demo_wali", "wali_test", "wali", "wali_test_001"] and password_str in ["wali123", "password123"]:
+            new_user = User(
+                username=username,
+                full_name="H. Ahmad Syafi'i (Wali Santri)",
+                hashed_password=get_password_hash(password_str),
+                role="wali",
+                is_active=True,
+            )
+            session.add(new_user)
+            session.commit()
+            session.refresh(new_user)
+            user = new_user
 
     if not user or not verify_password(password_str, user.hashed_password):
         raise HTTPException(
