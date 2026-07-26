@@ -8,7 +8,7 @@ interface SettingsContextType {
   isConnectedSSE: boolean;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://backend-ptdarrahman.vercel.app';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const DEFAULT_SETTINGS: SchoolSettings = {
   id: 'set-ptdarrahman-01',
@@ -16,8 +16,8 @@ const DEFAULT_SETTINGS: SchoolSettings = {
   address: 'Jl. Raya Pesantren No. 99, Cibinong, Bogor, Jawa Barat 16914',
   phone: '(021) 8765-4321',
   email: 'info@ptdarrahman.sch.id',
-  logo: '/download.png',
-  favicon: '/download.png',
+  logo: `${API_BASE}/settings/logo/default`,
+  favicon: `${API_BASE}/settings/logo/default`,
   spp_nominal_default: 1500000,
   academic_year_current: '2025/2026',
 };
@@ -36,7 +36,6 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isLoading, setIsLoading] = useState(false);
   const [isConnectedSSE, setIsConnectedSSE] = useState(false);
 
-  // Sync favicon and logo dynamically when settings change
   useEffect(() => {
     localStorage.setItem('spp_school_settings', JSON.stringify(settings));
 
@@ -44,8 +43,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       document.title = `SPP Panel - ${settings.name}`;
     }
 
-    // Dynamic favicon sync harmonized with Superadmin
-    const faviconUrl = settings.favicon || settings.logo || '/download.png';
+    const faviconUrl = settings.favicon || settings.logo || `${API_BASE}/settings/logo/default`;
     let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
     if (!link) {
       link = document.createElement('link');
@@ -55,54 +53,46 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     link.href = faviconUrl;
   }, [settings]);
 
-  // Harmonize logo & profile loading with Superadmin (GET /companyprofile/settings & SSE events)
   useEffect(() => {
     setIsLoading(true);
 
-    const loadSettingsFromSuperadmin = () => {
-      fetch(`${API_BASE}/companyprofile/settings`)
+    const loadSettings = () => {
+      fetch(`${API_BASE}/settings`)
         .then((res) => {
-          if (!res.ok) throw new Error('Failed to fetch company profile');
+          if (!res.ok) throw new Error('Failed to fetch settings');
           return res.json();
         })
-        .then((data: { key: string; value: string }[]) => {
-          if (Array.isArray(data)) {
-            const logo = data.find((s) => s.key === 'logo')?.value;
-            const favicon = data.find((s) => s.key === 'favicon')?.value;
-            const companyName = data.find((s) => s.key === 'company_name' || s.key === 'name')?.value;
-            const phone = data.find((s) => s.key === 'phone' || s.key === 'contact_phone')?.value;
-            const address = data.find((s) => s.key === 'address')?.value;
-            const email = data.find((s) => s.key === 'email')?.value;
+        .then((data: Record<string, string>) => {
+          if (data && typeof data === 'object') {
+            const logo = data['school_logo'] || data['logo'];
+            const schoolName = data['school_name'];
+            const phone = data['school_phone'];
+            const address = data['school_address'];
 
             setSettings((prev) => ({
               ...prev,
-              ...(logo ? { logo } : {}),
-              ...(favicon ? { favicon } : logo ? { favicon: logo } : {}),
-              ...(companyName ? { name: companyName } : {}),
+              ...(logo ? { logo, favicon: logo } : {}),
+              ...(schoolName ? { name: schoolName } : {}),
               ...(phone ? { phone } : {}),
               ...(address ? { address } : {}),
-              ...(email ? { email } : {}),
             }));
           }
         })
-        .catch(() => {
-          // Fallback gracefully to local cached settings if API is unreachable
-        })
+        .catch(() => {})
         .finally(() => {
           setIsLoading(false);
         });
     };
 
-    loadSettingsFromSuperadmin();
+    loadSettings();
 
-    // Listen to Superadmin SSE EventSource for live updates
-    const sseUrl = `${API_BASE}/companyprofile/events`;
+    const sseUrl = `${API_BASE}/sse/events`;
     let es: EventSource | null = null;
     try {
       es = new EventSource(sseUrl);
       es.addEventListener('open', () => setIsConnectedSSE(true));
-      es.addEventListener('change', () => {
-        loadSettingsFromSuperadmin();
+      es.addEventListener('settings_changed', () => {
+        loadSettings();
       });
       es.onerror = () => {
         setIsConnectedSSE(false);

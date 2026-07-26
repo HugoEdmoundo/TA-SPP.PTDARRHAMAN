@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from typing import List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Request
@@ -20,6 +21,40 @@ from app.dependencies import require_admin
 from app.routes.sse import manager
 
 router = APIRouter()
+
+DEFAULT_LOGO_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uploads", "default-logo.png")
+
+
+@router.get("/settings/logo/default")
+def get_default_logo():
+    """Serve default school logo as PNG."""
+    import io
+    from fastapi.responses import Response
+
+    if os.path.exists(DEFAULT_LOGO_PATH):
+        with open(DEFAULT_LOGO_PATH, "rb") as f:
+            return Response(content=f.read(), media_type="image/png")
+
+    # Generate a simple placeholder logo using Pillow
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        img = Image.new("RGBA", (200, 200), (26, 107, 71, 255))
+        draw = ImageDraw.Draw(img)
+        draw.ellipse([20, 20, 180, 180], fill=(255, 255, 255, 255))
+        draw.ellipse([40, 40, 160, 160], fill=(26, 107, 71, 255))
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 48)
+        except Exception:
+            font = ImageFont.load_default()
+        draw.text((100, 100), "PT", fill=(255, 255, 255, 255), anchor="mm", font=font)
+
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+        return Response(content=buf.read(), media_type="image/png")
+    except Exception:
+        return Response(content=b"", media_type="image/png", status_code=404)
+
 
 DEFAULT_SCHOOL_SETTINGS = {
     "school_name": "SMA Islam Darrahman",
