@@ -4,12 +4,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { Button, Card } from '../../components/ui';
-import { Lock, User, Shield, UserCheck, ArrowRight, Sparkles, Rocket, Users } from 'lucide-react';
+import { Lock, User, ArrowRight, Sparkles, Rocket, Users, ShieldCheck } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState<'ADMIN' | 'WALI'>('ADMIN');
   const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuth();
@@ -17,18 +16,19 @@ export const LoginPage: React.FC = () => {
   const { success, error } = useToast();
   const navigate = useNavigate();
 
-  const handleLogin = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!username || !password) {
+  const executeLogin = async (userVal: string, passVal: string) => {
+    if (!userVal || !passVal) {
       error('Input Tidak Lengkap', 'Mohon masukkan username dan kata sandi.');
       return;
     }
 
     setIsLoading(true);
     try {
-      await login(username, password);
-      success('Login Berhasil', `Selamat datang kembali.`);
-      if (selectedRole === 'WALI') {
+      const loggedUser = await login(userVal, passVal);
+      success('Login Berhasil', `Selamat datang kembali, ${loggedUser.name}.`);
+      
+      // Automatic Role-Based Navigation (Unified Auth)
+      if (loggedUser.role === 'WALI') {
         navigate('/wali');
       } else {
         navigate('/admin');
@@ -40,10 +40,15 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = (demoUsername: string, demoPassword: string, role: 'ADMIN' | 'WALI') => {
-    setUsername(demoUsername);
-    setPassword(demoPassword);
-    setSelectedRole(role);
+  const handleLogin = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    executeLogin(username, password);
+  };
+
+  const handleDemoLogin = (demoUser: string, demoPass: string) => {
+    setUsername(demoUser);
+    setPassword(demoPass);
+    executeLogin(demoUser, demoPass);
   };
 
   return (
@@ -61,50 +66,28 @@ export const LoginPage: React.FC = () => {
             />
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-obsidian tracking-tight leading-tight mb-1 font-heading">
-            {settings.name || 'PTDARRAHMAN'}
+            {settings.name || 'PTD AR-RAHMAN'}
           </h1>
           <p className="text-xs sm:text-sm text-slate font-medium">
-            Sistem Pembayaran SPP & Keuangan Pesantren
+            Portal Unified Login Keuangan & SPP Pesantren
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate/10 rounded-2xl mb-6">
-          <button
-            type="button"
-            onClick={() => setSelectedRole('ADMIN')}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
-              selectedRole === 'ADMIN'
-                ? 'bg-white text-emerald-primary shadow-sm scale-[1.02]'
-                : 'text-slate-dark hover:text-obsidian'
-            }`}
-          >
-            <Shield className="w-4 h-4" />
-            <span>Staf / Admin</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedRole('WALI')}
-            className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
-              selectedRole === 'WALI'
-                ? 'bg-white text-emerald-primary shadow-sm scale-[1.02]'
-                : 'text-slate-dark hover:text-obsidian'
-            }`}
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>Wali Santri</span>
-          </button>
+        <div className="flex items-center justify-center gap-2 mb-6 p-2.5 rounded-xl bg-emerald-light/50 border border-emerald-primary/20 text-emerald-primary text-xs font-extrabold text-center">
+          <ShieldCheck className="w-4 h-4 shrink-0" />
+          <span>Satu Pintu Akses untuk Staf Admin & Wali Santri</span>
         </div>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-obsidian mb-1.5">
-              Username
+              Username / Email
             </label>
             <div className="relative">
               <User className="w-5 h-5 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="contoh: admin"
+                placeholder="contoh: admin atau admin_demo"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian placeholder:text-slate-light focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary shadow-2xs transition-all"
@@ -144,12 +127,12 @@ export const LoginPage: React.FC = () => {
         <div className="mt-8 pt-6 border-t border-dashed border-slate/20 text-center">
           <div className="flex items-center justify-center gap-1.5 mb-3 text-xs font-extrabold text-gold-dark uppercase tracking-wider">
             <Sparkles className="w-4 h-4 text-gold-accent" />
-            <span>Akses Cepat Demo</span>
+            <span>Akses Instan Mode Showcase (Demo)</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => handleDemoLogin('admin', 'admin123', 'ADMIN')}
+              onClick={() => handleDemoLogin('admin_demo', 'admin123')}
               className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-light/60 hover:bg-emerald-primary hover:text-white text-emerald-primary text-xs font-bold border border-emerald-primary/20 transition-all active:scale-95 text-center shadow-2xs group"
             >
               <Rocket className="w-3.5 h-3.5 text-emerald-primary group-hover:text-white transition-colors" />
@@ -157,7 +140,7 @@ export const LoginPage: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => handleDemoLogin('wali', 'wali123', 'WALI')}
+              onClick={() => handleDemoLogin('demo_wali', 'wali123')}
               className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gold-bg hover:bg-gold-accent hover:text-obsidian text-gold-dark text-xs font-bold border border-gold-accent/40 transition-all active:scale-95 text-center shadow-2xs group"
             >
               <Users className="w-3.5 h-3.5 text-gold-dark group-hover:text-obsidian transition-colors" />
@@ -169,3 +152,5 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
+
+export default LoginPage;

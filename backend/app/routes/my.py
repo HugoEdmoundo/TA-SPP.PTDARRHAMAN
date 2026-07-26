@@ -14,6 +14,26 @@ from app.schemas.payments import GatewayCreateRequest, GatewayCreateResponse
 router = APIRouter()
 
 
+@router.get("/children", response_model=List[Dict[str, Any]])
+def get_my_children(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(require_wali),
+):
+    """
+    Mengambil daftar anak/siswa yang terhubug dengan akun Wali Siswa yang sedang login (B-16).
+    """
+    students_list = []
+    for s in current_user.students:
+        if s.is_active:
+            students_list.append({
+                "id": s.id,
+                "name": s.full_name,
+                "nis": s.nis,
+                "grade": s.academic_year or "Umum",
+            })
+    return students_list
+
+
 @router.get("/bills", response_model=Dict[str, Any])
 def get_my_child_bills(
     child_id: int = Query(..., description="ID siswa/anak yang ingin dilihat tagihannya"),
@@ -104,6 +124,48 @@ def get_my_child_bills(
             "unpaid_bills_count": len(spp_bills) + len(non_spp_bills) + len(event_bills),
         },
     }
+
+
+@router.get("/payments", response_model=List[Dict[str, Any]])
+def get_my_child_payments(
+    child_id: int = Query(..., description="ID siswa/anak yang ingin dilihat riwayat pembayarannya"),
+    session: Session = Depends(get_session),
+    current_user: User = Depends(require_wali),
+):
+    """
+    Mengambil riwayat pembayaran untuk siswa/anak tertentu (Wali Only / Admin).
+    """
+    if current_user.role == "wali":
+        linked_ids = [s.id for s in current_user.students]
+        if child_id not in linked_ids:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Akses ditolak: Siswa ini bukan anak yang terhubung dengan akun Wali Anda.",
+            )
+
+    payments = session.exec(
+        select(Payment).where(Payment.student_id == child_id).order_by(Payment.id.desc())
+    ).all()
+
+    result = []
+    for p in payments:
+        r_num = p.receipt.receipt_number if p.receipt else f"PAY-{p.id}"
+        is_void = p.receipt.is_void if p.receipt else False
+        ver_code = p.receipt.verification_code if p.receipt else f"PTD-VER-{p.id}"
+        result.append({
+            "id": p.id,
+            "invoice_number": p.invoice_number,
+            "receipt_number": r_num,
+            "verification_code": ver_code,
+            "payment_type": p.payment_type,
+            "amount": float(p.amount),
+            "infaq_amount": float(p.infaq_amount),
+            "total_amount": float(p.total_amount),
+            "method": p.channel or "transfer",
+            "status": "VOID" if is_void else "PAID",
+            "created_at": p.created_at.isoformat() if p.created_at else None,
+        })
+    return result
 
 
 # ─── B-22: Wali Checkout Flow Integration ────────────────────

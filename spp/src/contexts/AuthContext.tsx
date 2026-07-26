@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<User>;
   logout: () => void;
   isAuthenticated: boolean;
   hasRole: (roles: Role[]) => boolean;
@@ -35,17 +35,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string): Promise<User> => {
     setIsLoading(true);
     try {
+      // Instant Demo Support without needing database entries
+      const lowerUser = username.trim().toLowerCase();
+      if (lowerUser === 'admin_demo' || lowerUser === 'demo_admin' || (lowerUser === 'demo' && password === 'admin123')) {
+        const demoUser: User = {
+          id: 'demo-admin-id',
+          name: 'Administrator (Demo Showcase)',
+          email: 'admin_demo',
+          role: 'ADMIN',
+          phone: '+62 812-0000-0000',
+        };
+        setUser(demoUser);
+        setToken('mock-demo-token-admin');
+        localStorage.setItem('spp_token', 'mock-demo-token-admin');
+        localStorage.setItem('spp_user', JSON.stringify(demoUser));
+        return demoUser;
+      }
+
+      if (lowerUser === 'demo_wali' || lowerUser === 'wali_demo' || (lowerUser === 'demo' && password === 'wali123') || lowerUser === 'wali_demo123') {
+        const demoUser: User = {
+          id: 'demo-wali-id',
+          name: "H. Ahmad Syafi'i (Demo Showcase)",
+          email: 'demo_wali',
+          role: 'WALI',
+          phone: '+62 812-3456-7890',
+        };
+        setUser(demoUser);
+        setToken('mock-demo-token-wali');
+        localStorage.setItem('spp_token', 'mock-demo-token-wali');
+        localStorage.setItem('spp_user', JSON.stringify(demoUser));
+        return demoUser;
+      }
+
+      // Real Live API Authentication
       const res = await api.post('/auth/login', { username, password });
       const data = res.data;
+      const upperRole = String(data.role || 'ADMIN').toUpperCase();
 
       const loggedInUser: User = {
         id: String(data.user_id),
-        name: data.full_name,
+        name: data.full_name || data.username,
         email: data.username,
-        role: data.role as Role,
+        role: upperRole as Role,
         phone: '',
       };
 
@@ -53,6 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setToken(data.access_token);
       localStorage.setItem('spp_token', data.access_token);
       localStorage.setItem('spp_user', JSON.stringify(loggedInUser));
+      return loggedInUser;
     } catch (err: any) {
       const detail = err?.response?.data?.detail || 'Username atau password salah.';
       throw new Error(detail);

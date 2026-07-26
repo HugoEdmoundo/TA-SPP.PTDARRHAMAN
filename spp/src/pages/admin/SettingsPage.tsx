@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Card, Button, InputCurrency, LogoInput } from '../../components/ui';
-import { Settings, Save, RefreshCw, Building, Phone, Mail, MapPin, Calendar, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+import { Settings, Save, RefreshCw, Building, Phone, Mail, MapPin, Calendar, CheckCircle2, Image as ImageIcon, Sparkles } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
   const { settings, updateSettings } = useSettings();
   const { success } = useToast();
+  const { user } = useAuth();
+
+  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
 
   const [name, setName] = useState(settings.name);
   const [address, setAddress] = useState(settings.address);
@@ -49,6 +53,15 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto">
+      {isDemo && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-100 border border-amber-300 p-4 rounded-2xl text-amber-900 text-xs font-bold">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
+            <span>Mode Showcase Demo: Anda sedang melihat pengaturan simulasi pesantren. Beralih ke akun Admin Real untuk pengujian live.</span>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

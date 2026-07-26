@@ -26,6 +26,7 @@ class AuditLogRead(BaseModel):
 
 
 @router.get("", response_model=Dict[str, Any])
+@router.get("/", response_model=Dict[str, Any])
 def get_audit_logs(
     user_id: Optional[int] = Query(None, description="Filter by User ID"),
     action: Optional[str] = Query(None, description="Filter by Action Type"),

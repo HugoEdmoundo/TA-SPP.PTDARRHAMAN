@@ -4,7 +4,7 @@ import type { BillStatus, PaymentStatus } from '../../types';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'gold';
-  status?: BillStatus | PaymentStatus;
+  status?: BillStatus | PaymentStatus | string;
   pulse?: boolean;
   size?: 'sm' | 'md';
 }
@@ -26,8 +26,9 @@ export const Badge: React.FC<BadgeProps> = ({
     switch (status) {
       case 'PAID':
       case 'SUCCESS':
+      case 'ACTIVE':
         determinedVariant = 'success';
-        label = label || (status === 'PAID' ? 'Lunas' : 'Berhasil');
+        label = label || (status === 'PAID' ? 'Lunas' : status === 'ACTIVE' ? 'Aktif' : 'Berhasil');
         break;
       case 'PARTIAL':
         determinedVariant = 'gold';

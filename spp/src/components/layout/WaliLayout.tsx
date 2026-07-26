@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '../../utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { api } from '../../api/client';
 import { 
   Home, 
   CreditCard, 
@@ -22,24 +23,49 @@ export const WaliLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isDemo = user?.email === 'demo' || user?.email === 'demo_wali' || user?.name?.toLowerCase().includes('demo');
+
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [isChildSelectorOpen, setIsChildSelectorOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const profileRef = useRef<HTMLDivElement>(null);
 
-  // Mock children list for Wali
-  const [selectedChild, setSelectedChild] = useState({
-    id: 'std-01',
-    name: "Muhammad Faiz Syafi'i",
-    nis: '20240105',
-    grade: 'XI-IPA-1',
-  });
-
-  const childrenList = [
+  const mockChildren = [
     { id: 'std-01', name: "Muhammad Faiz Syafi'i", nis: '20240105', grade: 'XI-IPA-1' },
     { id: 'std-02', name: "Aisyah Zahra Syafi'i", nis: '20250218', grade: 'X-A' },
   ];
+
+  const [childrenList, setChildrenList] = useState<any[]>(isDemo ? mockChildren : []);
+  const [selectedChild, setSelectedChild] = useState<any>(isDemo ? mockChildren[0] : {
+    id: 'empty',
+    name: 'Belum Ada Santri Terhubung',
+    nis: '-',
+    grade: '-',
+  });
+
+  useEffect(() => {
+    if (isDemo) {
+      setChildrenList(mockChildren);
+      setSelectedChild(mockChildren[0]);
+      return;
+    }
+    const fetchChildren = async () => {
+      try {
+        const res = await api.get('/my/children');
+        const list = res.data || [];
+        setChildrenList(list);
+        if (list.length > 0) {
+          setSelectedChild(list[0]);
+        } else {
+          setSelectedChild({ id: 'empty', name: 'Belum Ada Santri Terhubung', nis: '-', grade: '-' });
+        }
+      } catch (err) {
+        console.error('Failed to fetch wali children:', err);
+      }
+    };
+    fetchChildren();
+  }, [isDemo]);
 
   // Close profile dropdown on outside click
   useEffect(() => {

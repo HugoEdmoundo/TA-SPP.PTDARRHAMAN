@@ -1,0 +1,555 @@
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, formatDateIndo } from '../../components/ui';
+import { useToast } from '../../components/ui/ToastContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../api/client';
+import { Calendar, Plus, Search, CheckCircle2, Eye, Users, TrendingUp } from 'lucide-react';
+import type { Student } from '../../types';
+
+export const EventsPage: React.FC = () => {
+  const { user } = useAuth();
+  const { success, error: toastError } = useToast();
+
+  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
+
+  const [events, setEvents] = useState<any[]>([]);
+  const [allStudents, setAllStudents] = useState<Student[]>([]);
+  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Modals
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
+  const [trackingData, setTrackingData] = useState<any | null>(null);
+  const [isTrackingLoading, setIsTrackingLoading] = useState(false);
+
+  // Form States
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [perStudentAmount, setPerStudentAmount] = useState(1500000);
+  const [deadline, setDeadline] = useState('2026-11-30');
+  const [allowInstallment, setAllowInstallment] = useState(true);
+  const [minInstallmentAmount, setMinInstallmentAmount] = useState(300000);
+  const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
+  const [selectAllStudents, setSelectAllStudents] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchData = async () => {
+    if (isDemo) return;
+    setIsLoading(true);
+    try {
+      const [eventsRes, studentsRes] = await Promise.all([
+        api.get('/events/'),
+        api.get('/students/?limit=500&is_active=true'),
+      ]);
+      setEvents(eventsRes.data || []);
+      setAllStudents(studentsRes.data || []);
+    } catch (err: any) {
+      toastError('Gagal Memuat Event', err?.response?.data?.detail || 'Terjadi kesalahan koneksi.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [isDemo]);
+
+  const handleOpenAdd = () => {
+    setName('');
+    setDescription('');
+    setPerStudentAmount(1500000);
+    setDeadline('2026-11-30');
+    setAllowInstallment(true);
+    setMinInstallmentAmount(300000);
+    setSelectedStudentIds(allStudents.map(s => Number(s.id)));
+    setSelectAllStudents(true);
+    setShowAddModal(true);
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectAllStudents) {
+      setSelectedStudentIds([]);
+      setSelectAllStudents(false);
+    } else {
+      setSelectedStudentIds(allStudents.map(s => Number(s.id)));
+      setSelectAllStudents(true);
+    }
+  };
+
+  const handleToggleStudent = (sid: number) => {
+    if (selectedStudentIds.includes(sid)) {
+      setSelectedStudentIds(selectedStudentIds.filter(id => id !== sid));
+      setSelectAllStudents(false);
+    } else {
+      const next = [...selectedStudentIds, sid];
+      setSelectedStudentIds(next);
+      if (next.length === allStudents.length) setSelectAllStudents(true);
+    }
+  };
+
+  const handleCreateEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || perStudentAmount <= 0 || selectedStudentIds.length === 0) {
+      toastError('Form Tidak Lengkap', 'Nama event, nominal per siswa, dan minimal 1 peserta wajib diisi.');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await api.post('/events/', {
+        name,
+        description,
+        per_student_amount: perStudentAmount,
+        student_ids: selectedStudentIds,
+        deadline: deadline || null,
+        allow_installment: allowInstallment,
+        min_installment_amount: allowInstallment ? minInstallmentAmount : null,
+      });
+      success('Event Patungan Diterbitkan', `Kegiatan "${name}" berhasil dibuat dan tagihan otomatis dikirim ke ${selectedStudentIds.length} santri.`);
+      setShowAddModal(false);
+      fetchData();
+    } catch (err: any) {
+      toastError('Gagal Menerbitkan Event', err?.response?.data?.detail || 'Terjadi kesalahan sistem.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOpenTracking = async (event: any) => {
+    setShowTrackingModal(true);
+    setIsTrackingLoading(true);
+    try {
+      const res = await api.get(`/events/${event.id}/tracking`);
+      setTrackingData(res.data);
+    } catch (err: any) {
+      toastError('Gagal Memuat Progres', err?.response?.data?.detail || 'Terjadi kesalahan.');
+      setShowTrackingModal(false);
+    } finally {
+      setIsTrackingLoading(false);
+    }
+  };
+
+  const handleCompleteEvent = async (eventId: number, eventName: string) => {
+    try {
+      await api.post(`/events/${eventId}/complete`);
+      success('Event Selesai', `Kegiatan "${eventName}" resmi ditandai selesai/lunas.`);
+      setShowTrackingModal(false);
+      fetchData();
+    } catch (err: any) {
+      toastError('Gagal Menyelesaikan Event', err?.response?.data?.detail || 'Hanya event aktif yang dapat diselesaikan.');
+    }
+  };
+
+  const filteredEvents = events.filter(ev => 
+    !searchTerm || ev.name.toLowerCase().includes(searchTerm.toLowerCase()) || ev.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (isDemo) {
+    return (
+      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-1">
+              <span>Mode Showcase Demo</span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
+              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
+              <span>Event & Patungan Sekolah</span>
+            </h2>
+            <p className="text-xs text-slate mt-1">Kelola donasi, infaq pembangunan, study tour, dan kegiatan dengan progres bar real-time (Fase 4: B-14 & F-11).</p>
+          </div>
+          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Buat Event', 'Beralih ke akun Admin Real untuk membuat kegiatan patungan dengan tagihan otomatis.')} className="shrink-0 w-full sm:w-auto justify-center">Buat Event Baru</Button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card variant="elevated" padding="sm" className="p-5 bg-white/90 border border-slate/15 flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-sm font-extrabold text-obsidian block font-heading">Patungan Study Tour Yogyakarta</span>
+                <Badge status="PAID">Aktif</Badge>
+              </div>
+              <p className="text-xs text-slate mb-3">Kegiatan kunjungan studi kampus dan budaya untuk siswa kelas 11 selama 3 hari.</p>
+              <div className="flex items-center justify-between text-xs font-mono font-bold text-obsidian mb-1">
+                <span>Terkumpul: Rp 72.000.000</span>
+                <span className="text-emerald-primary">80%</span>
+              </div>
+              <div className="w-full h-2.5 bg-slate/10 rounded-full overflow-hidden mb-3">
+                <div className="h-full bg-emerald-primary rounded-full" style={{ width: '80%' }}></div>
+              </div>
+              <div className="flex justify-between text-[11px] text-slate font-medium">
+                <span>Target: Rp 90.000.000 (60 Siswa)</span>
+                <span>Cicilan: Min. Rp 300.000</span>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" leftIcon={<Eye className="w-4 h-4" />} onClick={() => success('Simulasi Progres', 'Menampilkan progres kontribusi santri dalam mode Demo.')} className="mt-4 w-full justify-center">Lihat Progres Siswa</Button>
+          </Card>
+
+          <Card variant="elevated" padding="sm" className="p-5 bg-white/90 border border-slate/15 flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-sm font-extrabold text-obsidian block font-heading">Infaq Pembangunan Masjid Pesantren</span>
+                <Badge status="PAID">Aktif</Badge>
+              </div>
+              <p className="text-xs text-slate mb-3">Donasi perluasan lantai 2 masjid Al-Hikmah untuk sarana ibadah santri.</p>
+              <div className="flex items-center justify-between text-xs font-mono font-bold text-obsidian mb-1">
+                <span>Terkumpul: Rp 45.500.000</span>
+                <span className="text-emerald-primary">45.5%</span>
+              </div>
+              <div className="w-full h-2.5 bg-slate/10 rounded-full overflow-hidden mb-3">
+                <div className="h-full bg-emerald-primary rounded-full" style={{ width: '45.5%' }}></div>
+              </div>
+              <div className="flex justify-between text-[11px] text-slate font-medium">
+                <span>Target: Rp 100.000.000</span>
+                <span>Sukarela / Boleh Cicil</span>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" leftIcon={<Eye className="w-4 h-4" />} onClick={() => success('Simulasi Progres', 'Menampilkan progres kontribusi santri dalam mode Demo.')} className="mt-4 w-full justify-center">Lihat Progres Siswa</Button>
+          </Card>
+        </div>
+
+        <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
+          ✨ Menampilkan kegiatan contoh (Mode Showcase Demo). Gunakan akun <b>admin / admin123</b> atau <b>admin_clean / admin123</b> untuk pengujian CRUD real-time.
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold uppercase tracking-wider mb-1">
+              <span>Database Real-Time SQLite</span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
+              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
+              <span>Event & Patungan Sekolah</span>
+            </h2>
+            <p className="text-xs text-slate mt-1">Buat kegiatan patungan (study tour, infaq, kurban) dan pantau progres dana terkumpul secara transparan.</p>
+          </div>
+          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd} className="shrink-0 w-full sm:w-auto justify-center">
+            Buat Event Baru
+          </Button>
+        </div>
+
+        <div className="relative w-full sm:w-72">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate/50" />
+          <input
+            type="text"
+            placeholder="Cari nama kegiatan atau deskripsi..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate/20 bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+          />
+        </div>
+      </Card>
+
+      {isLoading ? (
+        <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
+          <Spinner size="lg" color="emerald" />
+          <span className="text-xs text-slate mt-3 font-semibold">Memuat event dan patungan dari database...</span>
+        </Card>
+      ) : filteredEvents.length === 0 ? (
+        <Card variant="glass" padding="lg">
+          <EmptyState
+            title="Belum Ada Event Patungan"
+            description={searchTerm ? `Tidak ada kegiatan dengan kata kunci "${searchTerm}".` : "Database event saat ini masih bersih (0 record). Klik tombol Buat Event Baru di atas untuk memulai kampanye patungan study tour, kurban, atau infaq."}
+            action={!searchTerm ? <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd}>Buat Event Sekarang</Button> : undefined}
+          />
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredEvents.map((ev: any) => {
+            const isCompleted = ev.status === 'completed' || ev.status === 'COMPLETED';
+            return (
+              <Card key={ev.id} variant="elevated" padding="sm" className="p-5 bg-white/95 border border-slate/15 flex flex-col justify-between hover:shadow-xl transition-all">
+                <div>
+                  <div className="flex justify-between items-start gap-2 mb-2">
+                    <h4 className="text-base font-extrabold text-obsidian font-heading leading-snug">{ev.name}</h4>
+                    {isCompleted ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate/15 text-slate text-[10px] font-bold shrink-0">
+                        <CheckCircle2 className="w-3 h-3" /> Selesai
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold shrink-0">
+                        <TrendingUp className="w-3 h-3" /> Aktif
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-slate mb-4 line-clamp-2 min-h-[32px]">{ev.description || 'Tidak ada deskripsi rinci.'}</p>
+
+                  <div className="p-3 rounded-xl bg-slate/5 border border-slate/10 flex flex-col gap-1.5 text-xs mb-4">
+                    <div className="flex justify-between">
+                      <span className="text-slate">Target Total:</span>
+                      <span className="font-mono font-bold text-obsidian">{formatRupiah(Number(ev.total_target))}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate">Per Siswa:</span>
+                      <span className="font-mono font-bold text-emerald-primary">{formatRupiah(Number(ev.per_student_amount))}</span>
+                    </div>
+                    {ev.deadline && (
+                      <div className="flex justify-between pt-1 border-t border-slate/10">
+                        <span className="text-slate">Jatuh Tempo:</span>
+                        <span className="font-semibold text-obsidian">{formatDateIndo(ev.deadline)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  leftIcon={<Eye className="w-4 h-4" />}
+                  onClick={() => handleOpenTracking(ev)}
+                  className="w-full justify-center"
+                >
+                  Lihat Progres Kontribusi
+                </Button>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Modal Add Event */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
+          <Card variant="elevated" padding="lg" className="w-full max-w-lg bg-white border border-slate/20 shadow-2xl relative max-h-[90vh] flex flex-col">
+            <h3 className="text-base font-extrabold text-obsidian mb-4 font-heading flex items-center gap-2 shrink-0">
+              <Plus className="w-5 h-5 text-emerald-primary" />
+              <span>Buat Event Patungan Baru</span>
+            </h3>
+
+            <form onSubmit={handleCreateEvent} className="flex flex-col gap-3.5 text-xs overflow-y-auto pr-1 flex-1 min-h-0">
+              <div>
+                <label className="font-bold text-obsidian block mb-1">Nama Kegiatan / Event *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Misal: Patungan Study Tour Bandung Kelas 11..."
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-obsidian block mb-1">Nominal per Siswa (Rp) *</label>
+                  <InputCurrency
+                    value={perStudentAmount}
+                    onChange={(val) => setPerStudentAmount(val)}
+                    placeholder="Rp 0"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-obsidian block mb-1">Batas Waktu (Deadline)</label>
+                  <input
+                    type="date"
+                    value={deadline}
+                    onChange={(e) => setDeadline(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-slate/5 border border-slate/15 items-center">
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-obsidian">
+                  <input
+                    type="checkbox"
+                    checked={allowInstallment}
+                    onChange={(e) => setAllowInstallment(e.target.checked)}
+                    className="rounded text-emerald-primary focus:ring-0"
+                  />
+                  <span>Boleh Dicicil (Installment)</span>
+                </label>
+                {allowInstallment && (
+                  <div>
+                    <label className="font-bold text-obsidian block mb-1">Min. Nominal Cicilan (Rp)</label>
+                    <InputCurrency
+                      value={minInstallmentAmount}
+                      onChange={(val) => setMinInstallmentAmount(val)}
+                      placeholder="Rp 0"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="font-bold text-obsidian block mb-1">Deskripsi Kegiatan</label>
+                <textarea
+                  rows={2}
+                  placeholder="Tujuan, rincian biaya, dan fasilitas kegiatan..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                />
+              </div>
+
+              {/* Student Selector */}
+              <div className="border border-slate/20 rounded-xl p-3 bg-slate/5 mt-1">
+                <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate/15">
+                  <span className="font-bold text-obsidian flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-emerald-primary" />
+                    <span>Peserta Kegiatan ({selectedStudentIds.length} Siswa Terpilih)</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleToggleSelectAll}
+                    className="text-emerald-primary font-bold hover:underline"
+                  >
+                    {selectAllStudents ? 'Batal Pilih Semua' : 'Pilih Semua Santri'}
+                  </button>
+                </div>
+
+                {allStudents.length === 0 ? (
+                  <div className="text-center py-4 text-slate italic">Belum ada data santri di database.</div>
+                ) : (
+                  <div className="max-h-36 overflow-y-auto pr-1 flex flex-col gap-1.5">
+                    {allStudents.map((st: any) => {
+                      const sid = Number(st.id);
+                      const isSelected = selectedStudentIds.includes(sid);
+                      return (
+                        <label
+                          key={st.id}
+                          className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer transition-colors ${isSelected ? 'bg-emerald-light/40 border-emerald-primary/30 font-bold' : 'bg-white border-slate/15 hover:bg-slate/5'}`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleToggleStudent(sid)}
+                              className="rounded text-emerald-primary focus:ring-0"
+                            />
+                            <span className="truncate">{st.full_name || st.name}</span>
+                          </div>
+                          <span className="font-mono text-[10px] text-slate shrink-0">NIS: {st.nis}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15 shrink-0">
+                <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
+                <Button type="submit" variant="primary" size="sm" disabled={selectedStudentIds.length === 0 || perStudentAmount <= 0} isLoading={isSubmitting}>
+                  Terbitkan Event & Tagihan ({selectedStudentIds.length} Siswa)
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
+
+      {/* Modal Tracking Progres */}
+      {showTrackingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
+          <Card variant="elevated" padding="lg" className="w-full max-w-3xl bg-white border border-slate/20 shadow-2xl relative max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-slate/15 pb-3 mb-4 shrink-0">
+              <div>
+                <h3 className="text-base font-extrabold text-obsidian font-heading">Progres Kontribusi Santri</h3>
+                <span className="text-xs text-slate">{trackingData?.event?.name || 'Memuat...'}</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setShowTrackingModal(false)}>Tutup</Button>
+            </div>
+
+            {isTrackingLoading ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <Spinner size="md" color="emerald" />
+                <span className="text-xs text-slate mt-2">Menghitung akumulasi cicilan...</span>
+              </div>
+            ) : trackingData ? (
+              <div className="flex flex-col gap-4 overflow-y-auto pr-1 flex-1 min-h-0">
+                {/* Summary Box */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-emerald-light/20 border border-emerald-primary/20 shrink-0">
+                  <div>
+                    <span className="text-[11px] text-slate block">Total Target Dana</span>
+                    <span className="text-sm font-mono font-bold text-obsidian">{formatRupiah(Number(trackingData.total_target))}</span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-slate block">Dana Terkumpul</span>
+                    <span className="text-sm font-mono font-bold text-emerald-primary">{formatRupiah(Number(trackingData.total_collected))}</span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-slate block">Persentase Progres</span>
+                    <span className="text-sm font-extrabold text-emerald-primary">{trackingData.progress_pct}%</span>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="w-full h-3 bg-slate/10 rounded-full overflow-hidden shrink-0">
+                  <div className="h-full bg-emerald-primary rounded-full transition-all duration-500" style={{ width: `${Math.min(100, trackingData.progress_pct)}%` }}></div>
+                </div>
+
+                {/* Students Table */}
+                <div className="overflow-x-auto border border-slate/20 rounded-xl">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-slate/10 font-bold text-slate border-b border-slate/20">
+                        <th className="p-2.5 pl-4">NIS / Nama Santri</th>
+                        <th className="p-2.5 text-right">Target</th>
+                        <th className="p-2.5 text-right">Dibayar</th>
+                        <th className="p-2.5 text-right">Sisa</th>
+                        <th className="p-2.5 text-center">Cicilan</th>
+                        <th className="p-2.5 text-center">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate/10">
+                      {trackingData.students && trackingData.students.length > 0 ? (
+                        trackingData.students.map((st: any) => {
+                          const isPaid = st.status === 'paid' || st.status === 'PAID';
+                          return (
+                            <tr key={st.student_id} className="hover:bg-slate/5">
+                              <td className="p-2.5 pl-4 font-bold text-obsidian">
+                                <div>{st.name}</div>
+                                <span className="text-[10px] font-mono text-slate font-normal">NIS: {st.nis}</span>
+                              </td>
+                              <td className="p-2.5 font-mono text-right">{formatRupiah(Number(st.target))}</td>
+                              <td className="p-2.5 font-mono font-bold text-emerald-primary text-right">{formatRupiah(Number(st.paid))}</td>
+                              <td className="p-2.5 font-mono text-slate text-right">{formatRupiah(Number(st.remaining))}</td>
+                              <td className="p-2.5 font-mono text-center">{st.installment_count}x</td>
+                              <td className="p-2.5 text-center">
+                                {isPaid ? (
+                                  <span className="px-2 py-0.5 rounded bg-emerald-light text-emerald-primary font-bold text-[10px]">Lunas</span>
+                                ) : st.paid > 0 ? (
+                                  <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-bold text-[10px]">Nyicil</span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded bg-rose-light text-rose-danger font-bold text-[10px]">Belum</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="p-4 text-center text-slate italic">Belum ada siswa terdaftar pada event ini.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : null}
+
+            {trackingData && trackingData.event?.status === 'active' && (
+              <div className="flex justify-end gap-2.5 mt-4 pt-3 border-t border-slate/15 shrink-0">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => handleCompleteEvent(trackingData.event.id, trackingData.event.name)}
+                >
+                  Tandai Event Selesai / Lunas
+                </Button>
+              </div>
+            )}
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default EventsPage;

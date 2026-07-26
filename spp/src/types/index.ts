@@ -1,8 +1,10 @@
-export type Role = 'ADMIN' | 'SUPERADMIN' | 'WALI' | 'BENDAHARA';
+export type Role = 'ADMIN' | 'SUPERADMIN' | 'WALI' | 'BENDAHARA' | string;
 
 export interface User {
   id: string;
   name: string;
+  full_name?: string;
+  username?: string;
   email: string;
   role: Role;
   phone?: string;
@@ -15,9 +17,10 @@ export interface Student {
   nis: string;
   nisn?: string;
   name: string;
+  full_name?: string;
   grade: string; // e.g. "X-A", "XI-IPA-1", "XII-IPS-2"
   class_name?: string;
-  status: 'ACTIVE' | 'GRADUATED' | 'DROPPED_OUT';
+  status: 'ACTIVE' | 'GRADUATED' | 'DROPPED_OUT' | string;
   parent_id?: string;
   parent?: Parent;
   created_at?: string;
@@ -46,7 +49,7 @@ export interface SchoolSettings {
   updated_at?: string;
 }
 
-export type BillStatus = 'UNPAID' | 'PARTIAL' | 'PAID' | 'OVERDUE' | 'VOID';
+export type BillStatus = 'UNPAID' | 'PARTIAL' | 'PAID' | 'OVERDUE' | 'VOID' | 'ACTIVE' | string;
 
 export interface SppBill {
   id: string;
@@ -112,13 +115,13 @@ export interface EventContribution {
   created_at: string;
 }
 
-export type PaymentMethod = 'QRIS' | 'VA_BCA' | 'VA_MANDIRI' | 'VA_BRI' | 'VA_BNI' | 'EWALLET_GOPAY' | 'EWALLET_OVO' | 'MANUAL_CASH' | 'MANUAL_TRANSFER';
-export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'EXPIRED' | 'REFUNDED';
+export type PaymentMethod = string;
+export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'EXPIRED' | 'REFUNDED' | 'VOID' | string;
 
 export interface PaymentItem {
   id: string;
   payment_id: string;
-  item_type: 'SPP' | 'NON_SPP' | 'EVENT' | 'INFAQ';
+  item_type: 'SPP' | 'NON_SPP' | 'EVENT' | 'INFAQ' | string;
   reference_id?: string; // Bill ID or Event ID
   title: string;
   nominal: number;
@@ -149,6 +152,7 @@ export interface Receipt {
   payment?: Payment;
   pdf_url?: string;
   verification_code: string;
+  is_void?: boolean;
   created_at: string;
 }
 

@@ -433,3 +433,25 @@ def void_payment_by_id(
         "receipt": ReceiptRead.model_validate(receipt),
     }
 
+
+@router.get("", response_model=List[PaymentRead])
+@router.get("/", response_model=List[PaymentRead])
+def list_all_payments(
+    student_id: Optional[int] = None,
+    payment_type: Optional[str] = None,
+    method: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 100,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """Menampilkan daftar seluruh pembayaran untuk Admin."""
+    query = select(Payment).order_by(Payment.created_at.desc())
+    if student_id:
+        query = query.where(Payment.student_id == student_id)
+    if payment_type:
+        query = query.where(Payment.payment_type == payment_type)
+    if method:
+        query = query.where(Payment.method == method)
+    query = query.offset(skip).limit(limit)
+    return session.exec(query).all()
