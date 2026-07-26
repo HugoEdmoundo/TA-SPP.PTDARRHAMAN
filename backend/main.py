@@ -3,13 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 import os
-from app.database import init_db
-from app.config import get_settings
+import sys
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_db()
+    try:
+        from app.database import init_db
+        init_db()
+    except Exception as e:
+        print(f"[WARN] init_db failed: {e}", file=sys.stderr)
     yield
 
 
@@ -61,6 +64,7 @@ except ImportError:
 
 try:
     from fastapi.staticfiles import StaticFiles
+    from app.config import get_settings
     settings_cfg = get_settings()
     os.makedirs(settings_cfg.upload_dir, exist_ok=True)
     app.mount(f"/{settings_cfg.upload_dir}", StaticFiles(directory=settings_cfg.upload_dir), name="uploads")
