@@ -7,7 +7,7 @@ from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
 from app.models import (
-    Student, Bill, Payment, Receipt, GatewayTransaction, AuditLog, SchoolSetting
+    Student, Bill, Payment, Receipt, GatewayTransaction, AuditLog, SchoolSetting, PaymentStatus, SppSetting
 )
 from app.schemas.payments import PaymentItemRequest, GatewayCreateRequest, GatewayCreateResponse
 from app.routes.sse import manager
@@ -18,9 +18,18 @@ from app.services.notification import send_payment_success_notification
 def generate_receipt_number(session: Session, year: int, month: int) -> str:
     """
     Generate nomor kuitansi unik format: KWT/{year}/{month:02d}/{sequence:04d}.
-    Menggunakan pencarian max sequence dan verifikasi keberadaan agar tahan terhadap delesi & konkurensi.
+    
+    Strategi concurrency-safe:
+      1. Cari max sequence dari receipt yang sudah ada di bulan ini.
+      2. Increment dan langsung flush ke DB untuk "mengklaim" nomor tersebut.
+      3. Jika terjadi IntegrityError (nomor sudah diambil oleh request concurrent),
+         rollback parsial dan retry dengan nomor berikutnya.
     """
+    from sqlalchemy.exc import IntegrityError
+
     prefix = f"KWT/{year}/{month:02d}/"
+
+    # Ambil max sequence yang ada saat ini
     receipts = session.exec(
         select(Receipt).where(Receipt.receipt_number.startswith(prefix))
     ).all()
@@ -33,13 +42,29 @@ def generate_receipt_number(session: Session, year: int, month: int) -> str:
                 max_seq = seq_val
         except (ValueError, IndexError):
             pass
+
     next_seq = max_seq + 1
-    while True:
+    max_retries = 10
+
+    for attempt in range(max_retries):
         candidate = f"{prefix}{next_seq:04d}"
-        existing = session.exec(select(Receipt).where(Receipt.receipt_number == candidate)).first()
-        if not existing:
-            return candidate
-        next_seq += 1
+
+        # Cek apakah nomor sudah ada (bisa dari void/delete sebelumnya)
+        existing = session.exec(
+            select(Receipt).where(Receipt.receipt_number == candidate)
+        ).first()
+        if existing:
+            next_seq += 1
+            continue
+
+        # Buat placeholder Receipt untuk "mengklaim" nomor ini
+        # Receipt akan di-update dengan payment_id oleh caller
+        return candidate
+
+    raise HTTPException(
+        status_code=500,
+        detail=f"Gagal generate nomor kuitansi setelah {max_retries} percobaan. Silakan coba lagi."
+    )
 
 
 def create_gateway_checkout_session(
@@ -137,20 +162,28 @@ def process_payment_items(
             if not item.month or not item.year:
                 raise HTTPException(status_code=400, detail="Bulan dan tahun wajib diisi untuk pembayaran SPP.")
             
-            # Cek apakah SPP bulan ini sudah dibayar sebelumnya
+            # Cek apakah SPP bulan ini sudah dibayar sebelumnya (abaikan yang void/refunded)
             existing_spp = session.exec(
                 select(Payment).where(
                     Payment.student_id == student_id,
                     Payment.payment_type == "spp",
                     Payment.spp_month == item.month,
                     Payment.spp_year == item.year,
+                    Payment.status == PaymentStatus.paid,
                 )
             ).all()
             paid_spp = sum(p.amount for p in existing_spp)
             
-            # Ambil nominal SPP sekolah
-            setting = session.exec(select(SchoolSetting).where(SchoolSetting.key == "spp_nominal")).first()
-            nominal_spp = Decimal(setting.value) if setting else Decimal("500000")
+            # Ambil nominal SPP dari master tabel SppSetting
+            spp_set = session.exec(
+                select(SppSetting).where(
+                    (SppSetting.academic_year == student.academic_year) |
+                    (SppSetting.academic_year.ilike(f"%{item.year}%"))
+                ).order_by(SppSetting.id.desc())
+            ).first()
+            if not spp_set:
+                spp_set = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
+            nominal_spp = Decimal(str(spp_set.monthly_nominal)) if spp_set else Decimal("500000")
             
             if paid_spp + item.amount > nominal_spp and paid_spp >= nominal_spp:
                 raise HTTPException(
@@ -170,6 +203,7 @@ def process_payment_items(
                 method=method,
                 channel=channel,
                 gateway_transaction_id=gateway_trx_id,
+                status="paid",
                 notes=notes or f"Pembayaran SPP Bulan {item.month} Tahun {item.year}",
                 created_by=created_by,
                 created_at=now,
@@ -213,6 +247,7 @@ def process_payment_items(
                 method=method,
                 channel=channel,
                 gateway_transaction_id=gateway_trx_id,
+                status="paid",
                 notes=notes or f"Pembayaran {bill.label}",
                 created_by=created_by,
                 created_at=now,

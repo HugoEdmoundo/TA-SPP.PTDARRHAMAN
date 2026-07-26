@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 
 from app.database import get_session
 from app.models import (
-    User, Student, Bill, Payment, Receipt, GatewayTransaction, AuditLog, ParentStudent, Event
+    User, Student, Bill, Payment, Receipt, GatewayTransaction, AuditLog, ParentStudent, Event, PaymentStatus
 )
 from app.routes.sse import manager
 from app.dependencies import get_current_user, require_admin
@@ -263,6 +263,9 @@ def void_receipt(
     receipt.voided_by = admin.id
     receipt.voided_at = now
     session.add(receipt)
+    if payment:
+        payment.status = PaymentStatus.refunded
+        session.add(payment)
 
     audit = AuditLog(
         user_id=admin.id,
@@ -376,12 +379,14 @@ def void_payment_by_id(
 
     now = datetime.utcnow()
 
-    # 1. Update Receipt Status
+    # 1. Update Receipt & Payment Status
     receipt.is_void = True
     receipt.void_reason = reason
     receipt.voided_by = admin.id
     receipt.voided_at = now
+    payment.status = PaymentStatus.refunded
     session.add(receipt)
+    session.add(payment)
 
     # 2. Recalculate Bill Status if applicable
     if payment.bill_id:

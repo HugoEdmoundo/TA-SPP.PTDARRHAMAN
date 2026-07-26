@@ -70,6 +70,7 @@ class PaymentRead(BaseModel):
     channel: str
     gateway_transaction_id: Optional[str] = None
     notes: Optional[str] = None
+    status: str = "paid"
     created_at: datetime
     receipt: Optional[ReceiptRead] = None
 

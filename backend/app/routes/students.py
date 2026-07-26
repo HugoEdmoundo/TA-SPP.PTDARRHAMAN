@@ -8,7 +8,7 @@ from sqlmodel import Session, select
 from sqlalchemy import or_
 
 from app.database import get_session
-from app.models import Student, User, ParentStudent, AuditLog
+from app.models import Student, User, ParentStudent, AuditLog, StudentStatus
 from app.schemas.students import (
     StudentCreate,
     StudentUpdate,
@@ -42,6 +42,7 @@ def get_my_children(
 
 @router.get("/", response_model=List[StudentRead])
 def list_students(
+    status_filter: Optional[StudentStatus] = Query(None, alias="status", description="Filter status enum"),
     is_active: Optional[bool] = Query(None, description="Filter status aktif"),
     search: Optional[str] = Query(None, description="Cari nama atau NIS"),
     academic_year: Optional[str] = Query(None, description="Filter tahun ajaran"),
@@ -55,6 +56,8 @@ def list_students(
     
     if is_active is not None:
         query = query.where(Student.is_active == is_active)
+    if status_filter is not None:
+        query = query.where(Student.status == status_filter)
     if academic_year:
         query = query.where(Student.academic_year == academic_year)
     if search:
@@ -311,6 +314,7 @@ def delete_student(
         raise HTTPException(status_code=404, detail="Siswa tidak ditemukan.")
 
     student.is_active = False
+    student.status = StudentStatus.inactive
     student.updated_at = datetime.utcnow()
     session.add(student)
     session.commit()

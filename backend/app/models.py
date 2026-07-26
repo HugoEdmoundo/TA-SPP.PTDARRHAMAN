@@ -1,12 +1,16 @@
 """
-TA SPP Payment System - Database Models (B-03 Rewrite)
+TA SPP Payment System - Database Models (B-03 Rewrite + Production-Grade Upgrade)
 
 Berdasarkan spesifikasi final:
   1. SPP        → Tagihan rutin bulanan bersifat VIRTUAL (tidak disimpan di tabel bills).
   2. Non-SPP    → Tagihan ad-hoc (denda, seragam, buku, dll) disimpan di tabel bills.
   3. Event      → Patungan besar disimpan di tabel events & bills.
-  
-Semua pembayaran langsung auto-confirmed (tanpa status verifikasi).
+
+Upgrade Production-Grade:
+  - AcademicYear master table (anti-typo, tutup buku)
+  - BillCategory master table (jenis tagihan dinamis)
+  - StudentStatus enum (menggantikan is_active boolean)
+  - PaymentStatus enum (tracking status pembayaran gateway)
 """
 
 from datetime import datetime, date
@@ -53,6 +57,25 @@ class EventStatus(str, Enum):
     cancelled = "cancelled"
 
 
+class StudentStatus(str, Enum):
+    """Status keaktifan siswa — menggantikan boolean is_active."""
+    active = "active"             # Aktif bersekolah
+    graduated = "graduated"       # Lulus
+    transferred = "transferred"   # Pindah sekolah
+    dropout = "dropout"           # Drop out
+    inactive = "inactive"         # Nonaktif sementara
+
+
+class PaymentStatus(str, Enum):
+    """Status pembayaran — untuk integrasi payment gateway."""
+    pending = "pending"           # Menunggu konfirmasi gateway
+    paid = "paid"                 # Berhasil dikonfirmasi
+    failed = "failed"             # Gagal
+    expired = "expired"           # Expired di gateway
+    cancelled = "cancelled"       # Dibatalkan user
+    refunded = "refunded"         # Dana dikembalikan (void)
+
+
 # ─── Parent-Student Link Table ───────────────────────────────
 
 class ParentStudent(SQLModel, table=True):
@@ -61,6 +84,34 @@ class ParentStudent(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     parent_id: int = Field(foreign_key="users.id", index=True)
     student_id: int = Field(foreign_key="students.id", index=True)
+
+
+# ─── Master Tables ───────────────────────────────────────────
+
+class AcademicYear(SQLModel, table=True):
+    """Master tahun ajaran — anti-typo, tutup buku otomatis."""
+    __tablename__ = "academic_years"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True, index=True, max_length=20)   # "2025/2026"
+    start_date: Optional[date] = Field(default=None)             # 2025-07-01
+    end_date: Optional[date] = Field(default=None)               # 2026-06-30
+    is_active: bool = Field(default=True)                        # False = tutup buku
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class BillCategory(SQLModel, table=True):
+    """Master kategori tagihan — admin bisa tambah jenis tagihan baru tanpa programmer."""
+    __tablename__ = "bill_categories"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    code: str = Field(unique=True, index=True, max_length=30)    # "spp", "seragam", "ujian_praktek"
+    name: str = Field(max_length=100)                            # "SPP Bulanan", "Seragam Sekolah"
+    description: Optional[str] = Field(default=None)
+    default_amount: Optional[Decimal] = Field(default=None, max_digits=12, decimal_places=2)
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
 # ─── Users ───────────────────────────────────────────────────
@@ -98,9 +149,11 @@ class Student(SQLModel, table=True):
     birth_date: Optional[date] = Field(default=None)
     address: Optional[str] = Field(default=None)
     phone: Optional[str] = Field(default=None, max_length=20)
-    academic_year: Optional[str] = Field(default=None, max_length=10)  # e.g., "2025/2026"
+    academic_year: Optional[str] = Field(default=None, max_length=10)  # DEPRECATED — gunakan academic_year_id
+    academic_year_id: Optional[int] = Field(default=None, foreign_key="academic_years.id", index=True)
     photo_url: Optional[str] = Field(default=None)
-    is_active: bool = Field(default=True)
+    status: StudentStatus = Field(default=StudentStatus.active, index=True)
+    is_active: bool = Field(default=True)  # DEPRECATED — computed dari status, tetap ada untuk backward compat
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -121,7 +174,8 @@ class SppSetting(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     monthly_nominal: Decimal = Field(max_digits=12, decimal_places=2)
     due_day: int = Field(default=10)                    # Tanggal jatuh tempo per bulan (1-31)
-    academic_year: str = Field(max_length=10)           # "2025/2026"
+    academic_year: str = Field(max_length=10)           # DEPRECATED — gunakan academic_year_id
+    academic_year_id: Optional[int] = Field(default=None, foreign_key="academic_years.id", index=True)
     is_active: bool = Field(default=True)
     effective_from: Optional[date] = Field(default=None) # Mulai berlaku
     effective_to: Optional[date] = Field(default=None)   # Berakhir
@@ -165,12 +219,13 @@ class Bill(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     student_id: int = Field(foreign_key="students.id", index=True)
-    bill_type: BillType = Field(index=True)
+    bill_type: BillType = Field(index=True)             # DEPRECATED — gunakan category_id untuk fleksibilitas
+    category_id: Optional[int] = Field(default=None, foreign_key="bill_categories.id", index=True)
 
     # Identifiers & Category
     label: str = Field(max_length=200)                  # "Denda Buku", "Study Tour Bali"
     description: Optional[str] = Field(default=None)
-    category: Optional[str] = Field(default=None, max_length=50) # Untuk non_spp: seragam, denda, buku, dll
+    category: Optional[str] = Field(default=None, max_length=50) # DEPRECATED — gunakan category_id
     attachment_url: Optional[str] = Field(default=None)
 
     # Amounts
@@ -202,7 +257,6 @@ class Payment(SQLModel, table=True):
     """
     Satu payment = satu kali bayar.
     NOTE: Untuk SPP, bill_id bernilai null karena tagihan SPP bersifat virtual.
-    Semua pembayaran adalah auto-confirmed (tidak ada kolom status).
     """
     __tablename__ = "payments"
 
@@ -210,6 +264,7 @@ class Payment(SQLModel, table=True):
     student_id: int = Field(foreign_key="students.id", index=True)
     bill_id: Optional[int] = Field(default=None, foreign_key="bills.id", index=True)
     payment_type: PaymentType = Field(index=True)       # spp, non_spp, event
+    status: PaymentStatus = Field(default=PaymentStatus.paid, index=True)  # Status pembayaran
 
     # Period (untuk SPP)
     spp_month: Optional[int] = Field(default=None)      # 1-12

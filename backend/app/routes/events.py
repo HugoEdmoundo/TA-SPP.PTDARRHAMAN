@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import Event, Bill, Student, Payment, User, AuditLog
+from app.models import Event, Bill, Student, Payment, User, AuditLog, PaymentStatus
 from app.schemas.events import (
     EventCreate,
     EventUpdate,
@@ -50,6 +50,7 @@ def get_event_history_detail(id: int, session: Session = Depends(get_session)):
         payments = session.exec(
             select(Payment).where(
                 Payment.bill_id == bill.id,
+                Payment.status == PaymentStatus.paid,
             ).order_by(Payment.created_at.desc())
         ).all()
 
@@ -99,10 +100,11 @@ def track_event_progress(id: int, session: Session = Depends(get_session)):
         if not student:
             continue
 
-        # Hitung jumlah cicilan dari tabel Payment
+        # Hitung jumlah cicilan dari tabel Payment yang valid/paid
         payment_count = session.exec(
             select(Payment).where(
                 Payment.bill_id == bill.id,
+                Payment.status == PaymentStatus.paid,
             )
         ).all()
 

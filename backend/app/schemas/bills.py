@@ -37,6 +37,7 @@ class BillRead(BaseModel):
     event_id: Optional[int] = None
     bill_type: str
     category: Optional[str] = None
+    category_id: Optional[int] = None
     label: str
     description: Optional[str] = None
     amount: Decimal

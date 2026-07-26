@@ -280,7 +280,8 @@ def generate_receipt_image(session: Session, identifier: str) -> bytes:
     draw.text((190, y + 45), stamp_text, font=font_h2, fill=stamp_color, anchor="mm")
 
     # QR Code generation
-    qr_data = f"VERIFIED: {receipt.receipt_number} | Rp {payment.total_amount:,.0f} | {student.nis}"
+    qr_prefix = "VOID/BATAL" if receipt.is_void else "VERIFIED"
+    qr_data = f"{qr_prefix}: {receipt.receipt_number} | Rp {payment.total_amount:,.0f} | {student.nis}"
     qr = qrcode.QRCode(version=1, box_size=5, border=1)
     qr.add_data(qr_data)
     qr.make(fit=True)

@@ -22,8 +22,10 @@ class StudentBase(BaseModel):
     address: Optional[str] = Field(None, example="Jl. Merdeka No. 10")
     phone: Optional[str] = Field(None, max_length=20, example="08123456789")
     academic_year: Optional[str] = Field(None, max_length=10, example="2025/2026")
+    academic_year_id: Optional[int] = None
     photo_url: Optional[str] = None
     is_active: bool = True
+    status: Optional[str] = "active"
 
 
 class StudentCreate(StudentBase):
@@ -39,8 +41,11 @@ class StudentUpdate(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = Field(None, max_length=20)
     academic_year: Optional[str] = Field(None, max_length=10)
+    academic_year_id: Optional[int] = None
     photo_url: Optional[str] = None
     is_active: Optional[bool] = None
+    status: Optional[str] = None
+
 
 
 class StudentRead(StudentBase):
@@ -64,8 +69,10 @@ class StudentImportRow(BaseModel):
     address: Optional[str] = None
     phone: Optional[str] = None
     academic_year: Optional[str] = None
+    status: Optional[str] = None
     is_valid: bool
     errors: List[str] = []
+
 
 
 class StudentImportPreviewResponse(BaseModel):

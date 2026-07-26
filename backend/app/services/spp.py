@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
 from sqlmodel import Session, select
-from app.models import Student, SppSetting, Payment
+from app.models import Student, SppSetting, Payment, StudentStatus, PaymentStatus
 
 
 def get_student_spp_status(session: Session, student_id: int, year: int) -> List[Dict[str, Any]]:
@@ -25,14 +25,15 @@ def get_student_spp_status(session: Session, student_id: int, year: int) -> List
     if not spp_setting:
         spp_setting = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
     
-    nominal = float(spp_setting.nominal) if spp_setting else 500000.0
+    nominal = float(spp_setting.monthly_nominal) if spp_setting else 500000.0
 
-    # Ambil semua pembayaran SPP untuk siswa ini di tahun tersebut
+    # Ambil semua pembayaran SPP yang SUKSES/PAID untuk siswa ini di tahun tersebut
     payments = session.exec(
         select(Payment).where(
             Payment.student_id == student_id,
             Payment.payment_type == "spp",
             Payment.spp_year == year,
+            Payment.status == PaymentStatus.paid,
         )
     ).all()
 
@@ -70,13 +71,14 @@ def get_spp_grid(session: Session, year: int, semester: int) -> List[Dict[str, A
     Semester 2 = Januari - Juni (bulan 1 - 6).
     """
     months_range = range(7, 13) if semester == 1 else range(1, 7)
-    students = session.exec(select(Student).where(Student.is_active == True).order_by(Student.full_name)).all()
+    students = session.exec(select(Student).where(Student.is_active == True, Student.status == 'active').order_by(Student.full_name)).all()
 
-    # Query semua pembayaran SPP di tahun & bulan dalam range semester ini
+    # Query semua pembayaran SPP yang SUKSES/PAID di tahun & bulan dalam range semester ini
     payments = session.exec(
         select(Payment).where(
             Payment.payment_type == "spp",
             Payment.spp_year == year,
+            Payment.status == PaymentStatus.paid,
         )
     ).all()
 
@@ -89,7 +91,7 @@ def get_spp_grid(session: Session, year: int, semester: int) -> List[Dict[str, A
 
     # Lookup setting nominal SPP default
     latest_setting = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
-    default_nominal = float(latest_setting.nominal) if latest_setting else 500000.0
+    default_nominal = float(latest_setting.monthly_nominal) if latest_setting else 500000.0
 
     grid_data = []
     for student in students:

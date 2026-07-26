@@ -85,6 +85,12 @@ def update_user(
     if not user:
         raise HTTPException(status_code=404, detail="Pengguna tidak ditemukan.")
     
+    if user.id == admin.id:
+        if payload.is_active is False:
+            raise HTTPException(status_code=400, detail="Admin tidak dapat menonaktifkan akun sendiri.")
+        if payload.role and payload.role != "admin":
+            raise HTTPException(status_code=400, detail="Admin tidak dapat mengubah role akun sendiri.")
+
     update_data = payload.model_dump(exclude_unset=True)
     for key, val in update_data.items():
         setattr(user, key, val)

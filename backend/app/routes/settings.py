@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File,
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import SchoolSetting, BankAccount, SppSetting, User
+from app.models import SchoolSetting, BankAccount, SppSetting, User, AcademicYear, BillCategory
 from app.schemas.settings import (
     SchoolSettingItem,
     SchoolSettingUpdate,
@@ -15,6 +15,12 @@ from app.schemas.settings import (
     SppSettingCreate,
     SppSettingUpdate,
     SppSettingRead,
+    AcademicYearCreate,
+    AcademicYearUpdate,
+    AcademicYearRead,
+    BillCategoryCreate,
+    BillCategoryUpdate,
+    BillCategoryRead,
 )
 from app.utils.upload import save_upload
 from app.dependencies import require_admin
@@ -63,6 +69,142 @@ DEFAULT_SCHOOL_SETTINGS = {
     "school_logo": "",
     "receipt_format": "KWT/{YEAR}/{MONTH}/{ID}",
 }
+
+
+# ─── Academic Years Endpoints ────────────────────────────────
+
+@router.get("/academic-years", response_model=List[AcademicYearRead])
+@router.get("/settings/academic-years", response_model=List[AcademicYearRead])
+def list_academic_years(session: Session = Depends(get_session)):
+    """Menampilkan daftar tahun ajaran."""
+    return session.exec(select(AcademicYear).order_by(AcademicYear.name.desc())).all()
+
+
+@router.post("/academic-years", response_model=AcademicYearRead, status_code=status.HTTP_201_CREATED)
+@router.post("/settings/academic-years", response_model=AcademicYearRead, status_code=status.HTTP_201_CREATED)
+def create_academic_year(
+    payload: AcademicYearCreate,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """Membuat tahun ajaran baru."""
+    existing = session.exec(select(AcademicYear).where(AcademicYear.name == payload.name)).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Tahun ajaran dengan nama tersebut sudah ada.")
+    ay = AcademicYear.model_validate(payload)
+    session.add(ay)
+    session.commit()
+    session.refresh(ay)
+    return ay
+
+
+@router.put("/academic-years/{id}", response_model=AcademicYearRead)
+@router.put("/settings/academic-years/{id}", response_model=AcademicYearRead)
+def update_academic_year(
+    id: int,
+    payload: AcademicYearUpdate,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """Memperbarui status atau data tahun ajaran."""
+    ay = session.get(AcademicYear, id)
+    if not ay:
+        raise HTTPException(status_code=404, detail="Tahun ajaran tidak ditemukan.")
+    
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(ay, key, value)
+    
+    session.add(ay)
+    session.commit()
+    session.refresh(ay)
+    return ay
+
+
+@router.delete("/academic-years/{id}", status_code=status.HTTP_200_OK)
+@router.delete("/settings/academic-years/{id}", status_code=status.HTTP_200_OK)
+def delete_academic_year(
+    id: int,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """Menghapus atau nonaktifkan tahun ajaran."""
+    ay = session.get(AcademicYear, id)
+    if not ay:
+        raise HTTPException(status_code=404, detail="Tahun ajaran tidak ditemukan.")
+    ay.is_active = False
+    session.add(ay)
+    session.commit()
+    return {"status": "ok", "message": "Tahun ajaran berhasil dinonaktifkan."}
+
+
+# ─── Bill Categories Endpoints ───────────────────────────────
+
+@router.get("/bill-categories", response_model=List[BillCategoryRead])
+@router.get("/settings/bill-categories", response_model=List[BillCategoryRead])
+def list_bill_categories(session: Session = Depends(get_session)):
+    """Menampilkan daftar kategori tagihan."""
+    return session.exec(select(BillCategory).order_by(BillCategory.name.asc())).all()
+
+
+@router.post("/bill-categories", response_model=BillCategoryRead, status_code=status.HTTP_201_CREATED)
+@router.post("/settings/bill-categories", response_model=BillCategoryRead, status_code=status.HTTP_201_CREATED)
+def create_bill_category(
+    payload: BillCategoryCreate,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """Membuat kategori tagihan baru."""
+    existing = session.exec(select(BillCategory).where(BillCategory.code == payload.code)).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Kategori tagihan dengan kode tersebut sudah ada.")
+    bc = BillCategory.model_validate(payload)
+    session.add(bc)
+    session.commit()
+    session.refresh(bc)
+    return bc
+
+
+@router.put("/bill-categories/{id}", response_model=BillCategoryRead)
+@router.put("/settings/bill-categories/{id}", response_model=BillCategoryRead)
+def update_bill_category(
+    id: int,
+    payload: BillCategoryUpdate,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """Memperbarui kategori tagihan."""
+    bc = session.get(BillCategory, id)
+    if not bc:
+        raise HTTPException(status_code=404, detail="Kategori tagihan tidak ditemukan.")
+    
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(bc, key, value)
+    bc.updated_at = datetime.utcnow()
+    
+    session.add(bc)
+    session.commit()
+    session.refresh(bc)
+    return bc
+
+
+@router.delete("/bill-categories/{id}", status_code=status.HTTP_200_OK)
+@router.delete("/settings/bill-categories/{id}", status_code=status.HTTP_200_OK)
+def delete_bill_category(
+    id: int,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """Menghapus atau nonaktifkan kategori tagihan."""
+    bc = session.get(BillCategory, id)
+    if not bc:
+        raise HTTPException(status_code=404, detail="Kategori tagihan tidak ditemukan.")
+    bc.is_active = False
+    bc.updated_at = datetime.utcnow()
+    session.add(bc)
+    session.commit()
+    return {"status": "ok", "message": "Kategori tagihan berhasil dinonaktifkan."}
 
 
 # ─── School Settings Endpoints ───────────────────────────────

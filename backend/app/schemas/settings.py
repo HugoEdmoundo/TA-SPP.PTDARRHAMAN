@@ -75,3 +75,55 @@ class SppSettingRead(SppSettingBase):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# ─── Academic Year Schemas ───────────────────────────────────
+
+class AcademicYearBase(BaseModel):
+    name: str = Field(..., max_length=20, example="2025/2026")
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    is_active: bool = True
+
+class AcademicYearCreate(AcademicYearBase):
+    pass
+
+class AcademicYearUpdate(BaseModel):
+    name: Optional[str] = Field(None, max_length=20)
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    is_active: Optional[bool] = None
+
+class AcademicYearRead(AcademicYearBase):
+    id: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# ─── Bill Category Schemas ───────────────────────────────────
+
+class BillCategoryBase(BaseModel):
+    code: str = Field(..., max_length=30, example="seragam")
+    name: str = Field(..., max_length=100, example="Seragam Sekolah")
+    description: Optional[str] = None
+    default_amount: Optional[Decimal] = None
+    is_active: bool = True
+
+class BillCategoryCreate(BillCategoryBase):
+    pass
+
+class BillCategoryUpdate(BaseModel):
+    code: Optional[str] = Field(None, max_length=30)
+    name: Optional[str] = Field(None, max_length=100)
+    description: Optional[str] = None
+    default_amount: Optional[Decimal] = None
+    is_active: Optional[bool] = None
+
+class BillCategoryRead(BillCategoryBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+

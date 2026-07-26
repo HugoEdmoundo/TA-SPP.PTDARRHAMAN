@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException, Response
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import User, Student, Bill, Payment, Receipt, Event, SchoolSetting, ParentStudent
+from app.models import User, Student, Bill, Payment, Receipt, Event, SchoolSetting, ParentStudent, StudentStatus, PaymentStatus, SppSetting
 from app.dependencies import require_admin, get_current_user
 from app.services.report_generator import export_to_excel, export_to_pdf
 
@@ -78,14 +78,16 @@ def get_spp_semester_report(
     """
     months = [7, 8, 9, 10, 11, 12] if semester == 1 else [1, 2, 3, 4, 5, 6]
     
-    # Ambil nominal SPP sekolah
-    setting = session.exec(select(SchoolSetting).where(SchoolSetting.key == "spp_nominal")).first()
-    nominal_spp = Decimal(setting.value) if setting else Decimal("500000")
+    # Ambil nominal SPP dari tabel master SppSetting
+    spp_set = session.exec(select(SppSetting).where(SppSetting.academic_year.ilike(f"%{year}%")).order_by(SppSetting.id.desc())).first()
+    if not spp_set:
+        spp_set = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
+    nominal_spp = Decimal(str(spp_set.monthly_nominal)) if spp_set else Decimal("500000")
     target_per_student = nominal_spp * 6
 
-    students = session.exec(select(Student).where(Student.is_active == True)).all()
+    students = session.exec(select(Student).where(Student.is_active == True, Student.status == StudentStatus.active)).all()
     all_spp_pmts = session.exec(
-        select(Payment).where(Payment.payment_type == "spp", Payment.spp_year == year, Payment.spp_month.in_(months))
+        select(Payment).where(Payment.payment_type == "spp", Payment.spp_year == year, Payment.spp_month.in_(months), Payment.status == PaymentStatus.paid)
     ).all()
 
     pmt_map: Dict[int, Decimal] = {}
@@ -152,7 +154,7 @@ def get_monthly_report(
     """
     Laporan penerimaan kas bulanan dari seluruh jenis pembayaran - B-24.
     """
-    all_pmts = session.exec(select(Payment).order_by(Payment.created_at.desc())).all()
+    all_pmts = session.exec(select(Payment).where(Payment.status == PaymentStatus.paid).order_by(Payment.created_at.desc())).all()
     
     # Filter by month and year in Python (database agnostic)
     filtered = [p for p in all_pmts if p.created_at.year == year and p.created_at.month == month]
@@ -253,7 +255,7 @@ def get_student_report(
     if not st:
         raise HTTPException(status_code=404, detail="Siswa tidak ditemukan.")
 
-    pmts = session.exec(select(Payment).where(Payment.student_id == student_id).order_by(Payment.created_at.desc())).all()
+    pmts = session.exec(select(Payment).where(Payment.student_id == student_id, Payment.status == PaymentStatus.paid).order_by(Payment.created_at.desc())).all()
     receipts_map = {r.payment_id: r for r in session.exec(select(Receipt)).all()}
 
     rows = []
@@ -290,7 +292,7 @@ def get_student_report(
     summary = {
         "NIS / Nama Siswa": f"{st.nis} / {st.full_name}",
         "Tahun Ajaran": f"{st.academic_year or '-'}",
-        "Status Siswa": "AKTIF" if st.is_active else "TIDAK AKTIF",
+        "Status Siswa": st.status.value.upper() if st.status else ("AKTIF" if st.is_active else "TIDAK AKTIF"),
         "Total Transaksi": len(pmts),
         "Total Tagihan Dibayar (Rp)": float(tot_paid),
         "Total Infaq / Sedekah (Rp)": float(tot_infaq),
@@ -321,7 +323,7 @@ def get_infaq_report(
     """
     Laporan khusus transaksi infaq & sedekah yang terkumpul - B-24.
     """
-    query = select(Payment).where(Payment.infaq_amount > 0).order_by(Payment.created_at.desc())
+    query = select(Payment).where(Payment.infaq_amount > 0, Payment.status == PaymentStatus.paid).order_by(Payment.created_at.desc())
     pmts = session.exec(query).all()
     
     if year:

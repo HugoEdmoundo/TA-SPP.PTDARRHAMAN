@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import User, Student, Payment, Receipt, Event
+from app.models import User, Student, Payment, Receipt, Event, StudentStatus, PaymentStatus
 from app.dependencies import require_admin
 from app.schemas.dashboard import (
     AdminDashboardResponse,
@@ -34,7 +34,7 @@ def get_admin_dashboard_stats(session: Session = Depends(get_session)):
     curr_year = now.year
 
     # 1. Active students count
-    active_students = session.exec(select(Student).where(Student.is_active == True)).all()
+    active_students = session.exec(select(Student).where(Student.is_active == True, Student.status == StudentStatus.active)).all()
     total_students = len(active_students)
     active_student_ids = set(st.id for st in active_students)
 
@@ -53,6 +53,7 @@ def get_admin_dashboard_stats(session: Session = Depends(get_session)):
         select(Payment).where(
             Payment.created_at >= start_of_month,
             Payment.created_at < next_month,
+            Payment.status == PaymentStatus.paid,
         )
     ).all()
 
@@ -75,7 +76,7 @@ def get_admin_dashboard_stats(session: Session = Depends(get_session)):
     # To give a rich breakdown, let's analyze all valid payments this month (if > 0, else all-time valid)
     breakdown_source = valid_month_payments
     if not breakdown_source:
-        all_pmts = session.exec(select(Payment)).all()
+        all_pmts = session.exec(select(Payment).where(Payment.status == PaymentStatus.paid)).all()
         breakdown_source = [p for p in all_pmts if p.id not in voided_payment_ids]
 
     gw_spp, gw_non, gw_ev, gw_inf = Decimal("0"), Decimal("0"), Decimal("0"), Decimal("0")
@@ -123,7 +124,7 @@ def get_admin_dashboard_stats(session: Session = Depends(get_session)):
 
     oldest_y, oldest_m = trend_months[0]
     start_6m = datetime(oldest_y, oldest_m, 1, 0, 0, 0)
-    recent_all = session.exec(select(Payment).where(Payment.created_at >= start_6m)).all()
+    recent_all = session.exec(select(Payment).where(Payment.created_at >= start_6m, Payment.status == PaymentStatus.paid)).all()
     valid_recent = [p for p in recent_all if p.id not in voided_payment_ids]
 
     # Aggregate by (year, month)

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import User, Student, Bill, Payment, ParentStudent
+from app.models import User, Student, Bill, Payment, ParentStudent, StudentStatus, PaymentStatus
 from app.dependencies import require_wali
 from app.services.spp import get_student_spp_status
 from app.services.payment import create_gateway_checkout_session
@@ -24,7 +24,7 @@ def get_my_children(
     """
     students_list = []
     for s in current_user.students:
-        if s.is_active:
+        if s.is_active and s.status == StudentStatus.active:
             students_list.append({
                 "id": s.id,
                 "name": s.full_name,
@@ -103,10 +103,11 @@ def get_my_child_bills(
     total_event_out = sum(b.remaining_amount for b in event_bills)
     total_outstanding = total_spp_out + total_non_spp_out + total_event_out
 
-    # Total all-time payments for this child
+    # Total all-time payments for this child (only paid/valid transactions)
     all_payments = session.exec(
         select(Payment).where(
             Payment.student_id == child_id,
+            Payment.status == PaymentStatus.paid,
         )
     ).all()
     total_paid_all_time = sum(p.amount for p in all_payments)
@@ -150,7 +151,7 @@ def get_my_child_payments(
     result = []
     for p in payments:
         r_num = p.receipt.receipt_number if p.receipt else f"PAY-{p.id}"
-        is_void = p.receipt.is_void if p.receipt else False
+        is_void = (p.receipt.is_void if p.receipt else False) or (p.status in ("refunded", "failed", "cancelled"))
         ver_code = p.receipt.verification_code if p.receipt else f"PTD-VER-{p.id}"
         result.append({
             "id": p.id,
