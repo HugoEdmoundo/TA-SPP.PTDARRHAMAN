@@ -15,7 +15,9 @@ config = context.config
 
 # Load DB URL from app settings (.env)
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# Escape % for configparser (alembic.ini uses interpolation)
+safe_url = settings.database_url.replace("%", "%%")
+config.set_main_option("sqlalchemy.url", safe_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
