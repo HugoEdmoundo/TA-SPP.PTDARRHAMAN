@@ -375,7 +375,7 @@ export const EventsPage: React.FC = () => {
                     <Users className="w-3.5 h-3.5 text-emerald-primary" />
                     <span>Pilih Target Santri ({selectedStudentIds.length} terpilih) *</span>
                   </label>
-                  <Button type="button" variant="ghost" size="sm" onClick={handleSelectAllStudents} className="text-[11px] py-0.5 px-2 h-auto">
+                  <Button type="button" variant="ghost" size="sm" onClick={handleToggleSelectAll} className="text-[11px] py-0.5 px-2 h-auto">
                     {selectedStudentIds.length === allStudents.length ? 'Batal Semua' : 'Pilih Semua'}
                   </Button>
                 </div>

@@ -20,7 +20,9 @@ export interface Student {
   full_name?: string;
   grade: string; // e.g. "X-A", "XI-IPA-1", "XII-IPS-2"
   class_name?: string;
-  status: 'ACTIVE' | 'GRADUATED' | 'DROPPED_OUT' | string;
+  academic_year?: string; // Deprecated in backend, kept for backward compat
+  academic_year_id?: number;
+  status: 'active' | 'graduated' | 'transferred' | 'dropout' | 'inactive' | 'ACTIVE' | 'GRADUATED' | 'DROPPED_OUT' | string;
   parent_id?: string;
   parent?: Parent;
   created_at?: string;
@@ -49,6 +51,26 @@ export interface SchoolSettings {
   updated_at?: string;
 }
 
+export interface AcademicYear {
+  id: number;
+  name: string;
+  start_date?: string;
+  end_date?: string;
+  is_active: boolean;
+  created_at?: string;
+}
+
+export interface BillCategory {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+  default_amount?: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type BillStatus = 'UNPAID' | 'PARTIAL' | 'PAID' | 'OVERDUE' | 'VOID' | 'ACTIVE' | string;
 
 export interface SppBill {
@@ -68,6 +90,8 @@ export interface NonSppBill {
   id: string;
   title: string;
   description?: string;
+  category?: string;
+  category_id?: number;
   nominal: number;
   target_grade?: string; // If null, applies to specific students or all
   student_ids?: string[];
@@ -116,7 +140,7 @@ export interface EventContribution {
 }
 
 export type PaymentMethod = string;
-export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'EXPIRED' | 'REFUNDED' | 'VOID' | string;
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'expired' | 'cancelled' | 'refunded' | 'PENDING' | 'SUCCESS' | 'FAILED' | 'EXPIRED' | 'REFUNDED' | 'VOID' | string;
 
 export interface PaymentItem {
   id: string;
