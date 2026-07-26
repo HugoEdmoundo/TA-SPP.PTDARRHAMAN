@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 import os
 from app.database import init_db
 from app.config import get_settings
-from app.routes import settings
 
 
 @asynccontextmanager
@@ -68,7 +67,7 @@ try:
 except Exception:
     pass
 
-from app.routes import settings, auth, users, students, sse, spp, bills, events, my, payments, receipts, reports, audit, dashboard
+from app.routes import auth, users, students, sse, spp, bills, events, my, payments, receipts, reports, audit, dashboard, settings
 
 app.include_router(settings.router, tags=["Settings"])
 app.include_router(sse.router, prefix="/sse", tags=["SSE / Real-Time"])
