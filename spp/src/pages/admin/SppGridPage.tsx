@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -226,13 +226,17 @@ export const SppGridPage: React.FC = () => {
       )}
 
       {/* Modal Mass Generate */}
-      {showMassModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-md bg-white border border-slate/20 shadow-2xl relative">
-            <h3 className="text-base font-extrabold text-obsidian mb-2 font-heading flex items-center gap-2">
-              <Plus className="w-5 h-5 text-emerald-primary" />
-              <span>Aktivasi Tagihan SPP Massal</span>
-            </h3>
+      <Modal
+        isOpen={showMassModal}
+        onClose={() => setShowMassModal(false)}
+        title={
+          <>
+            <Plus className="w-5 h-5 text-emerald-primary" />
+            <span>Aktivasi Tagihan SPP Massal</span>
+          </>
+        }
+        maxWidth="md"
+      >
             <p className="text-xs text-slate mb-4">
               Sistem SPP bersifat <b>Virtual</b> (B-11 & B-12), artinya tagihan bulanan otomatis berlaku untuk seluruh santri aktif sesuai nominal standar pesantren tanpa memenuhi tabel database dengan ribuan baris statis.
             </p>
@@ -247,9 +251,7 @@ export const SppGridPage: React.FC = () => {
                 Aktifkan Sekarang
               </Button>
             </div>
-          </Card>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

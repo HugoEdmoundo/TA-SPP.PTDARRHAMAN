@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -404,13 +404,17 @@ export const StudentsPage: React.FC = () => {
       )}
 
       {/* Modal Add Student */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-md bg-white border border-slate/20 shadow-2xl relative">
-            <h3 className="text-base font-extrabold text-obsidian mb-4 font-heading flex items-center gap-2">
-              <Plus className="w-5 h-5 text-emerald-primary" />
-              <span>Daftarkan Santri Baru</span>
-            </h3>
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title={
+          <>
+            <Plus className="w-5 h-5 text-emerald-primary" />
+            <span>Daftarkan Santri Baru</span>
+          </>
+        }
+        maxWidth="md"
+      >
             <form onSubmit={handleCreateStudent} className="flex flex-col gap-3.5 text-xs">
               <div>
                 <label className="font-bold text-obsidian block mb-1">Nomor Induk Santri (NIS) *</label>
@@ -490,21 +494,23 @@ export const StudentsPage: React.FC = () => {
               </div>
               <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
-                <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Simpan Data</Button>
+                <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Simpan Santri</Button>
               </div>
             </form>
-          </Card>
-        </div>
-      )}
+      </Modal>
 
       {/* Modal Edit Student */}
-      {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-md bg-white border border-slate/20 shadow-2xl relative">
-            <h3 className="text-base font-extrabold text-obsidian mb-4 font-heading flex items-center gap-2">
-              <Edit2 className="w-5 h-5 text-emerald-primary" />
-              <span>Edit Data Santri</span>
-            </h3>
+      <Modal
+        isOpen={showEditModal && !!selectedStudent}
+        onClose={() => setShowEditModal(false)}
+        title={
+          <>
+            <Edit2 className="w-5 h-5 text-emerald-primary" />
+            <span>Edit Data Santri</span>
+          </>
+        }
+        maxWidth="md"
+      >
             <form onSubmit={handleUpdateStudent} className="flex flex-col gap-3.5 text-xs">
               <div>
                 <label className="font-bold text-obsidian block mb-1">Nomor Induk Santri (NIS) *</label>
@@ -582,18 +588,20 @@ export const StudentsPage: React.FC = () => {
                 <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Simpan Perubahan</Button>
               </div>
             </form>
-          </Card>
-        </div>
-      )}
+      </Modal>
 
       {/* Modal Import Excel / CSV */}
-      {showImportModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-2xl bg-white border border-slate/20 shadow-2xl relative max-h-[90vh] flex flex-col">
-            <h3 className="text-base font-extrabold text-obsidian mb-2 font-heading flex items-center gap-2 shrink-0">
-              <FileSpreadsheet className="w-5 h-5 text-emerald-primary" />
-              <span>Impor Santri Massal dari Excel / CSV</span>
-            </h3>
+      <Modal
+        isOpen={showImportModal}
+        onClose={() => { setShowImportModal(false); setImportPreview([]); setImportFile(null); }}
+        title={
+          <>
+            <FileSpreadsheet className="w-5 h-5 text-emerald-primary" />
+            <span>Impor Santri Massal dari Excel / CSV</span>
+          </>
+        }
+        maxWidth="2xl"
+      >
             <p className="text-xs text-slate mb-4 shrink-0">
               Unggah file dengan kolom: <code>nis</code>, <code>full_name</code>, <code>gender</code>, <code>phone</code>, <code>academic_year</code>. Sistem akan melakukan pratinjau dan validasi error otomatis.
             </p>
@@ -666,9 +674,7 @@ export const StudentsPage: React.FC = () => {
                 Impor {importPreview.filter(r => r.is_valid).length} Santri Valid
               </Button>
             </div>
-          </Card>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

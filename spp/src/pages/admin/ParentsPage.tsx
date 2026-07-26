@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -325,88 +325,97 @@ export const ParentsPage: React.FC = () => {
       )}
 
       {/* Modal Add Parent */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-md bg-white border border-slate/20 shadow-2xl relative">
-            <h3 className="text-base font-extrabold text-obsidian mb-4 font-heading flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-emerald-primary" />
-              <span>Buat Akun Wali Santri Baru</span>
-            </h3>
-            <form onSubmit={handleCreateParent} className="flex flex-col gap-3.5 text-xs">
-              <div>
-                <label className="font-bold text-obsidian block mb-1">Username Portal *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Misal: wali_ahmad"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '_'))}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                />
-              </div>
-              <div>
-                <label className="font-bold text-obsidian block mb-1">Nama Lengkap Wali *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nama orang tua / wali..."
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-obsidian block mb-1">Password Awal *</label>
-                  <input
-                    type="text"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-obsidian block mb-1">No. WhatsApp</label>
-                  <input
-                    type="text"
-                    placeholder="08123456789"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="font-bold text-obsidian block mb-1">Email (Opsional)</label>
-                <input
-                  type="email"
-                  placeholder="email@domain.com..."
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                />
-              </div>
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
-                <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
-                <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Buat Akun</Button>
-              </div>
-            </form>
-          </Card>
-        </div>
-      )}
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title={
+          <>
+            <UserPlus className="w-5 h-5 text-emerald-primary" />
+            <span>Buat Akun Wali Santri Baru</span>
+          </>
+        }
+        maxWidth="md"
+      >
+        <form onSubmit={handleCreateParent} className="flex flex-col gap-3.5 text-xs">
+          <div>
+            <label className="font-bold text-obsidian block mb-1">Username Portal *</label>
+            <input
+              type="text"
+              required
+              placeholder="Misal: wali_ahmad"
+              value={username}
+              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '_'))}
+              className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+            />
+          </div>
+          <div>
+            <label className="font-bold text-obsidian block mb-1">Nama Lengkap Wali *</label>
+            <input
+              type="text"
+              required
+              placeholder="Nama orang tua / wali..."
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="font-bold text-obsidian block mb-1">Password Awal *</label>
+              <input
+                type="password"
+                required
+                placeholder="Minimal 6 karakter"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              />
+            </div>
+            <div>
+              <label className="font-bold text-obsidian block mb-1">No. WhatsApp / HP</label>
+              <input
+                type="tel"
+                placeholder="081234567890"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="font-bold text-obsidian block mb-1">Alamat Email (Opsional)</label>
+            <input
+              type="email"
+              placeholder="contoh@domain.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+            />
+          </div>
+          <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
+            <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Buat Akun</Button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Modal Link Student */}
-      {showLinkModal && selectedParent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-md bg-white border border-slate/20 shadow-2xl relative">
-            <h3 className="text-base font-extrabold text-obsidian mb-2 font-heading flex items-center gap-2">
-              <Link2 className="w-5 h-5 text-emerald-primary" />
-              <span>Tautkan Siswa dengan Wali</span>
-            </h3>
-            <p className="text-xs text-slate mb-4">
-              Menautkan santri dengan akun <b>{selectedParent.full_name || selectedParent.name}</b> (@{selectedParent.username || selectedParent.email}).
-            </p>
+      <Modal
+        isOpen={showLinkModal && !!selectedParent}
+        onClose={() => setShowLinkModal(false)}
+        title={
+          <>
+            <Link2 className="w-5 h-5 text-emerald-primary" />
+            <span>Tautkan Siswa dengan Wali</span>
+          </>
+        }
+        maxWidth="md"
+      >
+            {selectedParent && (
+              <p className="text-xs text-slate mb-4">
+                Menautkan santri dengan akun <b>{selectedParent.full_name || selectedParent.name}</b> (@{selectedParent.username || selectedParent.email}).
+              </p>
+            )}
             
             <form onSubmit={handleConfirmLink} className="flex flex-col gap-4 text-xs">
               <div>
@@ -437,9 +446,7 @@ export const ParentsPage: React.FC = () => {
                 </Button>
               </div>
             </form>
-          </Card>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

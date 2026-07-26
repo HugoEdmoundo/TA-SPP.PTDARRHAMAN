@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, formatDateIndo } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -360,15 +360,18 @@ export const NonSppPage: React.FC = () => {
       )}
 
       {/* Modal Add Non-SPP */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-lg bg-white border border-slate/20 shadow-2xl relative max-h-[90vh] flex flex-col">
-            <h3 className="text-base font-extrabold text-obsidian mb-4 font-heading flex items-center gap-2 shrink-0">
-              <Plus className="w-5 h-5 text-emerald-primary" />
-              <span>Terbitkan Tagihan Non-SPP Baru</span>
-            </h3>
-            
-            <form onSubmit={handleCreateBill} className="flex flex-col gap-3.5 text-xs overflow-y-auto pr-1 flex-1 min-h-0">
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title={
+          <>
+            <Plus className="w-5 h-5 text-emerald-primary" />
+            <span>Terbitkan Tagihan Non-SPP Baru</span>
+          </>
+        }
+        maxWidth="lg"
+      >
+            <form onSubmit={handleCreateBill} className="flex flex-col gap-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
@@ -400,7 +403,7 @@ export const NonSppPage: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="Misal: Seragam Batik & Olahraga Kelas 10..."
+                  placeholder="Misal: Buku Modul Semester 1, Seragam Batik..."
                   value={label}
                   onChange={(e) => setLabel(e.target.value)}
                   className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
@@ -417,34 +420,32 @@ export const NonSppPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Deskripsi Tambahan (Opsional)</label>
+                <label className="font-bold text-obsidian block mb-1">Deskripsi Tambahan</label>
                 <textarea
                   rows={2}
-                  placeholder="Keterangan rincian barang/kegiatan..."
+                  placeholder="Opsional: Keterangan singkat mengenai tagihan..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50 resize-none"
                 />
               </div>
 
-              {/* Student Selector */}
-              <div className="border border-slate/20 rounded-xl p-3 bg-slate/5 mt-1">
-                <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate/15">
-                  <span className="font-bold text-obsidian flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-emerald-primary" />
-                    <span>Pilih Santri Penerima ({selectedStudentIds.length} Terpilih)</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleToggleSelectAll}
-                    className="text-emerald-primary font-bold hover:underline"
-                  >
-                    {selectAllStudents ? 'Batal Pilih Semua' : 'Pilih Semua Santri'}
-                  </button>
+              {/* Selector Santri */}
+              <div className="flex flex-col gap-1.5 mt-1">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-obsidian flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-emerald-primary" />
+                    <span>Pilih Target Santri ({selectedStudentIds.length} terpilih) *</span>
+                  </label>
+                  <Button type="button" variant="ghost" size="sm" onClick={handleToggleSelectAll} className="text-[11px] py-0.5 px-2 h-auto">
+                    {selectAllStudents ? 'Batal Semua' : 'Pilih Semua'}
+                  </Button>
                 </div>
 
                 {allStudents.length === 0 ? (
-                  <div className="text-center py-4 text-slate italic">Belum ada data santri aktif di sistem.</div>
+                  <div className="p-4 rounded-xl border border-dashed border-slate/30 text-center text-slate">
+                    Belum ada data siswa aktif.
+                  </div>
                 ) : (
                   <div className="max-h-36 overflow-y-auto pr-1 flex flex-col gap-1.5">
                     {allStudents.map((st: any) => {
@@ -479,19 +480,20 @@ export const NonSppPage: React.FC = () => {
                 </Button>
               </div>
             </form>
-          </Card>
-        </div>
-      )}
+      </Modal>
 
       {/* Modal Edit Non-SPP */}
-      {showEditModal && selectedBill && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-md bg-white border border-slate/20 shadow-2xl relative">
-            <h3 className="text-base font-extrabold text-obsidian mb-4 font-heading flex items-center gap-2">
-              <Edit2 className="w-5 h-5 text-emerald-primary" />
-              <span>Edit Tagihan Non-SPP</span>
-            </h3>
-            
+      <Modal
+        isOpen={showEditModal && !!selectedBill}
+        onClose={() => setShowEditModal(false)}
+        title={
+          <>
+            <Edit2 className="w-5 h-5 text-emerald-primary" />
+            <span>Edit Tagihan Non-SPP</span>
+          </>
+        }
+        maxWidth="md"
+      >
             <form onSubmit={handleUpdateBill} className="flex flex-col gap-3.5 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -554,9 +556,7 @@ export const NonSppPage: React.FC = () => {
                 <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Simpan Perubahan</Button>
               </div>
             </form>
-          </Card>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };

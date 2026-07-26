@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '../../utils/cn';
 import { X } from 'lucide-react';
 
@@ -23,20 +24,34 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 }) => {
   // Lock body scroll when open on mobile
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
     if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
     return () => {
+      document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === 'undefined') return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in">
+  const sheetContent = (
+    <div
+      className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-obsidian/50 backdrop-blur-sm transition-opacity"
@@ -75,13 +90,14 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
                 {title}
               </h3>
               {subtitle && (
-                <p className="text-xs text-slate font-medium mt-0.5 truncate">{subtitle}</p>
+                <p className="text-xs sm:text-sm text-slate mt-0.5 leading-normal">
+                  {subtitle}
+                </p>
               )}
             </div>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Tutup"
               className="shrink-0 p-2 rounded-xl text-slate hover:text-obsidian hover:bg-slate/10 active:scale-95 transition-all duration-150 -mr-1"
             >
               <X className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
@@ -99,4 +115,6 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(sheetContent, document.body);
 };

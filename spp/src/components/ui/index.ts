@@ -9,4 +9,5 @@ export * from './BottomSheet';
 export * from './Table';
 export * from './ToastContext';
 export * from './ReceiptShareCard';
+export * from './Modal';
 export * from '../../utils';

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '../../utils';
 import { useAuth } from '../../contexts/AuthContext';
@@ -417,9 +418,9 @@ export const AdminLayout: React.FC = () => {
         </div>
       </BottomSheet>
 
-      {/* Spotlight Search Modal (Ctrl+K / Cmd+K) */}
-      {isSearchOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 animate-fade-in">
+      {/* Spotlight Search Modal (Ctrl+K / Cmd+K) via Portal */}
+      {isSearchOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-20 px-4 animate-fade-in">
           <div className="fixed inset-0 bg-obsidian/40 backdrop-blur-xs" onClick={() => setIsSearchOpen(false)} />
           <div className="relative w-full max-w-lg glass-modal rounded-2xl overflow-hidden z-10 border border-white shadow-2xl">
             <div className="p-4 border-b border-white/60 flex items-center gap-3 bg-white/60">
@@ -435,7 +436,7 @@ export const AdminLayout: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(false)}
-                className="text-[10px] font-bold text-slate hover:text-obsidian px-2 py-1 rounded-lg bg-white/80 border border-white shadow-2xs"
+                className="text-[10px] font-bold text-slate hover:text-obsidian px-2 py-1 rounded-lg bg-white/80 border border-white shadow-2xs cursor-pointer"
               >
                 ESC
               </button>
@@ -465,7 +466,8 @@ export const AdminLayout: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

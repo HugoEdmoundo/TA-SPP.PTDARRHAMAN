@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Card, Badge, Button, ReceiptShareCard, EmptyState, Spinner, formatRupiah, formatMonthYearIndo, formatDateIndo } from '../../components/ui';
+import { Card, Badge, Button, ReceiptShareCard, EmptyState, Spinner, Modal, formatRupiah, formatMonthYearIndo, formatDateIndo } from '../../components/ui';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -268,17 +268,22 @@ export const WaliDashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {selectedReceipt && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/50 backdrop-blur-xs animate-fade-in">
-            <div className="relative w-full max-w-sm max-h-[90vh] overflow-y-auto">
-              <ReceiptShareCard
-                receipt={selectedReceipt}
-                settings={settings}
-                onClose={() => setSelectedReceipt(null)}
-              />
-            </div>
-          </div>
-        )}
+        <Modal
+          isOpen={!!selectedReceipt}
+          onClose={() => setSelectedReceipt(null)}
+          showCloseButton={false}
+          maxWidth="sm"
+          className="!bg-transparent !border-0 !shadow-none !p-0 !overflow-visible"
+          bodyClassName="!p-0 !overflow-visible"
+        >
+          {selectedReceipt && (
+            <ReceiptShareCard
+              receipt={selectedReceipt}
+              settings={settings}
+              onClose={() => setSelectedReceipt(null)}
+            />
+          )}
+        </Modal>
       </div>
     );
   }

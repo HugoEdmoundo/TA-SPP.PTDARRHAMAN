@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, formatDateIndo } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -422,15 +422,18 @@ export const PaymentKasirPage: React.FC = () => {
       )}
 
       {/* Modal Add Kasir Payment */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-lg bg-white border border-slate/20 shadow-2xl relative max-h-[90vh] flex flex-col">
-            <h3 className="text-base font-extrabold text-obsidian mb-4 font-heading flex items-center gap-2 shrink-0">
-              <Plus className="w-5 h-5 text-emerald-primary" />
-              <span>Catat Pembayaran Tunai (Loket Kasir)</span>
-            </h3>
-
-            <form onSubmit={handleCreatePayment} className="flex flex-col gap-3.5 text-xs overflow-y-auto pr-1 flex-1 min-h-0">
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title={
+          <>
+            <Plus className="w-5 h-5 text-emerald-primary" />
+            <span>Catat Pembayaran Tunai (Loket Kasir)</span>
+          </>
+        }
+        maxWidth="lg"
+      >
+            <form onSubmit={handleCreatePayment} className="flex flex-col gap-3.5 text-xs">
               <div>
                 <label className="font-bold text-obsidian block mb-1">Pilih Santri Pembayar *</label>
                 {allStudents.length === 0 ? (
@@ -577,22 +580,20 @@ export const PaymentKasirPage: React.FC = () => {
                 </Button>
               </div>
             </form>
-          </Card>
-        </div>
-      )}
+      </Modal>
 
       {/* Modal Receipt Detail */}
-      {showReceiptModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-md bg-white border border-slate/20 shadow-2xl relative">
-            <div className="flex items-center justify-between border-b border-slate/15 pb-3 mb-4">
-              <h3 className="text-base font-extrabold text-obsidian font-heading flex items-center gap-2">
-                <Printer className="w-5 h-5 text-emerald-primary" />
-                <span>Kuitansi Digital Resmi</span>
-              </h3>
-              <Button variant="outline" size="sm" onClick={() => setShowReceiptModal(false)}>Tutup</Button>
-            </div>
-
+      <Modal
+        isOpen={showReceiptModal}
+        onClose={() => setShowReceiptModal(false)}
+        title={
+          <>
+            <Printer className="w-5 h-5 text-emerald-primary" />
+            <span>Kuitansi Digital Resmi</span>
+          </>
+        }
+        maxWidth="md"
+      >
             {isReceiptLoading ? (
               <div className="flex flex-col items-center justify-center py-12">
                 <Spinner size="md" color="emerald" />
@@ -660,21 +661,25 @@ export const PaymentKasirPage: React.FC = () => {
             ) : (
               <div className="text-center py-6 text-slate italic text-xs">Detail kuitansi tidak tersedia.</div>
             )}
-          </Card>
-        </div>
-      )}
+      </Modal>
 
       {/* Modal Void Payment */}
-      {showVoidModal && selectedPayment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian/40 backdrop-blur-xs animate-fade-in">
-          <Card variant="elevated" padding="lg" className="w-full max-w-md bg-white border border-slate/20 shadow-2xl relative">
-            <h3 className="text-base font-extrabold text-obsidian mb-2 font-heading flex items-center gap-2 text-rose-danger">
-              <AlertTriangle className="w-5 h-5" />
-              <span>Batalkan (Void) Transaksi Pembayaran</span>
-            </h3>
-            <p className="text-xs text-slate mb-4">
-              Pembatalan transaksi ID <b>{selectedPayment.id}</b> senilai <b>{formatRupiah(Number(selectedPayment.amount))}</b> akan membatalkan kuitansi, mengembalikan sisa tagihan santri, dan dicatat dalam log keamanan (Audit Trail B-25 & B-27).
-            </p>
+      <Modal
+        isOpen={showVoidModal && !!selectedPayment}
+        onClose={() => setShowVoidModal(false)}
+        title={
+          <span className="text-rose-danger flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" />
+            <span>Batalkan (Void) Transaksi Pembayaran</span>
+          </span>
+        }
+        maxWidth="md"
+      >
+            {selectedPayment && (
+              <p className="text-xs text-slate mb-4">
+                Pembatalan transaksi ID <b>{selectedPayment.id}</b> senilai <b>{formatRupiah(Number(selectedPayment.amount))}</b> akan membatalkan kuitansi, mengembalikan sisa tagihan santri, dan dicatat dalam log keamanan (Audit Trail B-25 & B-27).
+              </p>
+            )}
 
             <form onSubmit={handleConfirmVoid} className="flex flex-col gap-3.5 text-xs">
               <div>
@@ -696,9 +701,7 @@ export const PaymentKasirPage: React.FC = () => {
                 </Button>
               </div>
             </form>
-          </Card>
-        </div>
-      )}
+      </Modal>
     </div>
   );
 };
