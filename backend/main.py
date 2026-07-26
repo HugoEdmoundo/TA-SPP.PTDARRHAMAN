@@ -91,7 +91,3 @@ try:
     app.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard Stats (Fase 6 - B-26)"])
 except Exception as e:
     traceback.print_exc(file=sys.stderr)
-
-    @app.get("/debug/routes-error")
-    def routes_error():
-        return {"error": str(e)}
