@@ -5,6 +5,7 @@ import { ToastProvider } from './components/ui/ToastContext';
 import { WaliLayout, AdminLayout } from './components/layout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
+import { NotFoundPage } from './pages/error/NotFoundPage';
 import { DashboardPage } from './pages/admin/DashboardPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
 import { WaliDashboardPage } from './pages/wali/WaliDashboardPage';
@@ -226,8 +227,8 @@ export function App() {
                 <Route path="profile" element={<WaliDashboardPage />} />
               </Route>
 
-              {/* Fallback wildcard route */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              {/* Fallback 404 */}
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </BrowserRouter>
         </ToastProvider>

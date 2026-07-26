@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  login: (email: string, role: Role) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
   hasRole: (roles: Role[]) => boolean;
@@ -14,86 +14,48 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Default mock users for instant demonstration and development without backend running
-const MOCK_USERS: Record<string, User> = {
-  'admin@ptdarrahman.sch.id': {
-    id: 'usr-admin-001',
-    name: 'Ustadz Ahmad Fauzi (Admin)',
-    email: 'admin@ptdarrahman.sch.id',
-    role: 'ADMIN',
-    phone: '081234567890',
-  },
-  'wali@ptdarrahman.sch.id': {
-    id: 'usr-wali-001',
-    name: 'Bapak H. Hendro Sugiono (Wali Santri)',
-    email: 'wali@ptdarrahman.sch.id',
-    role: 'WALI',
-    phone: '081987654321',
-  },
-  'superadmin@ptdarrahman.sch.id': {
-    id: 'usr-superadmin-001',
-    name: 'K.H. Abdullah Syafi\'i (Superadmin)',
-    email: 'superadmin@ptdarrahman.sch.id',
-    role: 'SUPERADMIN',
-    phone: '08111222333',
-  },
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load from storage on mount
     const storedToken = localStorage.getItem('spp_token');
     const storedUser = localStorage.getItem('spp_user');
-    
+
     if (storedToken && storedUser) {
       try {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
-      } catch (e) {
+      } catch {
         localStorage.removeItem('spp_token');
         localStorage.removeItem('spp_user');
       }
-    } else {
-      // Auto-login default admin for smooth immediate demo if nothing in localStorage
-      const defaultUser = MOCK_USERS['admin@ptdarrahman.sch.id'];
-      setUser(defaultUser);
-      setToken('mock-jwt-token-admin');
-      localStorage.setItem('spp_token', 'mock-jwt-token-admin');
-      localStorage.setItem('spp_user', JSON.stringify(defaultUser));
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, role: Role) => {
+  const login = async (username: string, password: string) => {
     setIsLoading(true);
     try {
-      // Try backend call if available, fallback to mock user
-      let loggedUser: User;
-      let authToken = `token-${role.toLowerCase()}-${Date.now()}`;
+      const res = await api.post('/auth/login', { username, password });
+      const data = res.data;
 
-      try {
-        const res = await api.post('/auth/login', { email, role });
-        loggedUser = res.data.user;
-        authToken = res.data.token;
-      } catch {
-        // Fallback for demo/offline resilience
-        loggedUser = MOCK_USERS[email] || {
-          id: `usr-${Date.now()}`,
-          name: email.split('@')[0].toUpperCase(),
-          email,
-          role,
-          phone: '081234567890',
-        };
-      }
+      const loggedInUser: User = {
+        id: String(data.user_id),
+        name: data.full_name,
+        email: data.username,
+        role: data.role as Role,
+        phone: '',
+      };
 
-      setUser(loggedUser);
-      setToken(authToken);
-      localStorage.setItem('spp_token', authToken);
-      localStorage.setItem('spp_user', JSON.stringify(loggedUser));
+      setUser(loggedInUser);
+      setToken(data.access_token);
+      localStorage.setItem('spp_token', data.access_token);
+      localStorage.setItem('spp_user', JSON.stringify(loggedInUser));
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail || 'Username atau password salah.';
+      throw new Error(detail);
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         logout,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user && !!token,
         hasRole,
       }}
     >
