@@ -29,12 +29,14 @@ ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://ta-frontend-hugoedmoundo.vercel.app",
     "https://ta-frontend.vercel.app",
+    "https://ta-spp-ptdarrhaman.vercel.app",
+    "https://ta-spp-ptdarrhaman-omof.vercel.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_origin_regex=r"https://ta-frontend.*\.vercel\.app",
+    allow_origin_regex=r"https://.*\.vercel\.app|http://localhost:.*|http://127\.0\.0\.1:.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

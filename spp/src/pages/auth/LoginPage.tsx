@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { Button, Card } from '../../components/ui';
-import { Lock, User, ArrowRight, Sparkles, Rocket, Users, ShieldCheck } from 'lucide-react';
+import { Lock, User, ArrowRight, Sparkles, Rocket, Users } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -69,13 +69,8 @@ export const LoginPage: React.FC = () => {
             {settings.name || 'PTD AR-RAHMAN'}
           </h1>
           <p className="text-xs sm:text-sm text-slate font-medium">
-            Portal Unified Login Keuangan & SPP Pesantren
+            Sistem Pembayaran SPP & Keuangan Pesantren
           </p>
-        </div>
-
-        <div className="flex items-center justify-center gap-2 mb-6 p-2.5 rounded-xl bg-emerald-light/50 border border-emerald-primary/20 text-emerald-primary text-xs font-extrabold text-center">
-          <ShieldCheck className="w-4 h-4 shrink-0" />
-          <span>Satu Pintu Akses untuk Staf Admin & Wali Santri</span>
         </div>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
