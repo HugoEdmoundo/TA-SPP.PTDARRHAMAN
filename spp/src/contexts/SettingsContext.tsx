@@ -8,7 +8,8 @@ interface SettingsContextType {
   isConnectedSSE: boolean;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const rawApiBase = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') ? 'https://ta-spp-ptdarrhaman.vercel.app' : 'http://localhost:8000');
+const API_BASE = rawApiBase.replace(/\/+$/, '');
 
 const DEFAULT_SETTINGS: SchoolSettings = {
   id: 'set-ptdarrahman-01',
