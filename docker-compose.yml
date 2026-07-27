@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # ─── 1. Backend Service (FastAPI / REST API + SSE) ───
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ta_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/ta_spp.db:/app/ta_spp.db
+    networks:
+      - ta_network
+
+  # ─── 2. Frontend Service (Vite React SPA + Nginx Reverse Proxy) ───
+  frontend:
+    build:
+      context: ./spp
+      dockerfile: Dockerfile
+      args:
+        # Dikosongkan agar Axios menggunakan relative URL (/students/, /spp/, dll)
+        # yang akan di-proxy secara transparan oleh Nginx ke service backend:8000
+        - VITE_API_URL=
+    container_name: ta_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - ta_network
+
+  # ─── 3. Database Service (Opsional: PostgreSQL 16 untuk Produksi) ───
+  # Jika ingin menggunakan PostgreSQL zamiast SQLite, hilangkan komentar pada blok di bawah
+  # dan sesuaikan DATABASE_URL di backend/.env.
+  # db:
+  #   image: postgres:16-alpine
+  #   container_name: ta_db
+  #   restart: always
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgrespassword
+  #     - POSTGRES_DB=ta_spp
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - ta_network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres -d ta_spp"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+
+networks:
+  ta_network:
+    driver: bridge
+
+# volumes:
+#   postgres_data:

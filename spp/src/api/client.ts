@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const rawBaseUrl = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') ? 'https://ta-spp-ptdarrhaman.vercel.app' : 'http://localhost:8000');
+const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+const rawBaseUrl = import.meta.env.VITE_API_URL || (isVercel ? 'https://ta-spp-ptdarrhaman.vercel.app' : 'http://localhost:8000');
 const BASE_URL = rawBaseUrl.replace(/\/+$/, '');
 
 export const api = axios.create({
