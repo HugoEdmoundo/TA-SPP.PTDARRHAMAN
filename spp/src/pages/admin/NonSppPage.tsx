@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -38,7 +38,6 @@ export const NonSppPage: React.FC = () => {
   const [label, setLabel] = useState('');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(500000);
-  const [dueDate, setDueDate] = useState('2026-08-31');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchData = async () => {
@@ -91,7 +90,6 @@ export const NonSppPage: React.FC = () => {
     handleCategoryChange(firstCat, true);
     setLabel('');
     setDescription('');
-    setDueDate('2026-08-31');
     setShowAddModal(true);
   };
 
@@ -104,7 +102,6 @@ export const NonSppPage: React.FC = () => {
     setLabel(bill.label);
     setDescription(bill.description || '');
     setAmount(Number(bill.amount) || 0);
-    setDueDate(bill.due_date ? String(bill.due_date).substring(0, 10) : '2026-08-31');
     setShowEditModal(true);
   };
 
@@ -144,7 +141,6 @@ export const NonSppPage: React.FC = () => {
         label,
         description,
         amount,
-        due_date: dueDate || null,
       });
       success('Tagihan Diterbitkan', `Tagihan "${label}" senilai ${formatRupiah(amount)} berhasil dibuat untuk ${selectedStudentIds.length} santri.`);
       setShowAddModal(false);
@@ -167,7 +163,6 @@ export const NonSppPage: React.FC = () => {
         label,
         description,
         amount,
-        due_date: dueDate || null,
       });
       success('Tagihan Diperbarui', `Informasi tagihan "${label}" berhasil disimpan.`);
       setShowEditModal(false);
@@ -211,7 +206,7 @@ export const NonSppPage: React.FC = () => {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <span className="text-xs font-extrabold text-obsidian block">Seragam Olahraga & Batik Kelas 10</span>
-                <span className="text-[11px] text-slate font-medium">Kategori: Seragam • Jatuh Tempo: 31 Agustus 2026</span>
+                <span className="text-[11px] text-slate font-medium">Kategori: Seragam</span>
               </div>
               <Badge status="UNPAID">Tagihan Aktif</Badge>
             </div>
@@ -225,7 +220,7 @@ export const NonSppPage: React.FC = () => {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <span className="text-xs font-extrabold text-obsidian block">Ujian Akhir Semester & Raport</span>
-                <span className="text-[11px] text-slate font-medium">Kategori: Kegiatan • Jatuh Tempo: 15 Desember 2026</span>
+                <span className="text-[11px] text-slate font-medium">Kategori: Kegiatan</span>
               </div>
               <Badge status="PAID">Lunas 95%</Badge>
             </div>
@@ -234,10 +229,6 @@ export const NonSppPage: React.FC = () => {
               Diterbitkan untuk seluruh 480 santri aktif. Terkumpul: Rp 159.600.000.
             </div>
           </Card>
-        </div>
-
-        <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan tagihan contoh (Mode Showcase Demo). Gunakan akun <b>admin / admin123</b> atau <b>admin_clean / admin123</b> untuk pengujian CRUD real-time.
         </div>
       </Card>
     );
@@ -310,7 +301,6 @@ export const NonSppPage: React.FC = () => {
                   <th className="p-3.5 pl-5">Label Tagihan / Kategori</th>
                   <th className="p-3.5">Santri Penerima</th>
                   <th className="p-3.5">Nominal (Rp)</th>
-                  <th className="p-3.5">Jatuh Tempo</th>
                   <th className="p-3.5">Status Bayar</th>
                   <th className="p-3.5 pr-5 text-right">Aksi</th>
                 </tr>
@@ -344,9 +334,6 @@ export const NonSppPage: React.FC = () => {
                       </td>
                       <td className="p-3.5 font-mono font-bold text-emerald-primary text-sm">
                         {formatRupiah(Number(bill.amount))}
-                      </td>
-                      <td className="p-3.5 text-slate font-medium">
-                        {bill.due_date ? formatDateIndo(bill.due_date) : '-'}
                       </td>
                       <td className="p-3.5">
                         {isPaid ? (
@@ -405,7 +392,7 @@ export const NonSppPage: React.FC = () => {
         maxWidth="lg"
       >
             <form onSubmit={handleCreateBill} className="flex flex-col gap-3.5 text-xs">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Kategori Tagihan (Master Kategori) *</label>
                   <select
@@ -420,15 +407,6 @@ export const NonSppPage: React.FC = () => {
                     ))}
                     {categoriesList.length === 0 && <option value="Seragam">Seragam</option>}
                   </select>
-                </div>
-                <div>
-                  <label className="font-bold text-obsidian block mb-1">Jatuh Tempo (Opsional)</label>
-                  <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  />
                 </div>
               </div>
 
@@ -529,7 +507,7 @@ export const NonSppPage: React.FC = () => {
         maxWidth="md"
       >
             <form onSubmit={handleUpdateBill} className="flex flex-col gap-3.5 text-xs">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Kategori Tagihan (Master Kategori) *</label>
                   <select
@@ -544,15 +522,6 @@ export const NonSppPage: React.FC = () => {
                     ))}
                     {categoriesList.length === 0 && <option value="Seragam">Seragam</option>}
                   </select>
-                </div>
-                <div>
-                  <label className="font-bold text-obsidian block mb-1">Jatuh Tempo</label>
-                  <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  />
                 </div>
               </div>
 

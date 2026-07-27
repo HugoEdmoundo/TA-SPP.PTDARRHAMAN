@@ -59,11 +59,13 @@ export const SppGridPage: React.FC = () => {
             </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Grid Tagihan SPP (Tahun Ajaran 2025/2026)</span>
+              <span>Simulasi Data SPP</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Pantau status lunas/menunggak santri secara matriks per semester (Fase 3: B-12 & F-09).</p>
           </div>
-          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Tagihan Massal', 'Dalam mode Demo, matriks SPP menampilkan statistik contoh.')} className="shrink-0 w-full sm:w-auto justify-center">Buat Tagihan SPP Massal</Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <p className="text-xs text-slate mt-1">Pantau status lunas/menunggak santri per semester secara mudah dan cepat.</p>
+          </div>
+          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Tagihan Massal', 'Menampilkan statistik contoh.')} className="shrink-0 w-full sm:w-auto justify-center">Buat Tagihan SPP Massal</Button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 text-center">
           <div className="p-3.5 sm:p-4 bg-emerald-light/50 rounded-2xl border border-emerald-primary/20"><span className="text-xs text-slate font-bold block">Juli 2026</span><Badge status="PAID" className="mt-1 font-bold text-xs">85% Lunas</Badge></div>
@@ -102,8 +104,8 @@ export const SppGridPage: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan matriks contoh (Mode Showcase Demo). Gunakan akun <b>admin / admin123</b> atau <b>admin_clean / admin123</b> untuk pengujian CRUD real-time.
+        <div className="bg-emerald-light/50 p-3 mt-4 rounded-2xl border border-emerald-primary/20 text-slate text-xs text-center font-medium">
+          ✨ Menampilkan data contoh (Simulasi SPP). Gunakan akun resmi admin sekolah untuk mengolah transaksi secara aktual.
         </div>
       </Card>
     );
@@ -119,9 +121,11 @@ export const SppGridPage: React.FC = () => {
             </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Grid Tagihan SPP Virtual</span>
+              <span>Daftar Tagihan SPP Bulanan</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Pantau status pembayaran bulanan seluruh santri dalam tampilan matriks terpadu yang cepat dan intuitif.</p>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <p className="text-xs text-slate mt-1">Pantau status pembayaran bulanan seluruh santri secara mudah dan cepat per kelas atau semester.</p>
           </div>
           <div className="flex gap-2 items-center shrink-0">
             <Button variant="outline" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />} onClick={fetchGrid}>
@@ -167,12 +171,12 @@ export const SppGridPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Membentuk matriks SPP dari database SQLite...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Memuat data tagihan SPP santri...</span>
         </Card>
       ) : gridData.length === 0 ? (
         <Card variant="glass" padding="lg">
           <EmptyState
-            title="Matriks Santri Kosong"
+            title="Data SPP Kosong"
             description="Belum ada data santri aktif di database untuk ditampilkan dalam grid SPP ini. Silakan daftarkan santri terlebih dahulu di menu Data Siswa."
 
           />

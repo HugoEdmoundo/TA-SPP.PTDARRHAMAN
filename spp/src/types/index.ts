@@ -82,7 +82,6 @@ export interface SppBill {
   nominal: number;
   paid_amount: number;
   status: BillStatus;
-  due_date: string;
   created_at?: string;
 }
 
@@ -95,7 +94,6 @@ export interface NonSppBill {
   nominal: number;
   target_grade?: string; // If null, applies to specific students or all
   student_ids?: string[];
-  due_date: string;
   created_at?: string;
 }
 

@@ -277,7 +277,7 @@ export const AuditLogPage: React.FC = () => {
                   <tr key={l.id} className="hover:bg-white/60 transition-colors">
                     <td className="p-3.5 pl-5 font-mono text-slate">
                       <div className="font-bold text-obsidian">LOG-#{l.id}</div>
-                      <span className="text-[10px]">{formatDateIndo(l.created_at)}</span>
+                      <span className="text-[10px]">{formatDateIndo(l.created_at, true)}</span>
                     </td>
                     <td className="p-3.5">
                       {getActionBadge(l.action)}

@@ -63,8 +63,8 @@ def get_default_logo():
 
 
 DEFAULT_SCHOOL_SETTINGS = {
-    "school_name": "SMA Islam Darrahman",
-    "school_address": "Jl. Raya Darrahman No. 1, Jakarta",
+    "school_name": "PTDARRAHMAN",
+    "school_address": "Jl. Raya PTDARRAHMAN No. 1, Jakarta",
     "school_phone": "081234567890",
     "school_logo": "",
     "receipt_format": "KWT/{YEAR}/{MONTH}/{ID}",

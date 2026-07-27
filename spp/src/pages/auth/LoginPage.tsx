@@ -66,10 +66,10 @@ export const LoginPage: React.FC = () => {
             />
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-obsidian tracking-tight leading-tight mb-1 font-heading">
-            {settings.name || 'PTD AR-RAHMAN'}
+            {settings.name || 'PTDARRAHMAN'}
           </h1>
           <p className="text-xs sm:text-sm text-slate font-medium">
-            Sistem Pembayaran SPP & Keuangan Pesantren
+            Sistem Pembayaran SPP & Keuangan PTDARRAHMAN
           </p>
         </div>
 

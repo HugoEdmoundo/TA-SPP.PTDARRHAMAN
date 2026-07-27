@@ -21,8 +21,8 @@ def get_school_profile(session: Session) -> dict:
     settings = session.exec(select(SchoolSetting)).all()
     setting_map = {s.key: s.value for s in settings}
     return {
-        "name": setting_map.get("school_name", "SMK PTDARRAHMAN"),
-        "address": setting_map.get("school_address", "Jl. Pendidikan No. 1, Jakarta"),
+        "name": setting_map.get("school_name", "PTDARRAHMAN"),
+        "address": setting_map.get("school_address", "Jl. Raya PTDARRAHMAN No. 1, Jakarta"),
         "phone": setting_map.get("school_phone", "(021) 1234567"),
         "logo_url": setting_map.get("school_logo", ""),
     }

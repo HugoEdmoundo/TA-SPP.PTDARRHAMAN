@@ -42,7 +42,7 @@ def main():
     parser = argparse.ArgumentParser(description="Seed akun admin/wali pertama ke database.")
     parser.add_argument("--username", default="admin", help="Username (default: admin)")
     parser.add_argument("--password", default="admin123", help="Password (default: admin123)")
-    parser.add_argument("--full-name", default="Administrator PTD AR-RAHMAN", help="Nama lengkap")
+    parser.add_argument("--full-name", default="Administrator PTDARRAHMAN", help="Nama lengkap")
     parser.add_argument("--role", default="admin", choices=["admin", "wali"], help="Role user")
     args = parser.parse_args()
 

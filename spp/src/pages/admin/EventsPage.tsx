@@ -291,7 +291,7 @@ export const EventsPage: React.FC = () => {
                     </div>
                     {ev.deadline && (
                       <div className="flex justify-between pt-1 border-t border-slate/10">
-                        <span className="text-slate">Jatuh Tempo:</span>
+                        <span className="text-slate">Batas Waktu:</span>
                         <span className="font-semibold text-obsidian">{formatDateIndo(ev.deadline)}</span>
                       </div>
                     )}

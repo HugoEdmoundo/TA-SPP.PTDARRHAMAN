@@ -226,7 +226,6 @@ def create_event(
             label=event.name,
             description=event.description,
             amount=event.per_student_amount,
-            due_date=event.deadline,
             status="unpaid",
         )
         session.add(bill)
@@ -290,8 +289,6 @@ def update_event(
         for b in bills:
             if payload.name:
                 b.label = payload.name
-            if payload.deadline:
-                b.due_date = payload.deadline
             b.updated_at = datetime.utcnow()
             session.add(b)
 

@@ -139,7 +139,7 @@ export const WaliProfilePage: React.FC = () => {
           <span>Informasi & Bantuan Pesantren</span>
         </h3>
         <p className="text-xs text-slate leading-relaxed mb-4">
-          Aplikasi Sistem Pembayaran SPP Pesantren Tahfidh Darur Rahman (PTD AR-RAHMAN) dikembangkan dengan arsitektur masa depan untuk memudahkan komunikasi keuangan santri dan wali secara transparan dan instan.
+          Aplikasi Sistem Pembayaran SPP PTDARRAHMAN dikembangkan dengan arsitektur masa depan untuk memudahkan komunikasi keuangan santri dan wali secara transparan dan instan.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

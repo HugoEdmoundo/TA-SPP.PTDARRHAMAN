@@ -609,7 +609,7 @@ export const PaymentKasirPage: React.FC = () => {
                   )}
 
                   <div className="text-center pb-3 border-b border-dashed border-slate/30">
-                    <h4 className="font-extrabold text-obsidian text-sm">PESANTREN DAR RAHMAN</h4>
+                    <h4 className="font-extrabold text-obsidian text-sm">PTDARRAHMAN</h4>
                     <span className="text-[10px] text-slate block font-mono mt-0.5">{receiptDetail.receipt?.receipt_number}</span>
                   </div>
 

@@ -118,7 +118,7 @@ export const WaliHistoryPage: React.FC = () => {
                       <span className="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-slate/10 text-slate uppercase">{item.type}</span>
                     </div>
                     <p className="text-xs text-slate mt-1 font-mono">
-                      Inv: {item.inv} • {formatDateIndo(item.date)}
+                      Inv: {item.inv} • {formatDateIndo(item.date, true)}
                     </p>
                     <span className="text-[10px] text-slate font-semibold mt-0.5 inline-block">Metode: {item.method}</span>
                   </div>
@@ -244,7 +244,7 @@ export const WaliHistoryPage: React.FC = () => {
                     <p className="text-xs text-slate mt-1 font-mono">
                       Inv: {item.invoice_number} • No. Kuitansi: {item.receipt_number}
                     </p>
-                    {item.created_at && <span className="text-[10px] text-slate font-semibold mt-0.5 block">{formatDateIndo(item.created_at)}</span>}
+                    {item.created_at && <span className="text-[10px] text-slate font-semibold mt-0.5 block">{formatDateIndo(item.created_at, true)}</span>}
                   </div>
                 </div>
 

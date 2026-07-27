@@ -20,7 +20,7 @@ class SchoolSettingUpdate(BaseModel):
 class BankAccountBase(BaseModel):
     bank_name: str = Field(..., max_length=50, example="BSI")
     account_number: str = Field(..., max_length=50, example="7123456789")
-    account_holder: str = Field(..., max_length=100, example="Yayasan Darrahman")
+    account_holder: str = Field(..., max_length=100, example="PTDARRAHMAN")
     is_active: bool = True
 
 

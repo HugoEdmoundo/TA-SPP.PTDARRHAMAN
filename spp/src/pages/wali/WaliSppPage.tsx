@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { Card, Badge, Button, ReceiptShareCard, EmptyState, Spinner, Modal, formatRupiah, formatMonthYearIndo, formatDateIndo } from '../../components/ui';
+import { Card, Badge, Button, ReceiptShareCard, EmptyState, Spinner, Modal, formatRupiah, formatMonthYearIndo } from '../../components/ui';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -156,7 +156,7 @@ export const WaliSppPage: React.FC = () => {
                         SPP Bulan {formatMonthYearIndo(bill.month, bill.year)}
                       </h4>
                       <p className="text-xs text-slate mt-0.5">
-                        Jatuh tempo: {formatDateIndo(bill.due)} • Nominal: <span className="font-mono font-bold text-obsidian">{formatRupiah(bill.nominal)}</span>
+                        Nominal Tagihan: <span className="font-mono font-bold text-obsidian">{formatRupiah(bill.nominal)}</span>
                       </p>
                     </div>
                   </div>

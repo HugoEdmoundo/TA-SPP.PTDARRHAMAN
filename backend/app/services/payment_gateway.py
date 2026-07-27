@@ -29,7 +29,7 @@ def create_external_checkout(
     student_id: int,
     total_amount: Decimal,
     gateway_name: str,
-    student_name: str = "Siswa PTDArrahman",
+    student_name: str = "Siswa PTDARRAHMAN",
     student_email: str = "siswa@ptdarrahman.sch.id",
     student_phone: str = "081234567890",
 ) -> Tuple[str, str]:

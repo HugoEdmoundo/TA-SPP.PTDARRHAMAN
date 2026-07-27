@@ -18,9 +18,12 @@ import {
   Search, 
   PanelLeftClose,
   PanelLeftOpen,
-  LogOut, 
+  LogOut,
   CheckCircle2,
-  Grid
+  Grid,
+  User,
+  History,
+  HeartHandshake
 } from 'lucide-react';
 import { BottomSheet } from '../ui/BottomSheet';
 
@@ -73,14 +76,18 @@ export const AdminLayout: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const isSuperadmin = user?.role === 'SUPERADMIN' || user?.role === 'superadmin' || user?.role === 'SUPER_ADMIN';
+
   const menuItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },
-    { label: 'SPP Grid (Semester)', path: '/admin/spp', icon: CreditCard },
+    { label: 'SPP', path: '/admin/spp', icon: CreditCard },
     { label: 'Tagihan Non-SPP', path: '/admin/non-spp', icon: FileText },
-    { label: 'Event & Infaq', path: '/admin/event', icon: Calendar },
-    { label: 'Kasir & Pembayaran', path: '/admin/payment', icon: Wallet },
+    { label: 'Event (Kegiatan)', path: '/admin/event', icon: Calendar },
+    { label: 'Kas Infaq', path: '/admin/infaq', icon: HeartHandshake },
+    { label: 'Pembayaran Manual', path: '/admin/payment', icon: Wallet },
+    { label: 'Log Transaksi Santri', path: '/admin/student-history', icon: History },
     { label: 'Laporan Keuangan', path: '/admin/reports', icon: BarChart3 },
-    { label: 'Audit Log & History', path: '/admin/audit', icon: ShieldAlert },
+    ...(isSuperadmin ? [{ label: 'Audit Log & History', path: '/admin/audit', icon: ShieldAlert }] : []),
     { label: 'Data Siswa', path: '/admin/students', icon: Users },
     { label: 'Data Wali Santri', path: '/admin/parents', icon: UserCheck },
     { label: 'Pengaturan Sekolah', path: '/admin/settings', icon: Settings },
@@ -89,9 +96,9 @@ export const AdminLayout: React.FC = () => {
   // Mobile Telegram 5-Tab Bar items
   const mobileTabItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true, isAction: false },
-    { label: 'SPP Grid', path: '/admin/spp', icon: CreditCard, exact: false, isAction: false },
-    { label: 'Kasir', path: '/admin/payment', icon: Wallet, exact: false, isAction: false, badge: '3' },
-    { label: 'Laporan', path: '/admin/reports', icon: BarChart3, exact: false, isAction: false },
+    { label: 'SPP', path: '/admin/spp', icon: CreditCard, exact: false, isAction: false },
+    { label: 'Bayar', path: '/admin/payment', icon: Wallet, exact: false, isAction: false, badge: '3' },
+    { label: 'Riwayat', path: '/admin/student-history', icon: History, exact: false, isAction: false },
     { label: 'Semua Menu', path: '#', icon: Grid, exact: false, isAction: true, badge: 'NEW' },
   ];
 
@@ -268,6 +275,14 @@ export const AdminLayout: React.FC = () => {
                       <p className="text-xs text-slate truncate">{user?.email || 'admin@ptdarrahman.sch.id'}</p>
                     </div>
                     <div className="py-1.5 px-1">
+                      <button
+                        type="button"
+                        onClick={() => { setIsProfileOpen(false); navigate('/admin/profile'); }}
+                        className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-dark hover:bg-white/90 hover:text-emerald-primary transition-all flex items-center gap-2.5"
+                      >
+                        <User className="w-4 h-4 text-emerald-primary" />
+                        <span>Profil Saya</span>
+                      </button>
                       <button
                         type="button"
                         onClick={() => { setIsProfileOpen(false); navigate('/admin/settings'); }}

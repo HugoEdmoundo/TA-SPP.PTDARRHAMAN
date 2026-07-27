@@ -19,7 +19,6 @@ class NonSppBillCreate(BaseModel):
     label: str = Field(..., max_length=100, example="Seragam Batik & Olahraga Kelas 10")
     description: Optional[str] = Field(None, example="Pembayaran seragam untuk tahun ajaran baru")
     amount: Decimal = Field(..., gt=0, example=750000)
-    due_date: Optional[date] = None
     attachment_url: Optional[str] = None
 
 
@@ -29,7 +28,6 @@ class BillUpdate(BaseModel):
     label: Optional[str] = Field(None, max_length=100)
     description: Optional[str] = None
     amount: Optional[Decimal] = Field(None, gt=0)
-    due_date: Optional[date] = None
     attachment_url: Optional[str] = None
 
 
@@ -44,7 +42,6 @@ class BillRead(BaseModel):
     description: Optional[str] = None
     amount: Decimal
     remaining_amount: Decimal
-    due_date: Optional[date] = None
     attachment_url: Optional[str] = None
     status: str
     created_at: datetime

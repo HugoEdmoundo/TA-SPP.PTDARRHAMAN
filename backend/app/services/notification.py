@@ -15,7 +15,7 @@ def get_notification_settings(session: Session) -> Dict[str, str]:
     setting_map = {s.key: s.value for s in settings}
     return {
         "whatsapp_api_token": setting_map.get("whatsapp_api_token", "") or setting_map.get("fonnte_token", ""),
-        "school_name": setting_map.get("school_name", "SMK PTDARRAHMAN"),
+        "school_name": setting_map.get("school_name", "PTDARRAHMAN"),
         "school_phone": setting_map.get("school_phone", ""),
     }
 

@@ -234,7 +234,6 @@ class Bill(SQLModel, table=True):
     status: BillStatus = Field(default=BillStatus.unpaid, index=True)
 
     # References
-    due_date: Optional[date] = Field(default=None)
     event_id: Optional[int] = Field(default=None, foreign_key="events.id")
     notes: Optional[str] = Field(default=None)
 

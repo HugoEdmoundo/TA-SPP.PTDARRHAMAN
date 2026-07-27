@@ -45,7 +45,7 @@ def export_to_excel(
     # 1. Title & Timestamp
     ws["A1"] = title.upper()
     ws["A1"].font = font_title
-    ws["A2"] = f"Generated at: {datetime.utcnow().strftime('%d-%m-%Y %H:%M:%S UTC')} | SMK PTDARRAHMAN"
+    ws["A2"] = f"Generated at: {datetime.utcnow().strftime('%d-%m-%Y %H:%M:%S UTC')} | PTDARRAHMAN"
     ws["A2"].font = font_sub
     
     current_row = 4
@@ -167,7 +167,7 @@ def export_to_pdf(
 
     # Title & Subtitle
     elements.append(Paragraph(title.upper(), title_style))
-    elements.append(Paragraph(f"{subtitle} | SMK PTDARRAHMAN | Dicetak: {datetime.utcnow().strftime('%d-%m-%Y %H:%M')}", sub_style))
+    elements.append(Paragraph(f"{subtitle} | PTDARRAHMAN | Dicetak: {datetime.utcnow().strftime('%d-%m-%Y %H:%M')}", sub_style))
     elements.append(Spacer(1, 10))
 
     # Summary Section

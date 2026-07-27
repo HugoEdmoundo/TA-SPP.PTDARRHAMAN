@@ -44,7 +44,6 @@ def create_non_spp_bills(
             label=payload.label,
             description=payload.description,
             amount=payload.amount,
-            due_date=payload.due_date,
             attachment_url=payload.attachment_url,
             status="unpaid",
         )

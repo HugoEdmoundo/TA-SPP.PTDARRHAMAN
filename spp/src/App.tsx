@@ -18,6 +18,9 @@ import { ReportsPage } from './pages/admin/ReportsPage';
 import { AuditLogPage } from './pages/admin/AuditLogPage';
 import { StudentsPage } from './pages/admin/StudentsPage';
 import { ParentsPage } from './pages/admin/ParentsPage';
+import { InfaqPage } from './pages/admin/InfaqPage';
+import { AdminProfilePage } from './pages/admin/AdminProfilePage';
+import { StudentHistoryPage } from './pages/admin/StudentHistoryPage';
 
 // Wali Pages
 import { WaliDashboardPage } from './pages/wali/WaliDashboardPage';
@@ -50,9 +53,19 @@ export function App() {
                 <Route path="spp" element={<SppGridPage />} />
                 <Route path="non-spp" element={<NonSppPage />} />
                 <Route path="event" element={<EventsPage />} />
+                <Route path="infaq" element={<InfaqPage />} />
                 <Route path="payment" element={<PaymentKasirPage />} />
+                <Route path="student-history" element={<StudentHistoryPage />} />
+                <Route path="profile" element={<AdminProfilePage />} />
                 <Route path="reports" element={<ReportsPage />} />
-                <Route path="audit" element={<AuditLogPage />} />
+                <Route 
+                  path="audit" 
+                  element={
+                    <ProtectedRoute allowedRoles={['SUPERADMIN', 'superadmin', 'SUPER_ADMIN']}>
+                      <AuditLogPage />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route path="students" element={<StudentsPage />} />
                 <Route path="parents" element={<ParentsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
