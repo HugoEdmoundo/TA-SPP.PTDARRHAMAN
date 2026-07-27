@@ -241,7 +241,7 @@ def get_student_report(
     Laporan riwayat & status kewajiban tagihan seorang siswa - B-24.
     Dapat diakses oleh Admin atau Wali dari siswa tersebut.
     """
-    if user.role != "admin":
+    if (user.role or "").lower() not in ["admin", "superadmin"]:
         link = session.exec(
             select(ParentStudent).where(
                 ParentStudent.parent_id == user.id,

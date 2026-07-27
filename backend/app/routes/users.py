@@ -88,8 +88,8 @@ def update_user(
     if user.id == admin.id:
         if payload.is_active is False:
             raise HTTPException(status_code=400, detail="Admin tidak dapat menonaktifkan akun sendiri.")
-        if payload.role and payload.role != "admin":
-            raise HTTPException(status_code=400, detail="Admin tidak dapat mengubah role akun sendiri.")
+        if payload.role and (payload.role or "").lower() not in ["admin", "superadmin", "wali"]:
+            raise HTTPException(status_code=400, detail="Role tidak valid.")
 
     update_data = payload.model_dump(exclude_unset=True)
     for key, val in update_data.items():

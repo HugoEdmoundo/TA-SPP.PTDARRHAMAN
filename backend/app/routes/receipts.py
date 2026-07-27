@@ -16,7 +16,7 @@ def verify_receipt_access(session: Session, user: User, identifier: str):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-    if user.role != "admin":
+    if (user.role or "").lower() not in ["admin", "superadmin"]:
         link = session.exec(
             select(ParentStudent).where(
                 ParentStudent.parent_id == user.id,

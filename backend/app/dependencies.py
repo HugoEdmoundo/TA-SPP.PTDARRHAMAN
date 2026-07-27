@@ -38,20 +38,22 @@ def get_current_user(
 
 
 def require_admin(current_user: User = Depends(get_current_user)) -> User:
-    """Dependency: Hanya mengizinkan role 'admin'."""
-    if current_user.role != "admin":
+    """Dependency: Mengizinkan role 'admin' atau 'superadmin'."""
+    user_role = (current_user.role or "").lower()
+    if user_role not in ["admin", "superadmin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Akses ditolak: Fitur ini hanya untuk Administrator.",
+            detail="Akses ditolak: Fitur ini hanya untuk Administrator atau Superadmin.",
         )
     return current_user
 
 
 def require_wali(current_user: User = Depends(get_current_user)) -> User:
-    """Dependency: Mengizinkan role 'wali' atau 'admin'."""
-    if current_user.role not in ["wali", "admin"]:
+    """Dependency: Mengizinkan role 'wali', 'admin', atau 'superadmin'."""
+    user_role = (current_user.role or "").lower()
+    if user_role not in ["wali", "admin", "superadmin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Akses ditolak: Fitur ini hanya untuk Wali Siswa atau Administrator.",
+            detail="Akses ditolak: Fitur ini hanya untuk Wali Siswa, Admin, atau Superadmin.",
         )
     return current_user
