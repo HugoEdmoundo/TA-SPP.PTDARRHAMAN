@@ -1,9 +1,10 @@
 """
-CLI Seed Command — Membuat akun admin/wali perdana secara aman.
+CLI Seed Command — Membuat akun superadmin, admin, dan wali perdana secara aman.
 
 Usage:
-    python -m app.seed_admin                          # Seed admin default
-    python -m app.seed_admin --username admin --password securepass123
+    python -m app.seed_admin                          # Seed seluruh 3 akun default (superadmin, admin, wali)
+    python -m app.seed_admin --role superadmin --username superadmin --password superpass123
+    python -m app.seed_admin --role admin --username admin --password securepass123
     python -m app.seed_admin --role wali --username wali_test --password wali123
 
 Jalankan sekali saat pertama kali deploy ke Supabase/PostgreSQL.
@@ -38,18 +39,30 @@ def seed_user(username: str, password: str, full_name: str, role: str):
         print(f"[OK] User '{username}' berhasil dibuat (ID: {user.id}, role: {role}).")
 
 
+def seed_all_defaults():
+    """Seed 3 role utama sistem PTDARRAHMAN: Superadmin, Admin, dan Wali."""
+    print("=== Memulai Seeding Akun Default PTDARRAHMAN ===")
+    seed_user("superadmin", "superadmin123", "Superadmin PTDARRAHMAN", "superadmin")
+    seed_user("admin", "admin123", "Administrator PTDARRAHMAN", "admin")
+    seed_user("wali_demo", "wali123", "H. Ahmad Syafi'i (Wali Santri)", "wali")
+    print("=== Seeding Selesai ===")
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Seed akun admin/wali pertama ke database.")
-    parser.add_argument("--username", default="admin", help="Username (default: admin)")
-    parser.add_argument("--password", default="admin123", help="Password (default: admin123)")
+    parser = argparse.ArgumentParser(description="Seed akun superadmin, admin, dan wali ke database.")
+    parser.add_argument("--all", action="store_true", help="Seed seluruh 3 akun default sekaligus")
+    parser.add_argument("--username", default=None, help="Username kustom")
+    parser.add_argument("--password", default="admin123", help="Password kustom")
     parser.add_argument("--full-name", default="Administrator PTDARRAHMAN", help="Nama lengkap")
-    parser.add_argument("--role", default="admin", choices=["admin", "wali"], help="Role user")
+    parser.add_argument("--role", default="admin", choices=["admin", "superadmin", "SUPERADMIN", "wali", "WALI"], help="Role user")
     args = parser.parse_args()
 
-    if args.password == "admin123":
-        print("[WARN] Anda menggunakan password default 'admin123'. Ganti segera di production!")
-
-    seed_user(args.username, args.password, args.full_name, args.role)
+    if args.all or args.username is None:
+        seed_all_defaults()
+    else:
+        if args.password == "admin123":
+            print("[WARN] Anda menggunakan password default 'admin123'. Ganti segera di production!")
+        seed_user(args.username, args.password, args.full_name, args.role)
 
 
 if __name__ == "__main__":

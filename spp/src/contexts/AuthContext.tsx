@@ -40,6 +40,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Instant Demo Support without needing database entries
       const lowerUser = username.trim().toLowerCase();
+      if (lowerUser === 'superadmin_demo' || lowerUser === 'demo_superadmin' || lowerUser === 'superadmin' || (lowerUser === 'demo' && password === 'superadmin123')) {
+        const demoUser: User = {
+          id: 'demo-superadmin-id',
+          name: 'Superadmin PTDARRAHMAN (Showcase)',
+          email: 'superadmin_demo',
+          role: 'SUPERADMIN',
+          phone: '+62 811-0000-0000',
+        };
+        setUser(demoUser);
+        setToken('mock-demo-token-superadmin');
+        localStorage.setItem('spp_token', 'mock-demo-token-superadmin');
+        localStorage.setItem('spp_user', JSON.stringify(demoUser));
+        return demoUser;
+      }
+
       if (lowerUser === 'admin_demo' || lowerUser === 'demo_admin' || (lowerUser === 'demo' && password === 'admin123')) {
         const demoUser: User = {
           id: 'demo-admin-id',

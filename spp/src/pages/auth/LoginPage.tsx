@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { Button, Card } from '../../components/ui';
-import { Lock, User, ArrowRight, Sparkles, Rocket, Users } from 'lucide-react';
+import { Lock, User, ArrowRight, Sparkles, Rocket, Users, ShieldCheck } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -124,22 +124,30 @@ export const LoginPage: React.FC = () => {
             <Sparkles className="w-4 h-4 text-gold-accent" />
             <span>Akses Instan Mode Showcase (Demo)</span>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              onClick={() => handleDemoLogin('superadmin_demo', 'superadmin123')}
+              className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 text-xs font-bold border border-purple-200 transition-all active:scale-95 text-center shadow-2xs group"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-purple-600 group-hover:text-white transition-colors shrink-0" />
+              <span className="truncate">Superadmin</span>
+            </button>
             <button
               type="button"
               onClick={() => handleDemoLogin('admin_demo', 'admin123')}
-              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-light/60 hover:bg-emerald-primary hover:text-white text-emerald-primary text-xs font-bold border border-emerald-primary/20 transition-all active:scale-95 text-center shadow-2xs group"
+              className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-emerald-light/60 hover:bg-emerald-primary hover:text-white text-emerald-primary text-xs font-bold border border-emerald-primary/20 transition-all active:scale-95 text-center shadow-2xs group"
             >
-              <Rocket className="w-3.5 h-3.5 text-emerald-primary group-hover:text-white transition-colors" />
-              <span>Demo Admin</span>
+              <Rocket className="w-3.5 h-3.5 text-emerald-primary group-hover:text-white transition-colors shrink-0" />
+              <span className="truncate">Admin</span>
             </button>
             <button
               type="button"
               onClick={() => handleDemoLogin('demo_wali', 'wali123')}
-              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-gold-bg hover:bg-gold-accent hover:text-obsidian text-gold-dark text-xs font-bold border border-gold-accent/40 transition-all active:scale-95 text-center shadow-2xs group"
+              className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-gold-bg hover:bg-gold-accent hover:text-obsidian text-gold-dark text-xs font-bold border border-gold-accent/40 transition-all active:scale-95 text-center shadow-2xs group"
             >
-              <Users className="w-3.5 h-3.5 text-gold-dark group-hover:text-obsidian transition-colors" />
-              <span>Demo Wali</span>
+              <Users className="w-3.5 h-3.5 text-gold-dark group-hover:text-obsidian transition-colors shrink-0" />
+              <span className="truncate">Wali</span>
             </button>
           </div>
         </div>
