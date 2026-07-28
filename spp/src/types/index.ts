@@ -10,6 +10,7 @@ export interface User {
   phone?: string;
   avatar_url?: string;
   created_at?: string;
+  is_active?: boolean;
 }
 
 export interface Student {

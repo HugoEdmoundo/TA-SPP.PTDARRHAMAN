@@ -10,6 +10,7 @@ import { NotFoundPage } from './pages/error/NotFoundPage';
 // Admin Pages
 import { DashboardPage } from './pages/admin/DashboardPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
+import { UsersPage } from './pages/admin/UsersPage';
 import { SppGridPage } from './pages/admin/SppGridPage';
 import { NonSppPage } from './pages/admin/NonSppPage';
 import { EventsPage } from './pages/admin/EventsPage';
@@ -69,6 +70,14 @@ export function App() {
                 <Route path="students" element={<StudentsPage />} />
                 <Route path="parents" element={<ParentsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route 
+                  path="users" 
+                  element={
+                    <ProtectedRoute allowedRoles={['SUPERADMIN', 'superadmin', 'SUPER_ADMIN']}>
+                      <UsersPage />
+                    </ProtectedRoute>
+                  } 
+                />
               </Route>
 
               {/* Wali Santri Protected Routes */}
