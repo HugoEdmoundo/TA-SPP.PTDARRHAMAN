@@ -102,7 +102,7 @@ export const DashboardPage: React.FC = () => {
             <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
             <span>Mode Showcase Demo: Menampilkan data contoh pesanan & grafik. Gunakan akun admin / admin_clean untuk pengujian data live.</span>
           </div>
-          <Button variant="outline" size="sm" onClick={() => success('Simulasi Demo', 'Beralih ke akun Admin Real untuk menguji database SQLite live.')}>Uji Akun Real</Button>
+          <Button variant="outline" size="sm" onClick={() => success('Simulasi Demo', 'Beralih ke akun Admin Real untuk menguji sistem.')}>Uji Akun Real</Button>
         </div>
 
         {/* Welcome Banner */}
@@ -111,7 +111,7 @@ export const DashboardPage: React.FC = () => {
           <div className="z-10 max-w-xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-emerald-light text-xs font-bold uppercase tracking-wider mb-2 sm:mb-2.5 backdrop-blur-xs">
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gold-accent shrink-0" />
-              <span>Keuangan Pesantren Real-Time</span>
+              <span>Keuangan Pesantren</span>
             </div>
             <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight mb-2 font-heading">
               Ringkasan Keuangan & SPP (Demo)
@@ -311,7 +311,7 @@ export const DashboardPage: React.FC = () => {
     {
       title: 'Total Santri Terdaftar Aktif',
       valueStr: `${totalStudents} Santri`,
-      subText: 'Data terverifikasi dalam database SQLite',
+      subText: 'Data terverifikasi dalam database',
       icon: Users,
       color: 'blue',
     },
@@ -325,13 +325,13 @@ export const DashboardPage: React.FC = () => {
         <div className="z-10 max-w-xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-emerald-light text-xs font-bold uppercase tracking-wider mb-2 sm:mb-2.5 backdrop-blur-xs">
             <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gold-accent shrink-0" />
-            <span>Database Live Real-Time</span>
+            <span>Database Sistem</span>
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight mb-2 font-heading">
             Ringkasan Keuangan & SPP
           </h2>
           <p className="text-xs sm:text-sm text-emerald-light/90 leading-relaxed">
-            Dasbor interaktif real-time terhubung langsung ke database SQLite pesantren.
+            Dasbor interaktif terhubung ke database pesantren.
           </p>
         </div>
         <div className="z-10 flex flex-wrap gap-2 sm:gap-2.5 mt-2 sm:mt-0">

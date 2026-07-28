@@ -80,7 +80,7 @@ export const SettingsPage: React.FC = () => {
         academic_year_current: academicYear,
       });
       setIsSaving(false);
-      success('Pengaturan Disimpan', 'Identitas pesantren dan konfigurasi telah diperbarui ke seluruh sistem (Real-time SSE Sync).');
+      success('Pengaturan Disimpan', 'Identitas pesantren dan konfigurasi telah diperbarui ke seluruh sistem .');
     }, 600);
   };
 
@@ -126,6 +126,21 @@ export const SettingsPage: React.FC = () => {
       success('Tahun Ajaran Dinonaktifkan', `Tahun ajaran ${name} berhasil dinonaktifkan dari daftar.`);
     } catch (err: any) {
       toastError('Gagal Menghapus', err?.response?.data?.detail || 'Terjadi kesalahan saat menghapus.');
+    }
+  };
+
+  const handleToggleAcademicYear = async (id: number, name: string, isActive: boolean) => {
+    try {
+      if (!isDemo) {
+        await api.put(`/settings/academic-years/${id}`, { is_active: isActive });
+      }
+      setAcademicYearsList(prev => prev.map(item => ({
+        ...item,
+        is_active: item.id === id ? isActive : (isActive ? false : item.is_active)
+      })));
+      success('Tahun Ajaran Diaktifkan', `Tahun ajaran ${name} sekarang menjadi periode aktif.`);
+    } catch (err: any) {
+      toastError('Gagal Mengubah', err?.response?.data?.detail || 'Terjadi kesalahan saat mengubah status.');
     }
   };
 
@@ -214,7 +229,7 @@ export const SettingsPage: React.FC = () => {
           <div className="flex items-center justify-between mb-4 border-b border-slate/10 pb-3">
             <h3 className="font-extrabold text-obsidian text-base flex items-center gap-2 font-heading">
               <ImageIcon className="w-5 h-5 text-emerald-primary" />
-              <span>Logo & Branding Sekolah (Real-Time SSE Sync)</span>
+              <span>Logo & Branding Sekolah </span>
             </h3>
             <div className="text-xs font-bold text-emerald-primary bg-emerald-light px-2.5 py-1 rounded-lg flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -305,30 +320,17 @@ export const SettingsPage: React.FC = () => {
         <Card variant="glass" padding="lg" className="shadow-sm">
           <h3 className="font-extrabold text-obsidian text-base mb-4 border-b border-slate/10 pb-3 flex items-center gap-2 font-heading">
             <Calendar className="w-5 h-5 text-emerald-primary" />
-            <span>Konfigurasi Tahun Ajaran & SPP</span>
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-obsidian mb-1.5">
-                Tahun Ajaran Aktif (Semester Sekarang)
-              </label>
-              <select
-                value={academicYear}
-                onChange={(e) => setAcademicYear(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary shadow-2xs"
-                required
-              >
-                {academicYearsList.map((ay) => (
-                  <option key={ay.id} value={ay.name}>
-                    {ay.name} {ay.is_active ? '(Aktif)' : '(Nonaktif)'}
-                  </option>
-                ))}
-                {!academicYearsList.some((ay) => ay.name === academicYear) && (
-                  <option value={academicYear}>{academicYear}</option>
-                )}
-              </select>
+              <InputCurrency
+                label="Nominal SPP Bulanan (Berlaku untuk seluruh siswa)"
+                value={sppDefault}
+                onChange={(val) => setSppDefault(val)}
+                showQuickChips={true}
+                quickChips={[100000, 250000, 300000, 500000]}
+                allowPayAll={false}
+              />
               <p className="text-xs text-slate mt-1">
-                Pilih dari daftar Master Tahun Ajaran di bawah. Akan ditampilkan sebagai filter default pada sistem.
+                Nominal ini adalah besaran SPP global yang akan berlaku dan ditagihkan ke seluruh siswa.
               </p>
             </div>
 
@@ -403,14 +405,24 @@ export const SettingsPage: React.FC = () => {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-right">
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteAcademicYear(ay.id, ay.name)}
-                      className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors inline-flex items-center justify-center"
-                      title="Nonaktifkan / Hapus"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex justify-end gap-2">
+                      {!ay.is_active && (
+                        <button
+                          onClick={() => handleToggleAcademicYear(ay.id, ay.name, true)}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-primary text-white text-xs font-bold hover:bg-emerald-600 transition-colors"
+                          title="Jadikan Aktif"
+                        >
+                          Jadikan Aktif
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteAcademicYear(ay.id, ay.name)}
+                        className="p-1.5 rounded-lg bg-rose-50 text-rose-danger hover:bg-rose-danger hover:text-white transition-colors"
+                        title="Hapus / Nonaktifkan"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -426,114 +438,7 @@ export const SettingsPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* NEW: Master Kategori Tagihan Management */}
-      <Card variant="glass" padding="lg" className="shadow-sm border border-emerald-primary/20">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h3 className="font-extrabold text-obsidian text-base flex items-center gap-2 font-heading">
-              <Tag className="w-5 h-5 text-emerald-primary" />
-              <span>Master Kategori Tagihan (Bill Categories)</span>
-            </h3>
-            <p className="text-xs text-slate mt-0.5">
-              Daftar kategori tagihan Non-SPP (Seragam, Buku, Kegiatan, dll) untuk standarisasi pembuatan tagihan.
-            </p>
-          </div>
-        </div>
 
-        {/* Add Form */}
-        <form onSubmit={handleAddBillCategory} className="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate/5 p-4 rounded-xl mb-6 border border-slate/10">
-          <div>
-            <label className="block text-[10px] font-extrabold uppercase text-slate mb-1">Kode Kategori</label>
-            <input
-              type="text"
-              placeholder="e.g. seragam"
-              value={newCatCode}
-              onChange={(e) => setNewCatCode(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-white border border-slate/20 text-xs font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-extrabold uppercase text-slate mb-1">Nama Kategori</label>
-            <input
-              type="text"
-              placeholder="e.g. Seragam Sekolah"
-              value={newCatName}
-              onChange={(e) => setNewCatName(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg bg-white border border-slate/20 text-xs font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-extrabold uppercase text-slate mb-1">Nominal Default</label>
-            <input
-              type="number"
-              placeholder="0"
-              value={newCatAmount || ''}
-              onChange={(e) => setNewCatAmount(Number(e.target.value))}
-              className="w-full px-3 py-2 rounded-lg bg-white border border-slate/20 text-xs font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20"
-            />
-          </div>
-          <div className="flex items-end">
-            <Button type="submit" variant="primary" size="sm" fullWidth isLoading={isAddingCat} leftIcon={<Plus className="w-4 h-4" />}>
-              Tambah Kategori
-            </Button>
-          </div>
-        </form>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate/10 text-[11px] font-extrabold uppercase text-slate tracking-wider">
-                <th className="py-3 px-4">Kode</th>
-                <th className="py-3 px-4">Nama Kategori</th>
-                <th className="py-3 px-4">Nominal Default</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate/5 text-sm font-medium">
-              {billCategoriesList.map((cat) => (
-                <tr key={cat.id} className="hover:bg-slate/5 transition-colors">
-                  <td className="py-3 px-4 font-mono text-xs font-bold text-slate-700 bg-slate-50 rounded">
-                    {cat.code}
-                  </td>
-                  <td className="py-3 px-4 font-bold text-obsidian flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-emerald-primary" />
-                    <span>{cat.name}</span>
-                  </td>
-                  <td className="py-3 px-4 font-semibold text-emerald-600 font-mono">
-                    {cat.default_amount ? `Rp ${cat.default_amount.toLocaleString('id-ID')}` : '-'}
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold ${cat.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500'}`}>
-                      {cat.is_active ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                      {cat.is_active ? 'Aktif' : 'Nonaktif'}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-right">
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteBillCategory(cat.id, cat.name)}
-                      className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors inline-flex items-center justify-center"
-                      title="Nonaktifkan / Hapus"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {billCategoriesList.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-6 text-center text-xs font-semibold text-slate">
-                    Belum ada data Master Kategori Tagihan. Silakan tambahkan di atas.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
     </div>
   );
 };

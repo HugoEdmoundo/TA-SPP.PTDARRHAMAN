@@ -77,14 +77,11 @@ export const AuditLogPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Mode Showcase Demo</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Keamanan & Audit Trail Keuangan</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Rekaman jejak digital (audit logs) untuk mencegah kecurangan, manipulasi data, dan pelacakan void (Fase 5: B-25 & F-14).</p>
+            <p className="text-xs text-slate mt-1">Rekaman jejak digital (audit logs) untuk mencegah kecurangan, manipulasi data, dan pelacakan void .</p>
           </div>
           <Button variant="outline" size="sm" leftIcon={<RefreshCw className="w-4 h-4 text-emerald-primary" />} onClick={() => success('Simulasi Refresh Log', 'Menampilkan 150 catatan audit keamanan real-time dalam akun real.')}>Muat Ulang Log</Button>
         </div>
@@ -151,7 +148,7 @@ export const AuditLogPage: React.FC = () => {
         </div>
 
         <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan catatan audit contoh (Mode Showcase Demo). Gunakan akun <b>admin / admin123</b> atau <b>admin_clean / admin123</b> untuk pengawasan keamanan real-time.
+          ✨ Menampilkan catatan audit contoh . 
         </div>
       </Card>
     );
@@ -162,9 +159,6 @@ export const AuditLogPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Database Real-Time SQLite</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Keamanan & Audit Trail Keuangan</span>

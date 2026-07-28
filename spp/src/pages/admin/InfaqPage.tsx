@@ -413,7 +413,7 @@ export const InfaqPage: React.FC = () => {
           </div>
 
           <div className="bg-emerald-light/40 p-3 rounded-xl border border-emerald-primary/20 text-slate text-[11px]">
-            ℹ️ Pengeluaran yang dicatat akan mengurangi saldo kas infaq secara real-time pada laporan akuntansi pesantren.
+            ℹ️ Pengeluaran yang dicatat akan mengurangi saldo kas infaq secara langsung pada laporan akuntansi pesantren.
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-slate/15">

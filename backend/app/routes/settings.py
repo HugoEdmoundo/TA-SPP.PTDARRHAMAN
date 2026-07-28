@@ -118,6 +118,13 @@ def update_academic_year(
     for key, value in update_data.items():
         setattr(ay, key, value)
     
+    if payload.is_active is True:
+        # Nonaktifkan semua tahun ajaran lain
+        other_ays = session.exec(select(AcademicYear).where(AcademicYear.id != id, AcademicYear.is_active == True)).all()
+        for other_ay in other_ays:
+            other_ay.is_active = False
+            session.add(other_ay)
+    
     session.add(ay)
     session.commit()
     session.refresh(ay)

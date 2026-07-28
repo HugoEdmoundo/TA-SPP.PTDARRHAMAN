@@ -83,14 +83,11 @@ export const ReportsPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Mode Showcase Demo</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <FileBarChart className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Laporan Keuangan & Ekspor Resmi</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Rekapitulasi kas masuk, tunggakan SPP, donasi, dan ekspor dokumen Excel (.xlsx) serta PDF (Fase 5: B-24 & F-13).</p>
+            <p className="text-xs text-slate mt-1">Rekapitulasi kas masuk, tunggakan SPP, donasi, dan ekspor dokumen Excel (.xlsx) serta PDF .</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" leftIcon={<FileSpreadsheet className="w-4 h-4 text-emerald-primary" />} onClick={() => success('Simulasi Ekspor Excel', 'Dalam mode Demo, sistem mensimulasikan pengunduhan file Laporan_Bulanan_Juli_2026.xlsx.')}>Unduh Excel (.XLSX)</Button>
@@ -155,7 +152,7 @@ export const ReportsPage: React.FC = () => {
         </div>
 
         <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan ringkasan contoh (Mode Showcase Demo). Gunakan akun <b>admin / admin123</b> atau <b>admin_clean / admin123</b> untuk pengujian CRUD real-time.
+          ✨ Menampilkan ringkasan contoh . 
         </div>
       </Card>
     );
@@ -166,9 +163,6 @@ export const ReportsPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Database Real-Time SQLite</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <FileBarChart className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Laporan Keuangan & Ekspor Resmi</span>
@@ -256,7 +250,7 @@ export const ReportsPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Mengkalkulasi laporan dari database SQLite...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Mengkalkulasi laporan dari database...</span>
         </Card>
       ) : !reportData || !reportData.data || reportData.data.length === 0 ? (
         <Card variant="glass" padding="lg">

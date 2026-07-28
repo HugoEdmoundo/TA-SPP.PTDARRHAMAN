@@ -154,6 +154,10 @@ def process_payment_items(
     year = now.year
     month = now.month
 
+    from app.models import AcademicYear
+    active_ay = session.exec(select(AcademicYear).where(AcademicYear.is_active == True)).first()
+    active_ay_id = active_ay.id if active_ay else None
+
     for idx, item in enumerate(items):
         item_infaq = remaining_infaq if idx == 0 else Decimal("0")
         item_total = item.amount + item_infaq
@@ -175,18 +179,8 @@ def process_payment_items(
             ).all()
             paid_spp = sum(p.amount for p in existing_spp)
             
-            # Ambil nominal SPP dari master tabel SppSetting
-            conds = [SppSetting.academic_year.ilike(f"%{item.year}%")]
-            if student.academic_year:
-                conds.append(SppSetting.academic_year == student.academic_year)
-            if student.academic_year_id:
-                conds.append(SppSetting.academic_year_id == student.academic_year_id)
-
-            spp_set = session.exec(
-                select(SppSetting).where(or_(*conds)).order_by(SppSetting.id.desc())
-            ).first()
-            if not spp_set:
-                spp_set = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
+            # Ambil nominal SPP dari master tabel SppSetting (Global)
+            spp_set = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
             nominal_spp = Decimal(str(spp_set.monthly_nominal)) if spp_set else Decimal("500000")
             
             if paid_spp + item.amount > nominal_spp and paid_spp >= nominal_spp:
@@ -211,6 +205,7 @@ def process_payment_items(
                 notes=notes or f"Pembayaran SPP Bulan {item.month} Tahun {item.year}",
                 created_by=created_by,
                 created_at=now,
+                academic_year_id=active_ay_id,
             )
             session.add(payment)
             session.flush()
@@ -252,9 +247,10 @@ def process_payment_items(
                 channel=channel,
                 gateway_transaction_id=gateway_trx_id,
                 status="paid",
-                notes=notes or f"Pembayaran {bill.label}",
+                notes=notes or f"Pembayaran {item.type} {bill.label}",
                 created_by=created_by,
                 created_at=now,
+                academic_year_id=active_ay_id,
             )
             session.add(payment)
             session.flush()

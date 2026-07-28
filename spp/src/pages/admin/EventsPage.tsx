@@ -149,14 +149,11 @@ export const EventsPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Mode Showcase Demo</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Event & Patungan Sekolah</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Kelola donasi, infaq pembangunan, study tour, dan kegiatan dengan progres bar real-time (Fase 4: B-14 & F-11).</p>
+            <p className="text-xs text-slate mt-1">Kelola donasi, infaq pembangunan, study tour, dan kegiatan dengan progres bar .</p>
           </div>
           <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Buat Event', 'Beralih ke akun Admin Real untuk membuat kegiatan patungan dengan tagihan otomatis.')} className="shrink-0 w-full sm:w-auto justify-center">Buat Event Baru</Button>
         </div>
@@ -208,7 +205,7 @@ export const EventsPage: React.FC = () => {
         </div>
 
         <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan kegiatan contoh (Mode Showcase Demo). Gunakan akun <b>admin / admin123</b> atau <b>admin_clean / admin123</b> untuk pengujian CRUD real-time.
+          ✨ Menampilkan kegiatan contoh . 
         </div>
       </Card>
     );
@@ -219,9 +216,6 @@ export const EventsPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Database Real-Time SQLite</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Event & Patungan Sekolah</span>

@@ -54,9 +54,6 @@ export const SppGridPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Mode Showcase Demo</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Simulasi Data SPP</span>
@@ -116,9 +113,6 @@ export const SppGridPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Matriks Pembayaran Real-Time</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Daftar Tagihan SPP Bulanan</span>

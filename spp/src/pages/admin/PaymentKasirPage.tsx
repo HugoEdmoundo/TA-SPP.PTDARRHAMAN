@@ -91,7 +91,7 @@ export const PaymentKasirPage: React.FC = () => {
     setAmount(500000);
     setInfaqAmount(0);
     setPaymentMethod('cash');
-    setNotes('Pembayaran tunai di loket kasir');
+    setNotes('Pembayaran manual');
     setShowAddModal(true);
   };
 
@@ -205,16 +205,13 @@ export const PaymentKasirPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Mode Showcase Demo</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Kasir Manual & Pembayaran Sekolah</span>
+              <span>Pembayaran Manual</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Catat penerimaan tunai di loket dan verifikasi transfer manual dengan cetak kuitansi digital (Fase 4: B-19 & F-12).</p>
+            <p className="text-xs text-slate mt-1">Catat penerimaan manual.</p>
           </div>
-          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Kasir Manual', 'Beralih ke akun Admin Real untuk mencatat pembayaran tunai secara live.')} className="shrink-0 w-full sm:w-auto justify-center">Catat Pembayaran Baru</Button>
+          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Pembayaran Manual', 'Beralih ke akun Admin Real untuk mencatat pembayaran.')} className="shrink-0 w-full sm:w-auto justify-center">Catat Pembayaran Baru</Button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -269,7 +266,7 @@ export const PaymentKasirPage: React.FC = () => {
         </div>
 
         <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan transaksi contoh (Mode Showcase Demo). Gunakan akun <b>admin / admin123</b> atau <b>admin_clean / admin123</b> untuk pengujian CRUD real-time.
+          ✨ Menampilkan transaksi contoh.
         </div>
       </Card>
     );
@@ -280,17 +277,14 @@ export const PaymentKasirPage: React.FC = () => {
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold uppercase tracking-wider mb-1">
-              <span>Database Real-Time SQLite</span>
-            </div>
             <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
               <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Kasir Manual & Pembayaran Sekolah</span>
+              <span>Pembayaran Manual</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Loket kasir tunai (cash) & transfer manual untuk pembayaran SPP, Non-SPP, dan donasi kegiatan santri.</p>
+            <p className="text-xs text-slate mt-1">Pencatatan pembayaran manual (tunai / transfer).</p>
           </div>
           <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd} className="shrink-0 w-full sm:w-auto justify-center">
-            Catat Pembayaran Loket (Cash)
+            Catat Pembayaran
           </Button>
         </div>
 
@@ -329,8 +323,8 @@ export const PaymentKasirPage: React.FC = () => {
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Belum Ada Transaksi Pembayaran"
-            description={searchTerm ? `Tidak ditemukan transaksi dengan kata kunci "${searchTerm}".` : "Database pembayaran saat ini masih bersih (0 record). Klik tombol Catat Pembayaran Loket di atas untuk mulai mencatat pembayaran santri via loket kasir."}
-            action={!searchTerm ? <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd}>Catat Pembayaran Sekarang</Button> : undefined}
+            description={searchTerm ? `Tidak ditemukan transaksi dengan kata kunci "${searchTerm}".` : "Belum ada catatan pembayaran. Klik Catat Pembayaran untuk menambahkan."}
+            action={!searchTerm ? <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd}>Catat Pembayaran</Button> : undefined}
           />
         </Card>
       ) : (
@@ -428,7 +422,7 @@ export const PaymentKasirPage: React.FC = () => {
         title={
           <>
             <Plus className="w-5 h-5 text-emerald-primary" />
-            <span>Catat Pembayaran Tunai (Loket Kasir)</span>
+            <span>Catat Pembayaran Manual</span>
           </>
         }
         maxWidth="lg"
@@ -473,8 +467,8 @@ export const PaymentKasirPage: React.FC = () => {
                     onChange={(e: any) => setPaymentMethod(e.target.value)}
                     className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
                   >
-                    <option value="cash">Tunai (Cash / Loket)</option>
-                    <option value="transfer">Transfer Manual / EDC</option>
+                    <option value="cash">Tunai</option>
+                    <option value="transfer">Transfer</option>
                   </select>
                 </div>
               </div>

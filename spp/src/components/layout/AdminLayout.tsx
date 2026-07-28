@@ -245,13 +245,7 @@ export const AdminLayout: React.FC = () => {
                 </kbd>
               </button>
 
-              {/* SSE Live Sync Badge */}
-              {isConnectedSSE && (
-                <div className="hidden lg:flex items-center gap-1.5 text-[11px] font-bold text-emerald-primary bg-white/70 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/90 shadow-2xs" title="Real-Time SSE Sync Tersambung">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-primary" />
-                  <span>Live Sync</span>
-                </div>
-              )}
+
 
               {/* Profile Dropdown Pill */}
               <div className="relative" ref={profileRef}>

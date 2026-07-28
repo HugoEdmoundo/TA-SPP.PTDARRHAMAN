@@ -294,7 +294,7 @@ export const WaliDashboardPage: React.FC = () => {
       <Card variant="glass" padding="lg">
         <EmptyState
           title="Belum Ada Santri Terhubung"
-          description="Akun Wali Anda saat ini belum dikaitkan (linked) dengan data santri manapun dalam database SQLite pesantren. Silakan hubungi Admin / Tata Usaha untuk menautkan nomor HP atau akun Anda ke data putra/putri Anda."
+          description="Akun Wali Anda saat ini belum dikaitkan (linked) dengan data santri manapun dalam database pesantren. Silakan hubungi Admin / Tata Usaha untuk menautkan nomor HP atau akun Anda ke data putra/putri Anda."
           action={<Button variant="outline" size="sm" onClick={() => window.location.reload()}>Refresh Halaman</Button>}
         />
       </Card>
@@ -305,7 +305,7 @@ export const WaliDashboardPage: React.FC = () => {
     return (
       <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-16">
         <Spinner size="lg" color="emerald" />
-        <span className="text-xs text-slate font-semibold mt-3">Mengambil tagihan real-time santri dari database...</span>
+        <span className="text-xs text-slate font-semibold mt-3">Mengambil tagihan santri dari database...</span>
       </Card>
     );
   }

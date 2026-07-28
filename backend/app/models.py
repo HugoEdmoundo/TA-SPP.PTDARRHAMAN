@@ -197,6 +197,7 @@ class Event(SQLModel, table=True):
     total_target: Decimal = Field(default=Decimal("0"), max_digits=15, decimal_places=2)
     total_collected: Decimal = Field(default=Decimal("0"), max_digits=15, decimal_places=2)
     status: EventStatus = Field(default=EventStatus.draft)
+    academic_year_id: Optional[int] = Field(default=None, foreign_key="academic_years.id", index=True)
     deadline: Optional[date] = Field(default=None)
     allow_installment: bool = Field(default=True)
     min_installment_amount: Optional[Decimal] = Field(default=None, max_digits=12, decimal_places=2)
@@ -221,6 +222,7 @@ class Bill(SQLModel, table=True):
     student_id: int = Field(foreign_key="students.id", index=True)
     bill_type: BillType = Field(index=True)             # DEPRECATED — gunakan category_id untuk fleksibilitas
     category_id: Optional[int] = Field(default=None, foreign_key="bill_categories.id", index=True)
+    academic_year_id: Optional[int] = Field(default=None, foreign_key="academic_years.id", index=True)
 
     # Identifiers & Category
     label: str = Field(max_length=200)                  # "Denda Buku", "Study Tour Bali"
@@ -262,6 +264,7 @@ class Payment(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     student_id: int = Field(foreign_key="students.id", index=True)
     bill_id: Optional[int] = Field(default=None, foreign_key="bills.id", index=True)
+    academic_year_id: Optional[int] = Field(default=None, foreign_key="academic_years.id", index=True)
     payment_type: PaymentType = Field(index=True)       # spp, non_spp, event
     status: PaymentStatus = Field(default=PaymentStatus.paid, index=True)  # Status pembayaran
 

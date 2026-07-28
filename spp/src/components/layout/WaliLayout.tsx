@@ -123,9 +123,7 @@ export const WaliLayout: React.FC = () => {
                 alt="Logo"
                 className="w-7 h-7 sm:w-9 sm:h-9 object-contain rounded-xl bg-white/80 p-0.5 border border-white/90 shadow-2xs"
               />
-              {isConnectedSSE && (
-                <span className="absolute -bottom-0.5 -right-0.5 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-emerald-bright border-2 border-white rounded-full" title="Real-time SSE Tersambung" />
-              )}
+
             </div>
             <div className="min-w-0 flex-1">
               <h1 className="text-xs sm:text-sm md:text-base font-extrabold text-obsidian leading-tight tracking-tight truncate font-heading">PTDARRAHMAN</h1>
