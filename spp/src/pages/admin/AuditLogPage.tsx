@@ -147,9 +147,7 @@ export const AuditLogPage: React.FC = () => {
           </table>
         </div>
 
-        <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan catatan audit contoh . 
-        </div>
+        
       </Card>
     );
   }

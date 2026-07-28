@@ -97,13 +97,6 @@ export const DashboardPage: React.FC = () => {
 
     return (
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-100 border border-amber-300 p-4 rounded-2xl text-amber-900 text-xs font-bold">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
-            <span>Mode Showcase Demo: Menampilkan data contoh pesanan & grafik. Gunakan akun admin / admin_clean untuk pengujian data live.</span>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => success('Simulasi Demo', 'Beralih ke akun Admin Real untuk menguji sistem.')}>Uji Akun Real</Button>
-        </div>
 
         {/* Welcome Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 bg-gradient-to-r from-emerald-primary to-[#135235] text-white p-5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-xl relative overflow-hidden">
@@ -325,7 +318,7 @@ export const DashboardPage: React.FC = () => {
         <div className="z-10 max-w-xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-emerald-light text-xs font-bold uppercase tracking-wider mb-2 sm:mb-2.5 backdrop-blur-xs">
             <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gold-accent shrink-0" />
-            <span>Database Sistem</span>
+            
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight mb-2 font-heading">
             Ringkasan Keuangan & SPP

@@ -178,7 +178,7 @@ export const EventsPage: React.FC = () => {
                 <span>Cicilan: Min. Rp 300.000</span>
               </div>
             </div>
-            <Button variant="outline" size="sm" leftIcon={<Eye className="w-4 h-4" />} onClick={() => success('Simulasi Progres', 'Menampilkan progres kontribusi santri dalam mode Demo.')} className="mt-4 w-full justify-center">Lihat Progres Siswa</Button>
+            <Button variant="outline" size="sm" leftIcon={<Eye className="w-4 h-4" />} onClick={() => success('Simulasi Progres', 'Menampilkan progres kontribusi santri dalam sistem.')} className="mt-4 w-full justify-center">Lihat Progres Siswa</Button>
           </Card>
 
           <Card variant="elevated" padding="sm" className="p-5 bg-white/90 border border-slate/15 flex flex-col justify-between">
@@ -200,13 +200,11 @@ export const EventsPage: React.FC = () => {
                 <span>Sukarela / Boleh Cicil</span>
               </div>
             </div>
-            <Button variant="outline" size="sm" leftIcon={<Eye className="w-4 h-4" />} onClick={() => success('Simulasi Progres', 'Menampilkan progres kontribusi santri dalam mode Demo.')} className="mt-4 w-full justify-center">Lihat Progres Siswa</Button>
+            <Button variant="outline" size="sm" leftIcon={<Eye className="w-4 h-4" />} onClick={() => success('Simulasi Progres', 'Menampilkan progres kontribusi santri dalam sistem.')} className="mt-4 w-full justify-center">Lihat Progres Siswa</Button>
           </Card>
         </div>
 
-        <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan kegiatan contoh . 
-        </div>
+        
       </Card>
     );
   }

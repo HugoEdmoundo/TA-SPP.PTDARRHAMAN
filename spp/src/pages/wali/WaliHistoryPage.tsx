@@ -76,69 +76,6 @@ export const WaliHistoryPage: React.FC = () => {
 
     return (
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-100 border border-amber-300 p-4 rounded-2xl text-amber-900 text-xs font-bold">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
-            <span>Mode Showcase Demo: Menampilkan riwayat transaksi dan bukti pembayaran resmi santri.</span>
-          </div>
-        </div>
-
-        <Card variant="glass" padding="md" className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <History className="w-6 h-6 text-emerald-primary shrink-0" />
-              <span>Riwayat Transaksi & Bukti Pembayaran</span>
-            </h2>
-            <p className="text-xs text-slate mt-1">Seluruh riwayat pembayaran tersimpan aman dan dapat dibagikan ulang kapan saja.</p>
-          </div>
-
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-slate absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Cari invoice / kuitansi..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate/20 rounded-xl focus:outline-none focus:border-emerald-primary shadow-2xs font-medium"
-            />
-          </div>
-        </Card>
-
-        <Card variant="glass" padding="none" className="overflow-hidden">
-          <div className="divide-y divide-slate/10">
-            {filtered.map((item) => (
-              <div key={item.id} onClick={() => handleOpenReceiptDemo(item)} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-emerald-light/30 transition-colors cursor-pointer group">
-                <div className="flex items-start gap-3.5">
-                  <div className="p-2.5 rounded-2xl bg-emerald-light text-emerald-primary shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-obsidian group-hover:text-emerald-primary transition-colors">{item.title}</span>
-                      <span className="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-slate/10 text-slate uppercase">{item.type}</span>
-                    </div>
-                    <p className="text-xs text-slate mt-1 font-mono">
-                      Inv: {item.inv} • {formatDateIndo(item.date, true)}
-                    </p>
-                    <span className="text-[10px] text-slate font-semibold mt-0.5 inline-block">Metode: {item.method}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 sm:pt-0 border-t sm:border-0 border-slate/10">
-                  <div className="text-right">
-                    <span className="text-xs text-slate block">Total Bayar:</span>
-                    <span className="font-mono font-extrabold text-obsidian text-base">{formatRupiah(item.amount)}</span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    leftIcon={<ShieldCheck className="w-4 h-4 text-emerald-primary" />}
-                    className="font-bold text-xs shrink-0 bg-white"
-                    onClick={(e) => { e.stopPropagation(); handleOpenReceiptDemo(item); }}
-                  >
-                    Kuitansi Digital
-                  </Button>
-                </div>
               </div>
             ))}
           </div>

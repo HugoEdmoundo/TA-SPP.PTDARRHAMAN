@@ -38,52 +38,6 @@ export const WaliProfilePage: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto">
       {isDemo && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-100 border border-amber-300 p-4 rounded-2xl text-amber-900 text-xs font-bold">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
-            <span>Mode Showcase Demo: Menampilkan profil akun wali dan data anak santri contoh.</span>
-          </div>
-        </div>
-      )}
-
-      {/* Main Profile Info Card */}
-      <Card variant="glass" padding="lg" className="relative overflow-hidden border-2 border-emerald-primary/20">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-light/50 to-transparent rounded-bl-full pointer-events-none -z-10" />
-        
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-emerald-primary to-emerald-light flex items-center justify-center text-white font-extrabold text-3xl shadow-lg shrink-0 border-4 border-white">
-            {user?.name?.charAt(0) || 'W'}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
-              <h2 className="text-xl sm:text-2xl font-extrabold text-obsidian font-heading truncate">
-                {user?.name || 'H. Ahmad Syafi\'i'}
-              </h2>
-              <Badge status="ACTIVE" className="w-fit mx-auto sm:mx-0">Wali Santri Resmi</Badge>
-            </div>
-            
-            <p className="text-xs text-slate font-medium flex items-center justify-center sm:justify-start gap-1.5 mt-1">
-              <Mail className="w-3.5 h-3.5 text-emerald-primary" />
-              <span>{user?.email || 'wali_faiz@ptdarrahman.sch.id'}</span>
-            </p>
-
-            <p className="text-xs text-slate font-medium flex items-center justify-center sm:justify-start gap-1.5 mt-1">
-              <Phone className="w-3.5 h-3.5 text-emerald-primary" />
-              <span>+62 812-3456-7890 (Terhubung WhatsApp Kuitansi)</span>
-            </p>
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            leftIcon={<LogOut className="w-4 h-4 text-rose-danger" />}
-            onClick={logout}
-            className="text-rose-danger border-rose-200 hover:bg-rose-50 hover:border-rose-300 font-bold text-xs shrink-0"
-          >
-            Keluar Aplikasi
-          </Button>
-        </div>
       </Card>
 
       {/* Linked Children Card */}

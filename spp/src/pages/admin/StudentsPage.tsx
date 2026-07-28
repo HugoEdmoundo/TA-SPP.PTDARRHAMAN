@@ -279,7 +279,7 @@ export const StudentsPage: React.FC = () => {
             <p className="text-xs text-slate mt-1">Daftar santri aktif, status akademis, dan impor data cepat via file Excel / CSV terintegrasi Master Tahun Ajaran.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
-            <Button variant="outline" size="sm" leftIcon={<FileSpreadsheet className="w-4 h-4" />} onClick={() => success('Simulasi Impor Excel', 'Dalam mode Demo, fitur impor menampilkan simulasi data 480 santri.')} className="w-full sm:w-auto justify-center">Impor Excel / CSV</Button>
+            <Button variant="outline" size="sm" leftIcon={<FileSpreadsheet className="w-4 h-4" />} onClick={() => success('Simulasi Impor Excel', 'Dalam sistem, fitur impor menampilkan simulasi data 480 santri.')} className="w-full sm:w-auto justify-center">Impor Excel / CSV</Button>
             <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Tambah Santri', 'Beralih ke akun Admin Real (admin / admin123) untuk menyimpan data asli.')} className="w-full sm:w-auto justify-center">Tambah Santri</Button>
           </div>
         </div>
@@ -320,9 +320,7 @@ export const StudentsPage: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan data contoh . 
-        </div>
+        
       </Card>
     );
   }

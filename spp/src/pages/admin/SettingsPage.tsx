@@ -194,33 +194,6 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto pb-12">
       {isDemo && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-100 border border-amber-300 p-4 rounded-2xl text-amber-900 text-xs font-bold shadow-sm">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
-            <span>Mode Showcase Demo: Anda sedang melihat pengaturan simulasi pesantren. Beralih ke akun Admin Real untuk pengujian live.</span>
-          </div>
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-            <Settings className="w-6 h-6 text-emerald-primary" />
-            <span>Pengaturan & Profil Sekolah</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-slate mt-1">
-            Kelola identitas resmi, logo, master tahun ajaran, dan kategori tagihan sistem PTDARRAHMAN.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleReset} leftIcon={<RefreshCw className="w-4 h-4" />}>
-            Reset Default
-          </Button>
-          <Button variant="primary" size="sm" onClick={handleSave} isLoading={isSaving} leftIcon={<Save className="w-4 h-4" />}>
-            Simpan Perubahan
-          </Button>
-        </div>
       </div>
 
       <form onSubmit={handleSave} className="flex flex-col gap-6">

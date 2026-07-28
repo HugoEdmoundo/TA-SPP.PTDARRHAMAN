@@ -88,13 +88,6 @@ export const WaliDashboardPage: React.FC = () => {
 
     return (
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-100 border border-amber-300 p-4 rounded-2xl text-amber-900 text-xs font-bold">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-700 shrink-0" />
-            <span>Mode Showcase Demo: Menampilkan data tagihan contoh. Gunakan akun Wali Real untuk melihat tagihan asli santri.</span>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => success('Simulasi Demo', 'Anda sedang berada dalam mode simulasi interaktif.')}>Akun Simulasi</Button>
-        </div>
 
         {/* Student Profile Overview Card */}
         <Card variant="glass" padding="none" glow="emerald" className="p-4 sm:p-6 md:p-8 bg-gradient-to-r from-white/90 to-emerald-light/30 border-2 border-emerald-primary/30">

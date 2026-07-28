@@ -90,8 +90,8 @@ export const ReportsPage: React.FC = () => {
             <p className="text-xs text-slate mt-1">Rekapitulasi kas masuk, tunggakan SPP, donasi, dan ekspor dokumen Excel (.xlsx) serta PDF .</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<FileSpreadsheet className="w-4 h-4 text-emerald-primary" />} onClick={() => success('Simulasi Ekspor Excel', 'Dalam mode Demo, sistem mensimulasikan pengunduhan file Laporan_Bulanan_Juli_2026.xlsx.')}>Unduh Excel (.XLSX)</Button>
-            <Button variant="primary" size="sm" leftIcon={<FileText className="w-4 h-4" />} onClick={() => success('Simulasi Ekspor PDF', 'Dalam mode Demo, sistem mensimulasikan cetak dokumen Laporan_Bulanan_Juli_2026.pdf.')}>Unduh PDF (.PDF)</Button>
+            <Button variant="outline" size="sm" leftIcon={<FileSpreadsheet className="w-4 h-4 text-emerald-primary" />} onClick={() => success('Simulasi Ekspor Excel', 'Dalam sistem, sistem mensimulasikan pengunduhan file Laporan_Bulanan_Juli_2026.xlsx.')}>Unduh Excel (.XLSX)</Button>
+            <Button variant="primary" size="sm" leftIcon={<FileText className="w-4 h-4" />} onClick={() => success('Simulasi Ekspor PDF', 'Dalam sistem, sistem mensimulasikan cetak dokumen Laporan_Bulanan_Juli_2026.pdf.')}>Unduh PDF (.PDF)</Button>
           </div>
         </div>
 
@@ -151,9 +151,7 @@ export const ReportsPage: React.FC = () => {
           </table>
         </div>
 
-        <div className="mt-4 text-center text-xs text-slate bg-emerald-light/30 p-3 rounded-xl border border-emerald-primary/20">
-          ✨ Menampilkan ringkasan contoh . 
-        </div>
+        
       </Card>
     );
   }
