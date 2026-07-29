@@ -12,8 +12,6 @@ export const StudentHistoryPage: React.FC = () => {
   const { error: toastError } = useToast();
   const { user } = useAuth();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_clean@ptdarrahman.sch.id' || user?.name?.toLowerCase().includes('demo');
-
   const [studentsList, setStudentsList] = useState<Student[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);
   const [searchStudent, setSearchStudent] = useState('');
@@ -29,17 +27,6 @@ export const StudentHistoryPage: React.FC = () => {
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
 
   const fetchStudents = async () => {
-    if (isDemo) {
-      setStudentsList([
-        { id: 'std-101', nis: '20240101', name: 'Ahmad Fauzi', grade: 'X-A', status: 'ACTIVE', class_name: 'Kelas 10 A Tahfidh' },
-        { id: 'std-102', nis: '20240102', name: 'Siti Aminah', grade: 'XI-IPA-1', status: 'ACTIVE', class_name: 'Kelas 11 IPA 1' },
-        { id: 'std-103', nis: '20240103', name: 'Muhammad Ridwan', grade: 'XII-IPS-2', status: 'ACTIVE', class_name: 'Kelas 12 IPS 2' },
-        { id: 'std-104', nis: '20240104', name: 'Zahra Putri', grade: 'X-B', status: 'ACTIVE', class_name: 'Kelas 10 B Reguler' },
-        { id: 'std-105', nis: '20240105', name: 'Abdullah Azzam', grade: 'XI-IPA-2', status: 'ACTIVE', class_name: 'Kelas 11 IPA 2' },
-        { id: 'std-106', nis: '20240106', name: 'Fatimah Azzahra', grade: 'X-A', status: 'ACTIVE', class_name: 'Kelas 10 A Tahfidh' }
-      ]);
-      return;
-    }
 
     setIsLoadingStudents(true);
     try {
@@ -54,21 +41,10 @@ export const StudentHistoryPage: React.FC = () => {
 
   useEffect(() => {
     fetchStudents();
-  }, [isDemo]);
+  }, []);
 
   const fetchStudentHistory = async (student: Student) => {
     setSelectedStudent(student);
-    if (isDemo) {
-      // Mock Full History Timeline
-      setHistoryData([
-        { id: 'h-01', receipt_number: `KUITANSI-202607-${student.nis}`, invoice_number: `INV-2026-0701-${student.nis}`, title: 'SPP Bulan Juli 2026', type: 'SPP', amount: 1500000, date: '2026-07-05T14:35:10Z', method: 'QRIS Gateway (By App)', status: 'SUCCESS', infaq: 50000 },
-        { id: 'h-02', receipt_number: `KUITANSI-202606-${student.nis}`, invoice_number: `INV-2026-0612-${student.nis}`, title: 'SPP Bulan Juni 2026', type: 'SPP', amount: 1500000, date: '2026-06-08T10:20:45Z', method: 'Pembayaran Manual (Admin)', status: 'SUCCESS', infaq: 0 },
-        { id: 'h-03', receipt_number: `KUITANSI-202606-QURBAN-${student.nis}`, invoice_number: `INV-2026-0605-${student.nis}`, title: 'Patungan Qurban Idul Adha 1447 H', type: 'EVENT', amount: 200000, date: '2026-06-05T09:15:00Z', method: 'Virtual Account Gateway', status: 'SUCCESS', infaq: 25000 },
-        { id: 'h-04', receipt_number: `KUITANSI-202605-${student.nis}`, invoice_number: `INV-2026-0504-${student.nis}`, title: 'Buku Modul Semester 1 & LKS', type: 'NON_SPP', amount: 450000, date: '2026-05-12T16:40:20Z', method: 'Pembayaran Manual (Admin)', status: 'SUCCESS', infaq: 0 },
-        { id: 'h-05', receipt_number: `KUITANSI-202604-${student.nis}`, invoice_number: `INV-2026-0402-${student.nis}`, title: 'SPP Bulan April 2026', type: 'SPP', amount: 1500000, date: '2026-04-03T11:10:05Z', method: 'Transfer Bank Manual', status: 'SUCCESS', infaq: 100000 }
-      ]);
-      return;
-    }
 
     setIsLoadingHistory(true);
     try {

@@ -7,20 +7,10 @@ import { Phone, Mail, LogOut, Users, School, MessageCircle, Sparkles, CheckCircl
 export const WaliProfilePage: React.FC = () => {
   const { user, logout } = useAuth();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'demo_wali' || user?.name?.toLowerCase().includes('demo');
-
   const [childrenList, setChildrenList] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (isDemo) {
-      setChildrenList([
-        { id: 'std-01', name: "Muhammad Faiz Syafi'i", nis: '20240105', grade: 'XI-IPA-1', status: 'ACTIVE' },
-        { id: 'std-02', name: "Aisyah Zahra Syafi'i", nis: '20250218', grade: 'X-A', status: 'ACTIVE' },
-      ]);
-      setIsLoading(false);
-      return;
-    }
     const fetchChildren = async () => {
       setIsLoading(true);
       try {
@@ -33,7 +23,7 @@ export const WaliProfilePage: React.FC = () => {
       }
     };
     fetchChildren();
-  }, [isDemo]);
+  }, []);
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto">

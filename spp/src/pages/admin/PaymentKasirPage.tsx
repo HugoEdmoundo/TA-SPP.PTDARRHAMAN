@@ -10,12 +10,10 @@ export const PaymentKasirPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
-
   const [payments, setPayments] = useState<any[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [studentBills, setStudentBills] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMethod, setFilterMethod] = useState('all');
 
@@ -41,7 +39,6 @@ export const PaymentKasirPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchData = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       let url = `/payments/?limit=200`;
@@ -63,7 +60,7 @@ export const PaymentKasirPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [filterMethod, isDemo]);
+  }, [filterMethod]);
 
   // Load bills when student changes for non_spp or event
   useEffect(() => {
@@ -80,7 +77,7 @@ export const PaymentKasirPage: React.FC = () => {
       }
     };
     fetchStudentBills();
-  }, [selectedStudentId, paymentType, isDemo]);
+  }, [selectedStudentId, paymentType]);
 
   const handleOpenAdd = () => {
     setSelectedStudentId(allStudents[0]?.id ? String(allStudents[0].id) : '');
@@ -200,76 +197,6 @@ export const PaymentKasirPage: React.FC = () => {
     { num: 10, name: 'Oktober' }, { num: 11, name: 'November' }, { num: 12, name: 'Desember' }
   ];
 
-  if (isDemo) {
-    return (
-      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Pembayaran Manual</span>
-            </h2>
-            <p className="text-xs text-slate mt-1">Catat penerimaan manual.</p>
-          </div>
-          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Pembayaran Manual', 'Beralih ke akun Admin Real untuk mencatat pembayaran.')} className="shrink-0 w-full sm:w-auto justify-center">Catat Pembayaran Baru</Button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card variant="elevated" padding="sm" className="p-4 bg-emerald-light/30 border border-emerald-primary/20">
-            <span className="text-xs text-slate font-semibold block">Penerimaan Tunai Hari Ini</span>
-            <span className="text-lg font-mono font-bold text-obsidian block mt-1">Rp 12.500.000</span>
-            <span className="text-[11px] text-emerald-primary font-bold mt-1 inline-block">25 Transaksi Loket</span>
-          </Card>
-          <Card variant="elevated" padding="sm" className="p-4 bg-slate/5 border border-slate/15">
-            <span className="text-xs text-slate font-semibold block">Transfer Bank / VA</span>
-            <span className="text-lg font-mono font-bold text-obsidian block mt-1">Rp 48.000.000</span>
-            <span className="text-[11px] text-slate font-medium mt-1 inline-block">92 Transaksi Gateway</span>
-          </Card>
-          <Card variant="elevated" padding="sm" className="p-4 bg-slate/5 border border-slate/15">
-            <span className="text-xs text-slate font-semibold block">Infaq & Sedekah (Bulan Ini)</span>
-            <span className="text-lg font-mono font-bold text-emerald-primary block mt-1">Rp 4.250.000</span>
-            <span className="text-[11px] text-slate font-medium mt-1 inline-block">Sukarela Wali Santri</span>
-          </Card>
-        </div>
-
-        <div className="overflow-x-auto border border-slate/20 rounded-xl">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate/5 font-bold text-slate border-b border-slate/20">
-                <th className="p-3">Waktu & Kuitansi</th>
-                <th className="p-3">Santri</th>
-                <th className="p-3">Item Dibayar</th>
-                <th className="p-3">Nominal (Rp)</th>
-                <th className="p-3">Metode</th>
-                <th className="p-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate/10">
-              <tr>
-                <td className="p-3 font-mono">26/07/2026 14:30 <span className="block font-bold text-obsidian">REC-202607-001</span></td>
-                <td className="p-3 font-bold text-obsidian">Muhammad Faiz Syafi'i <span className="block text-[10px] text-slate font-normal">XI-IPA-1</span></td>
-                <td className="p-3 font-medium">SPP Bulan Juli 2026</td>
-                <td className="p-3 font-mono font-bold text-emerald-primary">Rp 500.000</td>
-                <td className="p-3"><span className="px-2 py-0.5 rounded bg-slate/10 font-bold text-[10px] uppercase">CASH</span></td>
-                <td className="p-3"><Badge status="PAID">Berhasil</Badge></td>
-              </tr>
-              <tr>
-                <td className="p-3 font-mono">26/07/2026 11:15 <span className="block font-bold text-obsidian">REC-202607-002</span></td>
-                <td className="p-3 font-bold text-obsidian">Aisyah Zahra Syafi'i <span className="block text-[10px] text-slate font-normal">X-A</span></td>
-                <td className="p-3 font-medium">Seragam Olahraga & Batik + Infaq</td>
-                <td className="p-3 font-mono font-bold text-emerald-primary">Rp 800.000</td>
-                <td className="p-3"><span className="px-2 py-0.5 rounded bg-slate/10 font-bold text-[10px] uppercase">TRANSFER</span></td>
-                <td className="p-3"><Badge status="PAID">Berhasil</Badge></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        
-      </Card>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-6">
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
@@ -279,7 +206,7 @@ export const PaymentKasirPage: React.FC = () => {
               <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Pembayaran Manual</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Pencatatan pembayaran manual (tunai / transfer).</p>
+            <p className="text-xs text-slate mt-1">Pencatatan pembayaran manual.</p>
           </div>
           <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd} className="shrink-0 w-full sm:w-auto justify-center">
             Catat Pembayaran
@@ -315,7 +242,7 @@ export const PaymentKasirPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Memuat riwayat pembayaran dari database...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Memuat riwayat pembayaran...</span>
         </Card>
       ) : filteredPayments.length === 0 ? (
         <Card variant="glass" padding="lg">
@@ -429,7 +356,7 @@ export const PaymentKasirPage: React.FC = () => {
               <div>
                 <label className="font-bold text-obsidian block mb-1">Pilih Santri Pembayar *</label>
                 {allStudents.length === 0 ? (
-                  <div className="p-3 rounded-xl bg-amber-50 text-amber-800 font-semibold">Belum ada data santri di database.</div>
+                  <div className="p-3 rounded-xl bg-amber-50 text-amber-800 font-semibold">Belum ada data santri.</div>
                 ) : (
                   <select
                     value={selectedStudentId}
@@ -589,7 +516,7 @@ export const PaymentKasirPage: React.FC = () => {
             {isReceiptLoading ? (
               <div className="flex flex-col items-center justify-center py-12">
                 <Spinner size="md" color="emerald" />
-                <span className="text-xs text-slate mt-2">Memuat kuitansi dari database...</span>
+                <span className="text-xs text-slate mt-2">Memuat kuitansi...</span>
               </div>
             ) : receiptDetail ? (
               <div className="flex flex-col gap-4 text-xs">

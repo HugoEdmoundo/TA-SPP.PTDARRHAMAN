@@ -10,12 +10,10 @@ export const ParentsPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
-
   const [parents, setParents] = useState<User[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [parentStudentsMap, setParentStudentsMap] = useState<Record<string, Student[]>>({});
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Modals
@@ -33,7 +31,6 @@ export const ParentsPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchData = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       let url = `/users/?role=wali`;
@@ -72,7 +69,7 @@ export const ParentsPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [searchTerm, isDemo]);
+  }, [searchTerm]);
 
   const handleOpenAdd = () => {
     setUsername('');
@@ -145,57 +142,6 @@ export const ParentsPage: React.FC = () => {
     }
   };
 
-  if (isDemo) {
-    return (
-      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <UserCheck className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Manajemen Akun Wali Santri</span>
-            </h2>
-            <p className="text-xs text-slate mt-1">Kelola pertautan (linking) data wali santri dengan satu atau banyak anak sekaligus .</p>
-          </div>
-          <Button variant="primary" size="sm" leftIcon={<Link2 className="w-4 h-4" />} onClick={() => success('Simulasi Tautkan Wali', 'Beralih ke akun Admin Real untuk menautkan anak angkat secara live.')} className="shrink-0 w-full sm:w-auto justify-center">Tautkan Akun Wali</Button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card variant="elevated" padding="sm" className="p-4 bg-white/90 border border-slate/15">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <span className="text-xs font-bold text-obsidian block">Bapak Ahmad Syafi'i</span>
-                <span className="text-[11px] font-mono text-slate">Username: wali_syafii</span>
-              </div>
-              <Badge status="PAID">Terhubung WA</Badge>
-            </div>
-            <div className="mt-3 pt-3 border-t border-slate/10 text-xs">
-              <span className="text-[11px] font-semibold text-slate block mb-1.5">Anak yang Ditautkan (2 Santri):</span>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2 py-1 rounded-lg bg-emerald-light/60 text-emerald-primary font-bold text-[10px]">Muhammad Faiz Syafi'i (XI-IPA-1)</span>
-                <span className="px-2 py-1 rounded-lg bg-emerald-light/60 text-emerald-primary font-bold text-[10px]">Aisyah Zahra Syafi'i (X-A)</span>
-              </div>
-            </div>
-          </Card>
-          <Card variant="elevated" padding="sm" className="p-4 bg-white/90 border border-slate/15">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <span className="text-xs font-bold text-obsidian block">Ibu Hj. Khadijah</span>
-                <span className="text-[11px] font-mono text-slate">Username: wali_rifky</span>
-              </div>
-              <Badge status="PAID">Terhubung WA</Badge>
-            </div>
-            <div className="mt-3 pt-3 border-t border-slate/10 text-xs">
-              <span className="text-[11px] font-semibold text-slate block mb-1.5">Anak yang Ditautkan (1 Santri):</span>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2 py-1 rounded-lg bg-emerald-light/60 text-emerald-primary font-bold text-[10px]">Rifky Hidayatullah (XII-IPS-2)</span>
-              </div>
-            </div>
-          </Card>
-        </div>
-        
-      </Card>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-6">
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
@@ -227,13 +173,13 @@ export const ParentsPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Memuat akun wali santri dari database...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Memuat akun wali santri...</span>
         </Card>
       ) : parents.length === 0 ? (
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Belum Ada Akun Wali Santri"
-            description={searchTerm ? `Tidak ada wali dengan kata kunci "${searchTerm}".` : "Database wali saat ini masih kosong (0 record). Klik tombol Buat Akun Wali Baru di atas untuk mulai menambahkan akun portal orang tua."}
+            description={searchTerm ? `Tidak ada wali dengan kata kunci "${searchTerm}".` : "Belum ada akun wali. Klik tombol Buat Akun Wali Baru di atas untuk mulai menambahkan akun portal orang tua."
             action={!searchTerm ? <Button variant="primary" size="sm" leftIcon={<UserPlus className="w-4 h-4" />} onClick={handleOpenAdd}>Buat Akun Wali Sekarang</Button> : undefined}
           />
         </Card>
@@ -414,7 +360,7 @@ export const ParentsPage: React.FC = () => {
                 <label className="font-bold text-obsidian block mb-1.5">Pilih Siswa (Santri) *</label>
                 {allStudents.length === 0 ? (
                   <div className="p-3 rounded-xl bg-amber-50 text-amber-800 text-xs font-semibold">
-                    Belum ada data siswa di database. Silakan daftarkan santri terlebih dahulu di menu Data Siswa.
+                    Belum ada data siswa. Silakan daftarkan santri terlebih dahulu di menu Data Siswa.
                   </div>
                 ) : (
                   <select

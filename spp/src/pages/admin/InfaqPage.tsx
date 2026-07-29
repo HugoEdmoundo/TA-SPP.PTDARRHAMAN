@@ -12,8 +12,6 @@ export const InfaqPage: React.FC = () => {
   const { success, error: toastError } = useToast();
   const { user } = useAuth();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_clean@ptdarrahman.sch.id' || user?.name?.toLowerCase().includes('demo');
-
   const [activeTab, setActiveTab] = useState<'inflow' | 'outflow'>('inflow');
   const [inflowData, setInflowData] = useState<any[]>([]);
   const [outflowData, setOutflowData] = useState<any[]>([]);
@@ -29,22 +27,6 @@ export const InfaqPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchInfaqData = async () => {
-    if (isDemo) {
-      // Mock Inflow (Uang Masuk Infaq dari pembayaran)
-      setInflowData([
-        { id: 'inf-in-01', receipt_number: 'KUITANSI-202607-001', student_name: 'Ahmad Fauzi', nis: '20240101', grade: 'X-A', invoice: 'INV-2026-0701', infaq_amount: 50000, date: '2026-07-27T10:15:00Z', payment_type: 'SPP Juli 2026' },
-        { id: 'inf-in-02', receipt_number: 'KUITANSI-202607-015', student_name: 'Siti Aminah', nis: '20240102', grade: 'XI-IPA-1', invoice: 'INV-2026-0715', infaq_amount: 100000, date: '2026-07-26T14:30:00Z', payment_type: 'SPP Juli 2026' },
-        { id: 'inf-in-03', receipt_number: 'KUITANSI-202607-023', student_name: 'Muhammad Ridwan', nis: '20240103', grade: 'XII-IPS-2', invoice: 'INV-2026-0723', infaq_amount: 25000, date: '2026-07-25T09:45:00Z', payment_type: 'Seragam Sekolah' },
-        { id: 'inf-in-04', receipt_number: 'KUITANSI-202606-088', student_name: 'Zahra Putri', nis: '20240104', grade: 'X-B', invoice: 'INV-2026-0688', infaq_amount: 50000, date: '2026-06-28T16:10:00Z', payment_type: 'SPP Juni 2026' }
-      ]);
-      // Mock Outflow (Uang Keluar / Penyaluran Infaq)
-      setOutflowData([
-        { id: 'inf-out-01', title: 'Perbaikan AC Masjid Utama & Pembersihan Filter', amount: 850000, notes: 'Dibayarkan kepada teknisi CV Berkah Dingin untuk 4 unit AC masjid.', date: '2026-07-20T11:00:00Z', pic: 'Ust. Hasyim' },
-        { id: 'inf-out-02', title: 'Santunan Rutin Yatim & Dhuafa Sekitar Pesantren', amount: 1500000, notes: 'Penyaluran dana santunan bulanan untuk 15 anak yatim di sekitar lingkungan pesantren.', date: '2026-07-15T09:30:00Z', pic: 'Ust. Hasyim' },
-        { id: 'inf-out-03', title: 'Pembelian Karpet Sujud Tambahan Shalat Jumat', amount: 1200000, notes: '4 gulung karpet sajadah hijau turki untuk saf tambahan selasar masjid.', date: '2026-06-30T14:15:00Z', pic: 'Bendahara Sekolah' }
-      ]);
-      return;
-    }
 
     setIsLoading(true);
     try {
@@ -67,7 +49,7 @@ export const InfaqPage: React.FC = () => {
         }));
       setInflowData(inflows);
 
-      // Simpan outflow di localStorage jika backend belum punya table khusus
+      // Simpan outflow di localStorage
       const savedOutflows = localStorage.getItem('ptdarrahman_infaq_outflows');
       if (savedOutflows) {
         setOutflowData(JSON.parse(savedOutflows));
@@ -83,7 +65,7 @@ export const InfaqPage: React.FC = () => {
 
   useEffect(() => {
     fetchInfaqData();
-  }, [isDemo]);
+  }, []);
 
   const totalInflow = inflowData.reduce((acc, curr) => acc + (Number(curr.infaq_amount) || 0), 0);
   const totalOutflow = outflowData.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);

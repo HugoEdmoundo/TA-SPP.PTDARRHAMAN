@@ -9,17 +9,14 @@ export const SppGridPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
-
   const [gridData, setGridData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
   const [year, setYear] = useState<number>(2026);
   const [semester, setSemester] = useState<number>(1);
   const [showMassModal, setShowMassModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchGrid = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       const res = await api.get(`/spp/grid?year=${year}&semester=${semester}`);
@@ -33,7 +30,7 @@ export const SppGridPage: React.FC = () => {
 
   useEffect(() => {
     fetchGrid();
-  }, [year, semester, isDemo]);
+  }, [year, semester]);
 
   const months = semester === 1 
     ? [{ num: 7, name: 'Juli' }, { num: 8, name: 'Agustus' }, { num: 9, name: 'September' }, { num: 10, name: 'Oktober' }, { num: 11, name: 'November' }, { num: 12, name: 'Desember' }]
@@ -48,65 +45,6 @@ export const SppGridPage: React.FC = () => {
       fetchGrid();
     }, 600);
   };
-
-  if (isDemo) {
-    return (
-      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Simulasi Data SPP</span>
-            </h2>
-          </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <p className="text-xs text-slate mt-1">Pantau status lunas/menunggak santri per semester secara mudah dan cepat.</p>
-          </div>
-          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Tagihan Massal', 'Menampilkan statistik contoh.')} className="shrink-0 w-full sm:w-auto justify-center">Buat Tagihan SPP Massal</Button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 text-center">
-          <div className="p-3.5 sm:p-4 bg-emerald-light/50 rounded-2xl border border-emerald-primary/20"><span className="text-xs text-slate font-bold block">Juli 2026</span><Badge status="PAID" className="mt-1 font-bold text-xs">85% Lunas</Badge></div>
-          <div className="p-3.5 sm:p-4 bg-amber-50 rounded-2xl border border-amber-200"><span className="text-xs text-slate font-bold block">Agustus 2026</span><Badge status="UNPAID" className="mt-1 font-bold text-xs">Tagihan Aktif</Badge></div>
-          <div className="p-3.5 sm:p-4 bg-slate/5 rounded-2xl border border-slate/15"><span className="text-xs text-slate font-bold block">September 2026</span><Badge status="PENDING" className="mt-1 font-bold text-xs">Terjadwal</Badge></div>
-          <div className="p-3.5 sm:p-4 bg-slate/5 rounded-2xl border border-slate/15"><span className="text-xs text-slate font-bold block">Oktober 2026</span><Badge status="PENDING" className="mt-1 font-bold text-xs">Terjadwal</Badge></div>
-        </div>
-        
-        {/* Sample Demo Grid Table */}
-        <div className="overflow-x-auto border border-slate/20 rounded-2xl">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate/5 font-bold text-slate border-b border-slate/20">
-                <th className="p-3">Santri / Kelas</th>
-                <th className="p-3 text-center">Jul 2026</th>
-                <th className="p-3 text-center">Ags 2026</th>
-                <th className="p-3 text-center">Sep 2026</th>
-                <th className="p-3 text-center">Okt 2026</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate/10">
-              <tr>
-                <td className="p-3 font-bold text-obsidian">Muhammad Faiz Syafi'i <span className="block text-[10px] text-slate font-normal">XI-IPA-1</span></td>
-                <td className="p-3 text-center"><Badge status="PAID">LUNAS</Badge></td>
-                <td className="p-3 text-center"><Badge status="PAID">LUNAS</Badge></td>
-                <td className="p-3 text-center"><Badge status="UNPAID">BELUM</Badge></td>
-                <td className="p-3 text-center"><Badge status="PENDING">-</Badge></td>
-              </tr>
-              <tr>
-                <td className="p-3 font-bold text-obsidian">Aisyah Zahra Syafi'i <span className="block text-[10px] text-slate font-normal">X-A</span></td>
-                <td className="p-3 text-center"><Badge status="PAID">LUNAS</Badge></td>
-                <td className="p-3 text-center"><Badge status="UNPAID">BELUM</Badge></td>
-                <td className="p-3 text-center"><Badge status="UNPAID">BELUM</Badge></td>
-                <td className="p-3 text-center"><Badge status="PENDING">-</Badge></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="bg-emerald-light/50 p-3 mt-4 rounded-2xl border border-emerald-primary/20 text-slate text-xs text-center font-medium">
-          ✨ Menampilkan data contoh (Simulasi SPP). Gunakan akun resmi admin sekolah untuk mengolah transaksi secara aktual.
-        </div>
-      </Card>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -171,7 +109,7 @@ export const SppGridPage: React.FC = () => {
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Data SPP Kosong"
-            description="Belum ada data santri aktif di database untuk ditampilkan dalam grid SPP ini. Silakan daftarkan santri terlebih dahulu di menu Data Siswa."
+            description="Belum ada data santri aktif untuk ditampilkan dalam grid SPP ini. Silakan daftarkan santri terlebih dahulu di menu Data Siswa."
 
           />
         </Card>
@@ -236,7 +174,7 @@ export const SppGridPage: React.FC = () => {
         maxWidth="md"
       >
             <p className="text-xs text-slate mb-4">
-              Sistem SPP bersifat <b>Virtual</b> (B-11 & B-12), artinya tagihan bulanan otomatis berlaku untuk seluruh santri aktif sesuai nominal standar pesantren tanpa memenuhi tabel database dengan ribuan baris statis.
+              Tagihan bulanan otomatis berlaku untuk seluruh santri aktif sesuai nominal standar pesantren.
             </p>
             
             <div className="p-3.5 rounded-2xl bg-emerald-light/30 border border-emerald-primary/20 text-xs text-obsidian font-semibold mb-4">
