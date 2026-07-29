@@ -27,9 +27,6 @@ export const WaliProfilePage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto">
-      {isDemo && (
-      </Card>
-
       {/* Linked Children Card */}
       <Card variant="glass" padding="lg">
         <div className="flex items-center justify-between mb-4 border-b border-slate/10 pb-3">

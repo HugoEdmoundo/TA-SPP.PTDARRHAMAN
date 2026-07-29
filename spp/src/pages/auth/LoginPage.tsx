@@ -45,11 +45,6 @@ export const LoginPage: React.FC = () => {
     executeLogin(username, password);
   };
 
-  const handleDemoLogin = (demoUser: string, demoPass: string) => {
-    setUsername(demoUser);
-    setPassword(demoPass);
-    executeLogin(demoUser, demoPass);
-  };
 
   return (
     <div className="min-h-screen bg-ivory flex items-center justify-center p-4 sm:p-6 relative overflow-hidden select-none">
@@ -119,38 +114,7 @@ export const LoginPage: React.FC = () => {
           </Button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-dashed border-slate/20 text-center">
-          <div className="flex items-center justify-center gap-1.5 mb-3 text-xs font-extrabold text-gold-dark uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-gold-accent" />
-            <span>Akses Instan Mode Showcase (Demo)</span>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('superadmin_demo', 'superadmin123')}
-              className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 text-xs font-bold border border-purple-200 transition-all active:scale-95 text-center shadow-2xs group"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-purple-600 group-hover:text-white transition-colors shrink-0" />
-              <span className="truncate">Superadmin</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('admin_demo', 'admin123')}
-              className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-emerald-light/60 hover:bg-emerald-primary hover:text-white text-emerald-primary text-xs font-bold border border-emerald-primary/20 transition-all active:scale-95 text-center shadow-2xs group"
-            >
-              <Rocket className="w-3.5 h-3.5 text-emerald-primary group-hover:text-white transition-colors shrink-0" />
-              <span className="truncate">Admin</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleDemoLogin('demo_wali', 'wali123')}
-              className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-gold-bg hover:bg-gold-accent hover:text-obsidian text-gold-dark text-xs font-bold border border-gold-accent/40 transition-all active:scale-95 text-center shadow-2xs group"
-            >
-              <Users className="w-3.5 h-3.5 text-gold-dark group-hover:text-obsidian transition-colors shrink-0" />
-              <span className="truncate">Wali</span>
-            </button>
-          </div>
-        </div>
+
       </Card>
     </div>
   );

@@ -179,8 +179,7 @@ export const ParentsPage: React.FC = () => {
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Belum Ada Akun Wali Santri"
-            description={searchTerm ? `Tidak ada wali dengan kata kunci "${searchTerm}".` : "Belum ada akun wali. Klik tombol Buat Akun Wali Baru di atas untuk mulai menambahkan akun portal orang tua."
-            action={!searchTerm ? <Button variant="primary" size="sm" leftIcon={<UserPlus className="w-4 h-4" />} onClick={handleOpenAdd}>Buat Akun Wali Sekarang</Button> : undefined}
+            description={searchTerm ? `Tidak ada wali dengan kata kunci "${searchTerm}".` : "Belum ada akun wali. Klik tombol Buat Akun Wali Baru di atas untuk mulai menambahkan akun portal orang tua."}
           />
         </Card>
       ) : (

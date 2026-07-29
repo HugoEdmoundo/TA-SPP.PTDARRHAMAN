@@ -87,9 +87,7 @@ export const InfaqPage: React.FC = () => {
 
     const updated = [newOutflow, ...outflowData];
     setOutflowData(updated);
-    if (!isDemo) {
-      localStorage.setItem('ptdarrahman_infaq_outflows', JSON.stringify(updated));
-    }
+    localStorage.setItem('ptdarrahman_infaq_outflows', JSON.stringify(updated));
 
     success('Pengeluaran Infaq Dicatat', `Penyaluran dana sebesar ${formatRupiah(outflowAmount)} berhasil disimpan ke buku kas infaq.`);
     setShowOutflowModal(false);
@@ -102,9 +100,7 @@ export const InfaqPage: React.FC = () => {
   const handleDeleteOutflow = (id: string) => {
     const updated = outflowData.filter(item => item.id !== id);
     setOutflowData(updated);
-    if (!isDemo) {
-      localStorage.setItem('ptdarrahman_infaq_outflows', JSON.stringify(updated));
-    }
+    localStorage.setItem('ptdarrahman_infaq_outflows', JSON.stringify(updated));
     success('Pengeluaran Dihapus', 'Catatan pengeluaran dana infaq telah dihapus dari ledger.');
   };
 
