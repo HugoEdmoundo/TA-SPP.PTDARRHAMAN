@@ -29,13 +29,8 @@ export const WaliLayout: React.FC = () => {
 
   const profileRef = useRef<HTMLDivElement>(null);
 
-  const mockChildren = [
-    { id: 'std-01', name: "Muhammad Faiz Syafi'i", nis: '20240105', grade: 'XI-IPA-1' },
-    { id: 'std-02', name: "Aisyah Zahra Syafi'i", nis: '20250218', grade: 'X-A' },
-  ];
-
-  const [childrenList, setChildrenList] = useState<any[]>(isDemo ? mockChildren : []);
-  const [selectedChild, setSelectedChild] = useState<any>(isDemo ? mockChildren[0] : {
+  const [childrenList, setChildrenList] = useState<any[]>([]);
+  const [selectedChild, setSelectedChild] = useState<any>({
     id: 'empty',
     name: 'Belum Ada Santri Terhubung',
     nis: '-',

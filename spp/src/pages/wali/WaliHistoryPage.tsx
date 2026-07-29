@@ -20,7 +20,7 @@ export const WaliHistoryPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchHistory = async () => {
-    if (isDemo || !selectedChild || selectedChild.id === 'empty') {
+    if (!selectedChild || selectedChild.id === 'empty') {
       setIsLoading(false);
       return;
     }
@@ -38,28 +38,6 @@ export const WaliHistoryPage: React.FC = () => {
   useEffect(() => {
     fetchHistory();
   }, [selectedChild?.id]);
-          </div>
-        </Card>
-
-        <Modal
-          isOpen={!!selectedReceipt}
-          onClose={() => setSelectedReceipt(null)}
-          showCloseButton={false}
-          maxWidth="sm"
-          className="!bg-transparent !border-0 !shadow-none !p-0 !overflow-visible"
-          bodyClassName="!p-0 !overflow-visible"
-        >
-          {selectedReceipt && (
-            <ReceiptShareCard
-              receipt={selectedReceipt}
-              settings={settings}
-              onClose={() => setSelectedReceipt(null)}
-            />
-          )}
-        </Modal>
-      </div>
-    );
-  }
 
   // Live Mode Rendering
   if (!selectedChild || selectedChild.id === 'empty') {

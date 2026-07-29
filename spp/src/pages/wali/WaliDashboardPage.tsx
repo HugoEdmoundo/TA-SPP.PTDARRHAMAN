@@ -19,7 +19,7 @@ export const WaliDashboardPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchBills = async () => {
-    if (isDemo || !selectedChild || selectedChild.id === 'empty') {
+    if (!selectedChild || selectedChild.id === 'empty') {
       setIsLoading(false);
       return;
     }

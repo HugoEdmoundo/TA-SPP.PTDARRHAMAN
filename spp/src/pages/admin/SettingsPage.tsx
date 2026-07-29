@@ -44,23 +44,21 @@ export const SettingsPage: React.FC = () => {
 
   // Fetch Data from Backend API
   useEffect(() => {
-    if (!isDemo) {
-      api.get('/settings/academic-years')
-        .then(res => {
-          if (Array.isArray(res.data) && res.data.length > 0) {
-            setAcademicYearsList(res.data);
-          }
-        })
-        .catch(() => {});
+    api.get('/settings/academic-years')
+      .then(res => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setAcademicYearsList(res.data);
+        }
+      })
+      .catch(() => {});
 
-      api.get('/settings/bill-categories')
-        .then(res => {
-          if (Array.isArray(res.data) && res.data.length > 0) {
-            setBillCategoriesList(res.data);
-          }
-        })
-        .catch(() => {});
-    }
+    api.get('/settings/bill-categories')
+      .then(res => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setBillCategoriesList(res.data);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleSave = (e: React.FormEvent) => {
@@ -99,13 +97,8 @@ export const SettingsPage: React.FC = () => {
     if (!newAyName.trim()) return;
     setIsAddingAy(true);
     try {
-      if (!isDemo) {
-        const res = await api.post('/settings/academic-years', { name: newAyName, is_active: true });
-        setAcademicYearsList(prev => [res.data, ...prev]);
-      } else {
-        const newAy: AcademicYear = { id: Date.now(), name: newAyName, is_active: true };
-        setAcademicYearsList(prev => [newAy, ...prev]);
-      }
+      const res = await api.post('/settings/academic-years', { name: newAyName, is_active: true });
+      setAcademicYearsList(prev => [res.data, ...prev]);
       setNewAyName('');
       success('Tahun Ajaran Ditambahkan', `Tahun ajaran ${newAyName} berhasil ditambahkan ke sistem.`);
     } catch (err: any) {
@@ -117,9 +110,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleDeleteAcademicYear = async (id: number, name: string) => {
     try {
-      if (!isDemo) {
-        await api.delete(`/settings/academic-years/${id}`);
-      }
+      await api.delete(`/settings/academic-years/${id}`);
       setAcademicYearsList(prev => prev.filter(item => item.id !== id));
       success('Tahun Ajaran Dinonaktifkan', `Tahun ajaran ${name} berhasil dinonaktifkan dari daftar.`);
     } catch (err: any) {
@@ -129,9 +120,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleToggleAcademicYear = async (id: number, name: string, isActive: boolean) => {
     try {
-      if (!isDemo) {
-        await api.put(`/settings/academic-years/${id}`, { is_active: isActive });
-      }
+      await api.put(`/settings/academic-years/${id}`, { is_active: isActive });
       setAcademicYearsList(prev => prev.map(item => ({
         ...item,
         is_active: item.id === id ? isActive : (isActive ? false : item.is_active)
@@ -148,24 +137,13 @@ export const SettingsPage: React.FC = () => {
     if (!newCatCode.trim() || !newCatName.trim()) return;
     setIsAddingCat(true);
     try {
-      if (!isDemo) {
-        const res = await api.post('/settings/bill-categories', {
-          code: newCatCode.toLowerCase().replace(/\s+/g, '_'),
-          name: newCatName,
-          default_amount: newCatAmount,
-          is_active: true
-        });
-        setBillCategoriesList(prev => [...prev, res.data]);
-      } else {
-        const newCat: BillCategory = {
-          id: Date.now(),
-          code: newCatCode.toLowerCase().replace(/\s+/g, '_'),
-          name: newCatName,
-          default_amount: newCatAmount,
-          is_active: true
-        };
-        setBillCategoriesList(prev => [...prev, newCat]);
-      }
+      const res = await api.post('/settings/bill-categories', {
+        code: newCatCode.toLowerCase().replace(/\s+/g, '_'),
+        name: newCatName,
+        default_amount: newCatAmount,
+        is_active: true
+      });
+      setBillCategoriesList(prev => [...prev, res.data]);
       setNewCatCode('');
       setNewCatName('');
       setNewCatAmount(0);
@@ -179,9 +157,7 @@ export const SettingsPage: React.FC = () => {
 
   const handleDeleteBillCategory = async (id: number, name: string) => {
     try {
-      if (!isDemo) {
-        await api.delete(`/settings/bill-categories/${id}`);
-      }
+      await api.delete(`/settings/bill-categories/${id}`);
       setBillCategoriesList(prev => prev.filter(item => item.id !== id));
       success('Kategori Dinonaktifkan', `Kategori "${name}" berhasil dinonaktifkan.`);
     } catch (err: any) {
@@ -191,9 +167,6 @@ export const SettingsPage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto pb-12">
-      {isDemo && (
-      </div>
-
       <form onSubmit={handleSave} className="flex flex-col gap-6">
         {/* Logo & Favicon Configuration Section */}
         <Card variant="glass" padding="lg" glow="emerald" className="border-2 border-emerald-primary/30 shadow-md">
@@ -291,6 +264,9 @@ export const SettingsPage: React.FC = () => {
         <Card variant="glass" padding="lg" className="shadow-sm">
           <h3 className="font-extrabold text-obsidian text-base mb-4 border-b border-slate/10 pb-3 flex items-center gap-2 font-heading">
             <Calendar className="w-5 h-5 text-emerald-primary" />
+            <span>Pengaturan Akademik & Keuangan</span>
+          </h3>
+          <div>
             <div>
               <InputCurrency
                 label="Nominal SPP Bulanan (Berlaku untuk seluruh siswa)"

@@ -64,7 +64,7 @@ export const PaymentKasirPage: React.FC = () => {
 
   // Load bills when student changes for non_spp or event
   useEffect(() => {
-    if (!selectedStudentId || paymentType === 'spp' || isDemo) {
+    if (!selectedStudentId || paymentType === 'spp') {
       setStudentBills([]);
       return;
     }
