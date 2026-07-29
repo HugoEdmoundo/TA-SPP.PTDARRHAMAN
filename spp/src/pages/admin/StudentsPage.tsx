@@ -10,14 +10,12 @@ export const StudentsPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
-
   const [students, setStudents] = useState<Student[]>([]);
   const [academicYearsList, setAcademicYearsList] = useState<AcademicYear[]>([
     { id: 1, name: '2025/2026', is_active: true },
     { id: 2, name: '2024/2025', is_active: false },
   ]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
@@ -45,7 +43,6 @@ export const StudentsPage: React.FC = () => {
   const [isImporting, setIsImporting] = useState(false);
 
   const fetchStudents = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       let url = `/students/?limit=500`;
@@ -72,7 +69,7 @@ export const StudentsPage: React.FC = () => {
 
   useEffect(() => {
     fetchStudents();
-  }, [searchTerm, filterStatus, isDemo]);
+  }, [searchTerm, filterStatus]);
 
   const handleAcademicYearChange = (ayName: string) => {
     setAcademicYear(ayName);
@@ -217,7 +214,7 @@ export const StudentsPage: React.FC = () => {
         is_active: true,
       }));
       await api.post('/students/import/confirm', { data: validRows });
-      success('Impor Selesai', `${validRows.length} santri berhasil diimpor ke dalam database.`);
+      success('Impor Selesai', `${validRows.length} santri berhasil diimpor.`);
       setShowImportModal(false);
       setImportPreview([]);
       setImportFile(null);
@@ -266,64 +263,6 @@ export const StudentsPage: React.FC = () => {
         );
     }
   };
-
-  if (isDemo) {
-    return (
-      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Manajemen Data Siswa (Santri)</span>
-            </h2>
-            <p className="text-xs text-slate mt-1">Daftar santri aktif, status akademis, dan impor data cepat via file Excel / CSV terintegrasi Master Tahun Ajaran.</p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
-            <Button variant="outline" size="sm" leftIcon={<FileSpreadsheet className="w-4 h-4" />} onClick={() => success('Simulasi Impor Excel', 'Dalam sistem, fitur impor menampilkan simulasi data 480 santri.')} className="w-full sm:w-auto justify-center">Impor Excel / CSV</Button>
-            <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Tambah Santri', 'Beralih ke akun Admin Real (admin / admin123) untuk menyimpan data asli.')} className="w-full sm:w-auto justify-center">Tambah Santri</Button>
-          </div>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-slate/20 bg-slate/5 text-slate font-bold uppercase">
-                <th className="p-3">NIS</th>
-                <th className="p-3">Nama Santri</th>
-                <th className="p-3">Kelas / Tahun</th>
-                <th className="p-3">Gender</th>
-                <th className="p-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate/10">
-              <tr>
-                <td className="p-3 font-mono font-bold">2025001</td>
-                <td className="p-3 font-bold text-obsidian">Muhammad Faiz Syafi'i</td>
-                <td className="p-3">XI-IPA-1 (2025/2026)</td>
-                <td className="p-3">Laki-laki</td>
-                <td className="p-3"><span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold"><CheckCircle2 className="w-3 h-3" /> Aktif</span></td>
-              </tr>
-              <tr>
-                <td className="p-3 font-mono font-bold">2025002</td>
-                <td className="p-3 font-bold text-obsidian">Aisyah Zahra Syafi'i</td>
-                <td className="p-3">X-A (2025/2026)</td>
-                <td className="p-3">Perempuan</td>
-                <td className="p-3"><span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-light text-emerald-primary text-[10px] font-bold"><CheckCircle2 className="w-3 h-3" /> Aktif</span></td>
-              </tr>
-              <tr>
-                <td className="p-3 font-mono font-bold">2024099</td>
-                <td className="p-3 font-bold text-obsidian">Rifky Hidayatullah (Alumni)</td>
-                <td className="p-3">XII-IPS-2 (2024/2025)</td>
-                <td className="p-3">Laki-laki</td>
-                <td className="p-3"><span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold"><GraduationCap className="w-3 h-3" /> Lulus</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-      </Card>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -383,13 +322,13 @@ export const StudentsPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Memuat data santri dari database...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Memuat data santri...</span>
         </Card>
       ) : students.length === 0 ? (
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Belum Ada Data Santri"
-            description={searchTerm ? `Tidak ditemukan santri dengan kata kunci "${searchTerm}". Coba reset pencarian.` : "Database santri saat ini masih bersih (0 record). Klik tombol Tambah Santri atau Impor Excel di atas untuk mulai mendaftar."}
+            description={searchTerm ? `Tidak ditemukan santri dengan kata kunci "${searchTerm}". Coba reset pencarian.` : "Belum ada data santri. Klik tombol Tambah Santri atau Impor Excel di atas untuk mulai mendaftar."}
             action={!searchTerm ? <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd}>Tambah Santri Sekarang</Button> : undefined}
           />
         </Card>
@@ -496,7 +435,7 @@ export const StudentsPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Tahun Ajaran (Master TA)</label>
+                  <label className="font-bold text-obsidian block mb-1">Tahun Ajaran</label>
                   <select
                     value={academicYear}
                     onChange={(e) => handleAcademicYearChange(e.target.value)}
@@ -610,7 +549,7 @@ export const StudentsPage: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Tahun Ajaran (Master TA)</label>
+                  <label className="font-bold text-obsidian block mb-1">Tahun Ajaran</label>
                   <select
                     value={academicYear}
                     onChange={(e) => handleAcademicYearChange(e.target.value)}

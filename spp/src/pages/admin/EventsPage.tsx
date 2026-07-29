@@ -10,11 +10,9 @@ export const EventsPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
-
   const [events, setEvents] = useState<any[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Modals
@@ -35,7 +33,6 @@ export const EventsPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchData = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       const [eventsRes, studentsRes] = await Promise.all([
@@ -53,7 +50,7 @@ export const EventsPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [isDemo]);
+  }, []);
 
   const handleOpenAdd = () => {
     setName('');
@@ -144,71 +141,6 @@ export const EventsPage: React.FC = () => {
     !searchTerm || ev.name.toLowerCase().includes(searchTerm.toLowerCase()) || ev.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (isDemo) {
-    return (
-      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Event & Patungan Sekolah</span>
-            </h2>
-            <p className="text-xs text-slate mt-1">Kelola donasi, infaq pembangunan, study tour, dan kegiatan dengan progres bar .</p>
-          </div>
-          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Buat Event', 'Beralih ke akun Admin Real untuk membuat kegiatan patungan dengan tagihan otomatis.')} className="shrink-0 w-full sm:w-auto justify-center">Buat Event Baru</Button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card variant="elevated" padding="sm" className="p-5 bg-white/90 border border-slate/15 flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-sm font-extrabold text-obsidian block font-heading">Patungan Study Tour Yogyakarta</span>
-                <Badge status="PAID">Aktif</Badge>
-              </div>
-              <p className="text-xs text-slate mb-3">Kegiatan kunjungan studi kampus dan budaya untuk siswa kelas 11 selama 3 hari.</p>
-              <div className="flex items-center justify-between text-xs font-mono font-bold text-obsidian mb-1">
-                <span>Terkumpul: Rp 72.000.000</span>
-                <span className="text-emerald-primary">80%</span>
-              </div>
-              <div className="w-full h-2.5 bg-slate/10 rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-emerald-primary rounded-full" style={{ width: '80%' }}></div>
-              </div>
-              <div className="flex justify-between text-[11px] text-slate font-medium">
-                <span>Target: Rp 90.000.000 (60 Siswa)</span>
-                <span>Cicilan: Min. Rp 300.000</span>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" leftIcon={<Eye className="w-4 h-4" />} onClick={() => success('Simulasi Progres', 'Menampilkan progres kontribusi santri dalam sistem.')} className="mt-4 w-full justify-center">Lihat Progres Siswa</Button>
-          </Card>
-
-          <Card variant="elevated" padding="sm" className="p-5 bg-white/90 border border-slate/15 flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-sm font-extrabold text-obsidian block font-heading">Infaq Pembangunan Masjid Pesantren</span>
-                <Badge status="PAID">Aktif</Badge>
-              </div>
-              <p className="text-xs text-slate mb-3">Donasi perluasan lantai 2 masjid Al-Hikmah untuk sarana ibadah santri.</p>
-              <div className="flex items-center justify-between text-xs font-mono font-bold text-obsidian mb-1">
-                <span>Terkumpul: Rp 45.500.000</span>
-                <span className="text-emerald-primary">45.5%</span>
-              </div>
-              <div className="w-full h-2.5 bg-slate/10 rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-emerald-primary rounded-full" style={{ width: '45.5%' }}></div>
-              </div>
-              <div className="flex justify-between text-[11px] text-slate font-medium">
-                <span>Target: Rp 100.000.000</span>
-                <span>Sukarela / Boleh Cicil</span>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" leftIcon={<Eye className="w-4 h-4" />} onClick={() => success('Simulasi Progres', 'Menampilkan progres kontribusi santri dalam sistem.')} className="mt-4 w-full justify-center">Lihat Progres Siswa</Button>
-          </Card>
-        </div>
-
-        
-      </Card>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-6">
       <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
@@ -240,13 +172,13 @@ export const EventsPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Memuat event dan patungan dari database...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Memuat event dan patungan...</span>
         </Card>
       ) : filteredEvents.length === 0 ? (
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Belum Ada Event Patungan"
-            description={searchTerm ? `Tidak ada kegiatan dengan kata kunci "${searchTerm}".` : "Database event saat ini masih bersih (0 record). Klik tombol Buat Event Baru di atas untuk memulai kampanye patungan study tour, kurban, atau infaq."}
+            description={searchTerm ? `Tidak ada kegiatan dengan kata kunci "${searchTerm}".` : "Belum ada event. Klik tombol Buat Event Baru di atas untuk memulai kampanye patungan study tour, kurban, atau infaq."}
             action={!searchTerm ? <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd}>Buat Event Sekarang</Button> : undefined}
           />
         </Card>

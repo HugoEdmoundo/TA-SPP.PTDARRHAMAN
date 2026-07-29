@@ -19,11 +19,9 @@ import { BottomSheet } from '../ui/BottomSheet';
 
 export const WaliLayout: React.FC = () => {
   const { user, logout } = useAuth();
-  const { settings, isConnectedSSE } = useSettings();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const isDemo = user?.email === 'demo' || user?.email === 'demo_wali' || user?.name?.toLowerCase().includes('demo');
 
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [isChildSelectorOpen, setIsChildSelectorOpen] = useState(false);
@@ -45,11 +43,6 @@ export const WaliLayout: React.FC = () => {
   });
 
   useEffect(() => {
-    if (isDemo) {
-      setChildrenList(mockChildren);
-      setSelectedChild(mockChildren[0]);
-      return;
-    }
     const fetchChildren = async () => {
       try {
         const res = await api.get('/my/children');
@@ -65,7 +58,7 @@ export const WaliLayout: React.FC = () => {
       }
     };
     fetchChildren();
-  }, [isDemo]);
+  }, []);
 
   // Close profile dropdown on outside click
   useEffect(() => {

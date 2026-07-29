@@ -9,11 +9,9 @@ export const ReportsPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
-
   const [reportType, setReportType] = useState<'monthly' | 'spp-semester' | 'infaq' | 'events'>('monthly');
   const [reportData, setReportData] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Filters
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
@@ -21,7 +19,6 @@ export const ReportsPage: React.FC = () => {
   const [semester, setSemester] = useState<number>(1);
 
   const fetchReport = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       let url = '';
@@ -47,7 +44,7 @@ export const ReportsPage: React.FC = () => {
 
   useEffect(() => {
     fetchReport();
-  }, [reportType, month, year, semester, isDemo]);
+  }, [reportType, month, year, semester]);
 
   const handleDownload = async (format: 'excel' | 'pdf') => {
     try {
@@ -77,84 +74,6 @@ export const ReportsPage: React.FC = () => {
     { num: 7, name: 'Juli' }, { num: 8, name: 'Agustus' }, { num: 9, name: 'September' },
     { num: 10, name: 'Oktober' }, { num: 11, name: 'November' }, { num: 12, name: 'Desember' }
   ];
-
-  if (isDemo) {
-    return (
-      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <FileBarChart className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Laporan Keuangan & Ekspor Resmi</span>
-            </h2>
-            <p className="text-xs text-slate mt-1">Rekapitulasi kas masuk, tunggakan SPP, donasi, dan ekspor dokumen Excel (.xlsx) serta PDF .</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<FileSpreadsheet className="w-4 h-4 text-emerald-primary" />} onClick={() => success('Simulasi Ekspor Excel', 'Dalam sistem, sistem mensimulasikan pengunduhan file Laporan_Bulanan_Juli_2026.xlsx.')}>Unduh Excel (.XLSX)</Button>
-            <Button variant="primary" size="sm" leftIcon={<FileText className="w-4 h-4" />} onClick={() => success('Simulasi Ekspor PDF', 'Dalam sistem, sistem mensimulasikan cetak dokumen Laporan_Bulanan_Juli_2026.pdf.')}>Unduh PDF (.PDF)</Button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card variant="elevated" padding="sm" className="p-4 bg-emerald-light/30 border border-emerald-primary/20">
-            <span className="text-xs text-slate font-semibold block">Total Penerimaan Juli</span>
-            <span className="text-lg font-mono font-bold text-obsidian block mt-1">Rp 64.750.000</span>
-            <span className="text-[10px] text-emerald-primary font-bold mt-1 inline-block">SPP + Non-SPP + Infaq</span>
-          </Card>
-          <Card variant="elevated" padding="sm" className="p-4 bg-slate/5 border border-slate/15">
-            <span className="text-xs text-slate font-semibold block">Koleksi SPP Semester 1</span>
-            <span className="text-lg font-mono font-bold text-obsidian block mt-1">Rp 1.250.000.000</span>
-            <span className="text-[10px] text-slate font-medium mt-1 inline-block">Target: Rp 1.440.000.000 (86%)</span>
-          </Card>
-          <Card variant="elevated" padding="sm" className="p-4 bg-slate/5 border border-slate/15">
-            <span className="text-xs text-slate font-semibold block">Donasi Infaq & Sedekah</span>
-            <span className="text-lg font-mono font-bold text-emerald-primary block mt-1">Rp 45.500.000</span>
-            <span className="text-[10px] text-slate font-medium mt-1 inline-block">142 Transaksi Sukarela</span>
-          </Card>
-          <Card variant="elevated" padding="sm" className="p-4 bg-slate/5 border border-slate/15">
-            <span className="text-xs text-slate font-semibold block">Tunggakan Aktif</span>
-            <span className="text-lg font-mono font-bold text-rose-danger block mt-1">Rp 190.000.000</span>
-            <span className="text-[10px] text-rose-danger font-medium mt-1 inline-block">14% Santri Menunggak</span>
-          </Card>
-        </div>
-
-        <div className="overflow-x-auto border border-slate/20 rounded-xl">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate/5 font-bold text-slate border-b border-slate/20">
-                <th className="p-3">No</th>
-                <th className="p-3">Tanggal / Kuitansi</th>
-                <th className="p-3">Santri Pembayar</th>
-                <th className="p-3">Keterangan Item</th>
-                <th className="p-3">Metode</th>
-                <th className="p-3 text-right">Total (Rp)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate/10">
-              <tr>
-                <td className="p-3 font-mono">1</td>
-                <td className="p-3 font-mono">26-07-2026 <span className="block font-bold text-obsidian">REC-001</span></td>
-                <td className="p-3 font-bold text-obsidian">Muhammad Faiz Syafi'i</td>
-                <td className="p-3">SPP Bulan Juli 2026</td>
-                <td className="p-3">TRANSFER (XENDIT)</td>
-                <td className="p-3 font-mono font-bold text-right text-emerald-primary">500.000</td>
-              </tr>
-              <tr>
-                <td className="p-3 font-mono">2</td>
-                <td className="p-3 font-mono">26-07-2026 <span className="block font-bold text-obsidian">REC-002</span></td>
-                <td className="p-3 font-bold text-obsidian">Aisyah Zahra Syafi'i</td>
-                <td className="p-3">Seragam Batik & Olahraga</td>
-                <td className="p-3">CASH (LOKET)</td>
-                <td className="p-3 font-mono font-bold text-right text-emerald-primary">800.000</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        
-      </Card>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -248,13 +167,13 @@ export const ReportsPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Mengkalkulasi laporan dari database...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Mengkalkulasi laporan...</span>
         </Card>
       ) : !reportData || !reportData.data || reportData.data.length === 0 ? (
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Data Laporan Kosong"
-            description="Belum ada transaksi pembayaran atau aktivitas keuangan pada periode yang dipilih (0 record)."
+            description="Belum ada transaksi pembayaran atau aktivitas keuangan pada periode yang dipilih."
             action={<Button variant="outline" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />} onClick={fetchReport}>Coba Muat Ulang</Button>}
           />
         </Card>

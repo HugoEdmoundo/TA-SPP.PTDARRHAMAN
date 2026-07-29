@@ -29,7 +29,7 @@ import { BottomSheet } from '../ui/BottomSheet';
 
 export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuth();
-  const { settings, isConnectedSSE } = useSettings();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const location = useLocation();
 

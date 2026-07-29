@@ -10,8 +10,6 @@ export const NonSppPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
-
   const [bills, setBills] = useState<any[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [categoriesList, setCategoriesList] = useState<BillCategory[]>([
@@ -21,7 +19,7 @@ export const NonSppPage: React.FC = () => {
     { id: 4, code: 'denda', name: 'Denda', default_amount: 50000, is_active: true },
     { id: 5, code: 'lainnya', name: 'Lainnya', default_amount: 100000, is_active: true },
   ]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
 
@@ -41,7 +39,6 @@ export const NonSppPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchData = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       let url = `/bills/non-spp?limit=500`;
@@ -68,7 +65,7 @@ export const NonSppPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [searchTerm, filterCategory, isDemo]);
+  }, [searchTerm, filterCategory]);
 
   const handleCategoryChange = (catName: string, isAdd: boolean = true) => {
     setCategory(catName);
@@ -177,59 +174,12 @@ export const NonSppPage: React.FC = () => {
   const handleDeleteBill = async (bill: any) => {
     try {
       await api.delete(`/bills/non-spp/${bill.id}`);
-      success('Tagihan Dihapus', `Tagihan "${bill.label}" berhasil dihapus dari database.`);
+      success('Tagihan Dihapus', `Tagihan "${bill.label}" berhasil dihapus.`);
       fetchData();
     } catch (err: any) {
       toastError('Gagal Menghapus Tagihan', err?.response?.data?.detail || 'Tagihan yang sudah dibayar sebagian/lunas tidak dapat dihapus.');
     }
   };
-
-  if (isDemo) {
-    return (
-      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Manajemen Tagihan Non-SPP</span>
-            </h2>
-            <p className="text-xs text-slate mt-1">Kelola tagihan buku, seragam, ujian, dan kegiatan khusus santri terintegrasi Master Kategori.</p>
-          </div>
-          <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => success('Simulasi Tambah Tagihan', 'Beralih ke akun Admin Real untuk menerbitkan tagihan ad-hoc secara live.')} className="shrink-0 w-full sm:w-auto justify-center">Tambah Tagihan Non-SPP</Button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card variant="elevated" padding="sm" className="p-4 bg-white/90 border border-slate/15">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <span className="text-xs font-extrabold text-obsidian block">Seragam Olahraga & Batik Kelas 10</span>
-                <span className="text-[11px] text-slate font-medium">Kategori: Seragam</span>
-              </div>
-              <Badge status="UNPAID">Tagihan Aktif</Badge>
-            </div>
-            <div className="text-sm font-mono font-bold text-emerald-primary my-2">Rp 750.000</div>
-            <div className="text-[11px] text-slate/80 bg-slate/5 p-2 rounded-lg border border-slate/10">
-              Diterbitkan untuk 120 santri baru kelas 10. Terkumpul: Rp 45.000.000 (60%).
-            </div>
-          </Card>
-
-          <Card variant="elevated" padding="sm" className="p-4 bg-white/90 border border-slate/15">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <span className="text-xs font-extrabold text-obsidian block">Ujian Akhir Semester & Raport</span>
-                <span className="text-[11px] text-slate font-medium">Kategori: Kegiatan</span>
-              </div>
-              <Badge status="PAID">Lunas 95%</Badge>
-            </div>
-            <div className="text-sm font-mono font-bold text-emerald-primary my-2">Rp 350.000</div>
-            <div className="text-[11px] text-slate/80 bg-slate/5 p-2 rounded-lg border border-slate/10">
-              Diterbitkan untuk seluruh 480 santri aktif. Terkumpul: Rp 159.600.000.
-            </div>
-          </Card>
-        </div>
-      </Card>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -240,7 +190,7 @@ export const NonSppPage: React.FC = () => {
               <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Manajemen Tagihan Non-SPP</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Terbitkan tagihan ad-hoc (seragam, buku, ujian, denda) terintegrasi dengan Master Kategori Tagihan.</p>
+            <p className="text-xs text-slate mt-1">Terbitkan tagihan ad-hoc (seragam, buku, ujian, denda).</p>
           </div>
           <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd} className="shrink-0 w-full sm:w-auto justify-center">
             Buat Tagihan Baru
@@ -276,13 +226,13 @@ export const NonSppPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Memuat tagihan Non-SPP dari database...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Memuat tagihan Non-SPP...</span>
         </Card>
       ) : bills.length === 0 ? (
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Belum Ada Tagihan Non-SPP"
-            description={searchTerm ? `Tidak ditemukan tagihan dengan kata kunci "${searchTerm}".` : "Database tagihan Non-SPP saat ini masih bersih (0 record). Klik tombol Buat Tagihan Baru di atas untuk menerbitkan tagihan seragam, buku, atau kegiatan."}
+            description={searchTerm ? `Tidak ditemukan tagihan dengan kata kunci "${searchTerm}".` : "Belum ada tagihan Non-SPP. Klik tombol Buat Tagihan Baru di atas untuk menerbitkan tagihan seragam, buku, atau kegiatan."}
             action={!searchTerm ? <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd}>Terbitkan Tagihan Sekarang</Button> : undefined}
           />
         </Card>
@@ -388,7 +338,7 @@ export const NonSppPage: React.FC = () => {
             <form onSubmit={handleCreateBill} className="flex flex-col gap-3.5 text-xs">
               <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan (Master Kategori) *</label>
+                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
                   <select
                     value={category}
                     onChange={(e) => handleCategoryChange(e.target.value, true)}
@@ -503,7 +453,7 @@ export const NonSppPage: React.FC = () => {
             <form onSubmit={handleUpdateBill} className="flex flex-col gap-3.5 text-xs">
               <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan (Master Kategori) *</label>
+                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
                   <select
                     value={category}
                     onChange={(e) => handleCategoryChange(e.target.value, false)}

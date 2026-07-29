@@ -14,11 +14,9 @@ export const WaliHistoryPage: React.FC = () => {
   const { error: toastError } = useToast();
   const { user } = useAuth();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'demo_wali' || user?.name?.toLowerCase().includes('demo');
-
   const [selectedReceipt, setSelectedReceipt] = useState<Receipt | null>(null);
   const [paymentsData, setPaymentsData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchHistory = async () => {
@@ -39,45 +37,7 @@ export const WaliHistoryPage: React.FC = () => {
 
   useEffect(() => {
     fetchHistory();
-  }, [selectedChild?.id, isDemo]);
-
-  if (isDemo) {
-    const mockHistory = [
-      { id: 'pay-01', inv: 'INV-2026-0701', rcp: 'KUITANSI-202607-20240105', type: 'SPP', title: 'SPP Bulan Juli 2026', amount: 1500000, date: '2026-07-05T10:15:00Z', status: 'SUCCESS', method: 'QRIS Virtual Account' },
-      { id: 'pay-02', inv: 'INV-2026-0612', rcp: 'KUITANSI-202606-20240105', type: 'SPP', title: 'SPP Bulan Juni 2026', amount: 1500000, date: '2026-06-08T14:20:00Z', status: 'SUCCESS', method: 'Bank Transfer Manual' },
-      { id: 'pay-03', inv: 'INV-2026-0605', rcp: 'KUITANSI-202606-QURBAN', type: 'EVENT', title: 'Patungan Qurban Idul Adha 1447 H', amount: 200000, date: '2026-06-05T09:00:00Z', status: 'SUCCESS', method: 'QRIS Virtual Account' },
-      { id: 'pay-04', inv: 'INV-2026-0504', rcp: 'KUITANSI-202605-20240105', type: 'SPP', title: 'SPP Bulan Mei 2026', amount: 1500000, date: '2026-05-06T11:30:00Z', status: 'SUCCESS', method: 'Tunai / Kasir' },
-    ];
-
-    const filtered = mockHistory.filter(h => h.title.toLowerCase().includes(searchQuery.toLowerCase()) || h.inv.toLowerCase().includes(searchQuery.toLowerCase()) || h.rcp.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    const handleOpenReceiptDemo = (item: typeof mockHistory[0]) => {
-      const mockReceipt: Receipt = {
-        id: `rcp-${item.id}`,
-        receipt_number: item.rcp,
-        verification_code: `PTD-VER-${Math.floor(1000 + Math.random() * 9000)}`,
-        created_at: item.date,
-        payment_id: item.id,
-        payment: {
-          id: item.id,
-          invoice_number: item.inv,
-          user_id: 'usr-wali-001',
-          student_id: String(selectedChild?.id || 'std-01'),
-          student: { id: String(selectedChild?.id || 'std-01'), nis: selectedChild?.nis || '20240105', name: selectedChild?.name || 'Santri Demo', grade: selectedChild?.grade || 'XI', status: 'ACTIVE' },
-          total_amount: item.amount,
-          payment_method: item.method,
-          status: 'SUCCESS',
-          created_at: item.date,
-          items: [{ id: `itm-${item.id}`, payment_id: item.id, item_type: item.type, title: item.title, nominal: item.amount }],
-        },
-      };
-      setSelectedReceipt(mockReceipt);
-    };
-
-    return (
-      <div className="flex flex-col gap-6">
-              </div>
-            ))}
+  }, [selectedChild?.id]);
           </div>
         </Card>
 
@@ -151,7 +111,7 @@ export const WaliHistoryPage: React.FC = () => {
             <History className="w-6 h-6 text-emerald-primary shrink-0" />
             <span>Riwayat Pembayaran ({selectedChild.name})</span>
           </h2>
-          <p className="text-xs text-slate mt-1">Daftar transaksi pembayaran yang tercatat pada database bersih.</p>
+          <p className="text-xs text-slate mt-1">Daftar transaksi pembayaran yang tercatat.</p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchHistory}>Refresh Riwayat</Button>
       </Card>
@@ -160,7 +120,7 @@ export const WaliHistoryPage: React.FC = () => {
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Belum Ada Riwayat Pembayaran"
-            description="Belum tercatat transaksi pembayaran atas santri ini di dalam database bersih saat ini."
+            description="Belum tercatat transaksi pembayaran atas santri ini saat ini."
             action={<Button variant="outline" size="sm" onClick={fetchHistory}>Periksa Ulang</Button>}
           />
         </Card>

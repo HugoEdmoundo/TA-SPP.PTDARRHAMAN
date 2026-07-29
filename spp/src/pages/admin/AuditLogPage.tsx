@@ -9,11 +9,9 @@ export const AuditLogPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'admin_demo' || user?.name?.toLowerCase().includes('demo');
-
   const [logs, setLogs] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Filters
   const [filterAction, setFilterAction] = useState<string>('');
@@ -23,7 +21,6 @@ export const AuditLogPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const fetchLogs = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       let url = `/audit-logs/?limit=150`;
@@ -44,7 +41,7 @@ export const AuditLogPage: React.FC = () => {
 
   useEffect(() => {
     fetchLogs();
-  }, [filterAction, filterEntity, startDate, endDate, isDemo]);
+  }, [filterAction, filterEntity, startDate, endDate]);
 
   const handleResetFilters = () => {
     setFilterAction('');
@@ -71,86 +68,6 @@ export const AuditLogPage: React.FC = () => {
     }
     return <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate/10 text-obsidian font-bold text-[10px]">{act}</span>;
   };
-
-  if (isDemo) {
-    return (
-      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 border-b border-slate/10 pb-4">
-          <div>
-            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
-              <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
-              <span>Keamanan & Audit Trail Keuangan</span>
-            </h2>
-            <p className="text-xs text-slate mt-1">Rekaman jejak digital (audit logs) untuk mencegah kecurangan, manipulasi data, dan pelacakan void .</p>
-          </div>
-          <Button variant="outline" size="sm" leftIcon={<RefreshCw className="w-4 h-4 text-emerald-primary" />} onClick={() => success('Simulasi Refresh Log', 'Menampilkan 150 catatan audit keamanan real-time dalam akun real.')}>Muat Ulang Log</Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card variant="elevated" padding="sm" className="p-4 bg-emerald-light/30 border border-emerald-primary/20">
-            <span className="text-xs text-slate font-semibold block">Total Log Keamanan Terkam</span>
-            <span className="text-lg font-mono font-bold text-obsidian block mt-1">1,429 Log Aktivitas</span>
-            <span className="text-[10px] text-emerald-primary font-bold mt-1 inline-block">Sistem Enkripsi Waktu</span>
-          </Card>
-          <Card variant="elevated" padding="sm" className="p-4 bg-slate/5 border border-slate/15">
-            <span className="text-xs text-slate font-semibold block">Aktivitas Void / Pembatalan</span>
-            <span className="text-lg font-mono font-bold text-rose-danger block mt-1">3 Transaksi Void</span>
-            <span className="text-[10px] text-slate font-medium mt-1 inline-block">Diawasi Oleh Kepala Sekolah</span>
-          </Card>
-          <Card variant="elevated" padding="sm" className="p-4 bg-slate/5 border border-slate/15">
-            <span className="text-xs text-slate font-semibold block">Status Integritas Database</span>
-            <span className="text-lg font-extrabold text-emerald-primary block mt-1 flex items-center gap-1.5">
-              <Shield className="w-5 h-5 inline" /> AMAN (100%)
-            </span>
-            <span className="text-[10px] text-slate font-medium mt-1 inline-block">Tidak Ada Anomali Ditemukan</span>
-          </Card>
-        </div>
-
-        <div className="overflow-x-auto border border-slate/20 rounded-xl">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate/5 font-bold text-slate border-b border-slate/20 uppercase text-[10px]">
-                <th className="p-3">Waktu Kejadian</th>
-                <th className="p-3">Aksi (Action)</th>
-                <th className="p-3">Entitas</th>
-                <th className="p-3">ID Entitas</th>
-                <th className="p-3">Rincian / Keterangan (Detail)</th>
-                <th className="p-3 text-center">User ID</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate/10 font-mono">
-              <tr>
-                <td className="p-3 text-slate">26-07-2026 14:32:10</td>
-                <td className="p-3">{getActionBadge('CREATE_MANUAL_PAYMENT')}</td>
-                <td className="p-3 font-bold uppercase text-obsidian">payment</td>
-                <td className="p-3 text-emerald-primary font-bold">#492</td>
-                <td className="p-3 font-sans font-medium text-obsidian">Input manual 1 item untuk siswa ID 12. Total: 500000</td>
-                <td className="p-3 text-center font-bold">Admin (ID 1)</td>
-              </tr>
-              <tr>
-                <td className="p-3 text-slate">26-07-2026 13:15:44</td>
-                <td className="p-3">{getActionBadge('VOID_PAYMENT')}</td>
-                <td className="p-3 font-bold uppercase text-obsidian">payment</td>
-                <td className="p-3 text-rose-danger font-bold">#480</td>
-                <td className="p-3 font-sans font-medium text-obsidian">Void pembayaran ID 480 (Rp 250,000.00). Alasan: Salah pilih bulan SPP</td>
-                <td className="p-3 text-center font-bold">Admin (ID 1)</td>
-              </tr>
-              <tr>
-                <td className="p-3 text-slate">26-07-2026 10:05:12</td>
-                <td className="p-3">{getActionBadge('CREATE_EVENT')}</td>
-                <td className="p-3 font-bold uppercase text-obsidian">event</td>
-                <td className="p-3 text-emerald-primary font-bold">#5</td>
-                <td className="p-3 font-sans font-medium text-obsidian">Admin membuat event 'Study Tour Bandung' dengan 60 tagihan siswa.</td>
-                <td className="p-3 text-center font-bold">Admin (ID 1)</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        
-      </Card>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -240,13 +157,13 @@ export const AuditLogPage: React.FC = () => {
       {isLoading ? (
         <Card variant="glass" padding="lg" className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" color="emerald" />
-          <span className="text-xs text-slate mt-3 font-semibold">Mengambil log keamanan dari database...</span>
+          <span className="text-xs text-slate mt-3 font-semibold">Mengambil log keamanan...</span>
         </Card>
       ) : filteredLogs.length === 0 ? (
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Tidak Ada Catatan Audit"
-            description={searchTerm || filterAction || filterEntity || startDate ? "Tidak ada aktivitas log yang cocok dengan kriteria filter Anda." : "Belum ada catatan aktivitas keamanan di dalam database bersih ini. Melakukan pembuatan siswa, pembayaran loket, atau pembatalan (void) akan otomatis terekam di sini."}
+            description={searchTerm || filterAction || filterEntity || startDate ? "Tidak ada aktivitas log yang cocok dengan kriteria filter Anda." : "Belum ada catatan aktivitas keamanan. Melakukan pembuatan siswa, pembayaran loket, atau pembatalan (void) akan otomatis terekam di sini."}
             action={(searchTerm || filterAction || filterEntity || startDate) ? <Button variant="outline" size="sm" onClick={handleResetFilters}>Reset Semua Filter</Button> : undefined}
           />
         </Card>

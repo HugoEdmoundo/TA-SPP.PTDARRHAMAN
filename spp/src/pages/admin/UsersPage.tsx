@@ -9,11 +9,9 @@ import type { User } from '../../types';
 export const UsersPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
-  
-  const isDemo = user?.email?.toLowerCase().includes('demo') || user?.name?.toLowerCase().includes('demo');
 
   const [usersList, setUsersList] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState<string>('');
 
@@ -37,7 +35,6 @@ export const UsersPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchUsers = async () => {
-    if (isDemo) return;
     setIsLoading(true);
     try {
       let url = '/users/?';
@@ -55,14 +52,10 @@ export const UsersPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [searchTerm, filterRole, isDemo]);
+  }, [searchTerm, filterRole]);
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isDemo) {
-      toastError('Akses Ditolak', 'Fitur tambah tidak tersedia di mode demo.');
-      return;
-    }
     
     setIsSubmitting(true);
     try {
@@ -80,7 +73,6 @@ export const UsersPage: React.FC = () => {
 
   const handleEditUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isDemo) return;
     if (!selectedUser) return;
     
     setIsSubmitting(true);
@@ -102,7 +94,6 @@ export const UsersPage: React.FC = () => {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isDemo) return;
     if (!selectedUser) return;
     
     setIsSubmitting(true);
@@ -119,7 +110,6 @@ export const UsersPage: React.FC = () => {
   };
 
   const handleDeleteUser = async () => {
-    if (isDemo) return;
     if (!selectedUser) return;
     
     setIsSubmitting(true);

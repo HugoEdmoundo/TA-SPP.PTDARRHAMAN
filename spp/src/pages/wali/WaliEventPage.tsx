@@ -11,10 +11,8 @@ export const WaliEventPage: React.FC = () => {
   const { success, error: toastError } = useToast();
   const { user } = useAuth();
 
-  const isDemo = user?.email === 'demo' || user?.email === 'demo_wali' || user?.name?.toLowerCase().includes('demo');
-
   const [eventsData, setEventsData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(!isDemo);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchEvents = async () => {
     if (isDemo || !selectedChild || selectedChild.id === 'empty') {
@@ -34,13 +32,9 @@ export const WaliEventPage: React.FC = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, [selectedChild?.id, isDemo]);
+  }, [selectedChild?.id]);
 
   const handleQuickPay = async (eventId: string | number, title: string, amount: number) => {
-    if (isDemo) {
-      success('Checkout Gateway (Simulasi)', `Menyiapkan partisipasi donasi/infaq "${title}" senilai ${formatRupiah(amount)}.`);
-      return;
-    }
     try {
       success('Membuka Gateway', `Menyiapkan sesi checkout untuk ${title}...`);
       const payload = {
@@ -59,19 +53,6 @@ export const WaliEventPage: React.FC = () => {
       toastError('Gagal Checkout', err?.response?.data?.detail || 'Gagal memulai transaksi online.');
     }
   };
-
-  if (isDemo) {
-    const mockEvents = [
-      { id: 'ev-01', title: 'Patungan Qurban Idul Adha 1447 H', target: 200000, collected: 200000, status: 'PAID' as const, desc: 'Donasi patungan hewan qurban untuk santri dan masyarakat sekitar pesantren.' },
-      { id: 'ev-02', title: 'Infaq Pembangunan Asrama Baru & Masjid', target: 500000, collected: 0, status: 'UNPAID' as const, desc: 'Wakaf dan infaq perbaikan fasilitas asrama santri putra/putri tahap 2.' },
-      { id: 'ev-03', title: 'Kegiatan Rihlah & Eduwisata Santri Tahfidh', target: 350000, collected: 350000, status: 'PAID' as const, desc: 'Kunjungan edukatif tahunan santri kelas XI ke museum dan observatorium.' },
-      { id: 'ev-04', title: 'Dana Kesehatan & Sosial Santri (Semester Ganjil)', target: 150000, collected: 0, status: 'UNPAID' as const, desc: 'Dana gotong royong kesehatan pesantren untuk penanganan medis darurat.' },
-    ];
-
-    return (
-      <div className="flex flex-col gap-6">
-            </Card>
-          ))}
         </div>
       )}
     </div>
