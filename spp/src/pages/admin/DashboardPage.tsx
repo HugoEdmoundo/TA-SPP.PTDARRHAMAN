@@ -1,30 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Badge, Button, Table, EmptyState, Spinner, formatRupiah, formatDateIndo } from '../../components/ui';
+import { Card, Badge, Button, EmptyState, Spinner, formatRupiah } from '../../components/ui';
 import { 
   TrendingUp, 
   Users, 
   CreditCard, 
   AlertCircle, 
   ArrowUpRight, 
-  Download, 
   Plus, 
   CheckCircle2, 
   Clock,
   FileText,
   Settings,
   Send,
-  ArrowUp,
   RefreshCw
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { success, error: toastError } = useToast();
-  const { user } = useAuth();
 
   const [dashboardData, setDashboardData] = useState<any | null>(null);
   const [recentPayments, setRecentPayments] = useState<any[]>([]);

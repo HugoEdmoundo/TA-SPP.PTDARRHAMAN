@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatRupiah, Modal } from '../../components/ui';
+import { Card, Button, EmptyState, Spinner, InputCurrency, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatRupiah, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { FileText, Plus, Search, Edit2, Trash2, CheckCircle2, AlertCircle, Clock, Users, Tag } from 'lucide-react';
 import type { Student, BillCategory } from '../../types';
 
 export const NonSppPage: React.FC = () => {
-  const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
   const [bills, setBills] = useState<any[]>([]);

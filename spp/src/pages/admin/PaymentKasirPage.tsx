@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
+import { Card, Button, EmptyState, Spinner, InputCurrency, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { DollarSign, Plus, Search, Printer, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import type { Student } from '../../types';
 
 export const PaymentKasirPage: React.FC = () => {
-  const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
   const [payments, setPayments] = useState<any[]>([]);
@@ -72,7 +70,7 @@ export const PaymentKasirPage: React.FC = () => {
       try {
         const res = await api.get(`/bills/non-spp?student_id=${selectedStudentId}&status=unpaid`);
         setStudentBills(res.data || []);
-      } catch (e) {
+      } catch {
         setStudentBills([]);
       }
     };

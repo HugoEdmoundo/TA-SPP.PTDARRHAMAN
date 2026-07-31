@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { Card, Button, InputCurrency, LogoInput, Input, Textarea } from '../../components/ui';
 import { api } from '../../api/client';
 import type { AcademicYear, BillCategory } from '../../types';
-import { Settings, Save, RefreshCw, Building, Phone, Mail, MapPin, Calendar, CheckCircle2, Image as ImageIcon, Sparkles, Plus, Trash2, Tag, GraduationCap, Layers, Check, X } from 'lucide-react';
+import { Building, Phone, Mail, MapPin, Calendar, CheckCircle2, Image as ImageIcon, Plus, Trash2, GraduationCap, Check, X } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
   const { settings, updateSettings } = useSettings();
   const { success, error: toastError } = useToast();
-  const { user } = useAuth();
 
   // Basic Identity & Logo State
   const [name, setName] = useState(settings.name);
@@ -19,8 +17,8 @@ export const SettingsPage: React.FC = () => {
   const [email, setEmail] = useState(settings.email);
   const [logoUrl, setLogoUrl] = useState(settings.logo || '');
   const [sppDefault, setSppDefault] = useState(settings.spp_nominal_default);
-  const [academicYear, setAcademicYear] = useState(settings.academic_year_current);
-  const [isSaving, setIsSaving] = useState(false);
+  const [academicYear] = useState(settings.academic_year_current);
+  const [, setIsSaving] = useState(false);
 
   // Tahun Ajaran State
   const [academicYearsList, setAcademicYearsList] = useState<AcademicYear[]>([
@@ -30,17 +28,8 @@ export const SettingsPage: React.FC = () => {
   const [newAyName, setNewAyName] = useState('');
   const [isAddingAy, setIsAddingAy] = useState(false);
 
-  // Kategori Tagihan State
-  const [billCategoriesList, setBillCategoriesList] = useState<BillCategory[]>([
-    { id: 1, code: 'seragam', name: 'Seragam Sekolah', default_amount: 500000, is_active: true },
-    { id: 2, code: 'buku', name: 'Buku Pelajaran & LKS', default_amount: 350000, is_active: true },
-    { id: 3, code: 'kegiatan', name: 'Kegiatan & Ekskul', default_amount: 250000, is_active: true },
-    { id: 4, code: 'denda', name: 'Denda & Administrasi', default_amount: 50000, is_active: true },
-  ]);
-  const [newCatCode, setNewCatCode] = useState('');
-  const [newCatName, setNewCatName] = useState('');
-  const [newCatAmount, setNewCatAmount] = useState<number>(0);
-  const [isAddingCat, setIsAddingCat] = useState(false);
+  // Kategori Tagihan State (setter only, daftar di-render dari API pada fetch)
+  const [, setBillCategoriesList] = useState<BillCategory[]>([]);
 
   // Fetch Data from Backend API
   useEffect(() => {
@@ -80,17 +69,6 @@ export const SettingsPage: React.FC = () => {
     }, 600);
   };
 
-  const handleReset = () => {
-    setName('PTDARRAHMAN');
-    setAddress('Jl. Raya Pesantren No. 99, Cibinong, Bogor, Jawa Barat 16914');
-    setPhone('(021) 8765-4321');
-    setEmail('info@ptdarrahman.sch.id');
-    setLogoUrl('/download.png');
-    setSppDefault(1500000);
-    setAcademicYear('2025/2026');
-    success('Direset ke Default', 'Pengaturan telah dikembalikan ke standar awal PTDARRAHMAN.');
-  };
-
   // Handlers for Academic Years
   const handleAddAcademicYear = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,40 +106,6 @@ export const SettingsPage: React.FC = () => {
       success('Tahun Ajaran Diaktifkan', `Tahun ajaran ${name} sekarang menjadi periode aktif.`);
     } catch (err: any) {
       toastError('Gagal Mengubah', err?.response?.data?.detail || 'Terjadi kesalahan saat mengubah status.');
-    }
-  };
-
-  // Handlers for Bill Categories
-  const handleAddBillCategory = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCatCode.trim() || !newCatName.trim()) return;
-    setIsAddingCat(true);
-    try {
-      const res = await api.post('/settings/bill-categories', {
-        code: newCatCode.toLowerCase().replace(/\s+/g, '_'),
-        name: newCatName,
-        default_amount: newCatAmount,
-        is_active: true
-      });
-      setBillCategoriesList(prev => [...prev, res.data]);
-      setNewCatCode('');
-      setNewCatName('');
-      setNewCatAmount(0);
-      success('Kategori Tagihan Ditambahkan', `Kategori "${newCatName}" berhasil disimpan.`);
-    } catch (err: any) {
-      toastError('Gagal Menambahkan', err?.response?.data?.detail || 'Terjadi kesalahan saat menyimpan.');
-    } finally {
-      setIsAddingCat(false);
-    }
-  };
-
-  const handleDeleteBillCategory = async (id: number, name: string) => {
-    try {
-      await api.delete(`/settings/bill-categories/${id}`);
-      setBillCategoriesList(prev => prev.filter(item => item.id !== id));
-      success('Kategori Dinonaktifkan', `Kategori "${name}" berhasil dinonaktifkan.`);
-    } catch (err: any) {
-      toastError('Gagal Menghapus', err?.response?.data?.detail || 'Terjadi kesalahan saat menghapus.');
     }
   };
 

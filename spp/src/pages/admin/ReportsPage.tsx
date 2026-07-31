@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, EmptyState, Spinner, formatRupiah, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { FileBarChart, FileSpreadsheet, FileText, RefreshCw } from 'lucide-react';
 
 export const ReportsPage: React.FC = () => {
-  const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
   const [reportType, setReportType] = useState<'monthly' | 'spp-semester' | 'infaq' | 'events'>('monthly');
@@ -63,7 +61,7 @@ export const ReportsPage: React.FC = () => {
       link.click();
       link.remove();
       success('Unduh Laporan Selesai', `File laporan dengan format .${format.toUpperCase()} berhasil diunduh ke komputer Anda.`);
-    } catch (err: any) {
+    } catch {
       toastError('Gagal Mengunduh File', 'Terjadi kesalahan saat memproses ekspor dokumen.');
     }
   };

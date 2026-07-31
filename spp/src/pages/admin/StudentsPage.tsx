@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, EmptyState, Spinner, Modal, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { Users, Plus, FileSpreadsheet, Search, Edit2, Trash2, CheckCircle2, XCircle, Upload, AlertCircle, GraduationCap, ArrowRightLeft, UserX } from 'lucide-react';
 import type { Student, AcademicYear } from '../../types';
 
 export const StudentsPage: React.FC = () => {
-  const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
   const [students, setStudents] = useState<Student[]>([]);

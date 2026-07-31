@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, Modal, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
+import { Card, Button, EmptyState, Spinner, Modal, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { CreditCard, Plus, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 
 export const SppGridPage: React.FC = () => {
-  const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
   const [gridData, setGridData] = useState<any[]>([]);

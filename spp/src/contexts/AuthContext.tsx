@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return loggedInUser;
     } catch (err: any) {
       const detail = err?.response?.data?.detail || 'Username atau password salah.';
-      throw new Error(detail);
+      throw new Error(detail, { cause: err });
     } finally {
       setIsLoading(false);
     }
