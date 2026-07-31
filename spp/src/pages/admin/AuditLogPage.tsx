@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, EmptyState, Spinner, formatDateIndo } from '../../components/ui';
+import { Card, Button, EmptyState, Spinner, formatDateIndo, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -89,57 +89,65 @@ export const AuditLogPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 text-xs">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate/50" />
-            <input
+            <Input
               type="text"
               placeholder="Cari rincian atau aksi..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate/20 bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              className="w-full pl-9 pr-3"
             />
           </div>
 
-          <select
-            value={filterAction}
-            onChange={(e) => setFilterAction(e.target.value)}
-            className="p-2 rounded-xl border border-slate/20 bg-white font-semibold focus:outline-none"
+          <Select
+            value={filterAction || '__all__'}
+            onValueChange={(v) => setFilterAction(v === '__all__' ? '' : v)}
           >
-            <option value="">-- Semua Aksi (Action) --</option>
-            <option value="CREATE_MANUAL_PAYMENT">CREATE_MANUAL_PAYMENT</option>
-            <option value="VOID_PAYMENT">VOID_PAYMENT</option>
-            <option value="VOID_RECEIPT">VOID_RECEIPT</option>
-            <option value="CREATE_EVENT">CREATE_EVENT</option>
-            <option value="UPDATE_EVENT">UPDATE_EVENT</option>
-            <option value="COMPLETE_EVENT">COMPLETE_EVENT</option>
-          </select>
+            <SelectTrigger className="font-semibold">
+              <SelectValue placeholder="Pilih..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">-- Semua Aksi (Action) --</SelectItem>
+              <SelectItem value="CREATE_MANUAL_PAYMENT">CREATE_MANUAL_PAYMENT</SelectItem>
+              <SelectItem value="VOID_PAYMENT">VOID_PAYMENT</SelectItem>
+              <SelectItem value="VOID_RECEIPT">VOID_RECEIPT</SelectItem>
+              <SelectItem value="CREATE_EVENT">CREATE_EVENT</SelectItem>
+              <SelectItem value="UPDATE_EVENT">UPDATE_EVENT</SelectItem>
+              <SelectItem value="COMPLETE_EVENT">COMPLETE_EVENT</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <select
-            value={filterEntity}
-            onChange={(e) => setFilterEntity(e.target.value)}
-            className="p-2 rounded-xl border border-slate/20 bg-white font-semibold focus:outline-none capitalize"
+          <Select
+            value={filterEntity || '__all__'}
+            onValueChange={(v) => setFilterEntity(v === '__all__' ? '' : v)}
           >
-            <option value="">-- Semua Entitas --</option>
-            <option value="payment">Payment</option>
-            <option value="receipt">Receipt</option>
-            <option value="event">Event</option>
-            <option value="student">Student</option>
-            <option value="parent">Parent</option>
-          </select>
+            <SelectTrigger className="font-semibold capitalize">
+              <SelectValue placeholder="Pilih..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">-- Semua Entitas --</SelectItem>
+              <SelectItem value="payment">Payment</SelectItem>
+              <SelectItem value="receipt">Receipt</SelectItem>
+              <SelectItem value="event">Event</SelectItem>
+              <SelectItem value="student">Student</SelectItem>
+              <SelectItem value="parent">Parent</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <input
+          <Input
             type="date"
             placeholder="Dari Tanggal"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="p-2 rounded-xl border border-slate/20 bg-white font-mono text-xs focus:outline-none"
+            className="font-mono text-xs"
           />
 
           <div className="flex gap-1.5">
-            <input
+            <Input
               type="date"
               placeholder="Sampai Tanggal"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full p-2 rounded-xl border border-slate/20 bg-white font-mono text-xs focus:outline-none"
+              className="w-full font-mono text-xs"
             />
             {(filterAction || filterEntity || startDate || endDate || searchTerm) && (
               <button

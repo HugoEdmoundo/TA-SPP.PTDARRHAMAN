@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './Dialog';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -26,27 +25,6 @@ export const Modal: React.FC<ModalProps> = ({
   headerClassName,
   bodyClassName,
 }) => {
-  // Handle ESC key press to close modal & Lock body scroll
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen || typeof document === 'undefined') return null;
-
   const maxWidthClasses = {
     sm: 'max-w-sm',
     md: 'max-w-md',
@@ -55,57 +33,31 @@ export const Modal: React.FC<ModalProps> = ({
     '2xl': 'max-w-2xl',
     '3xl': 'max-w-3xl',
     '4xl': 'max-w-4xl',
-    full: 'max-w-full mx-4',
+    full: 'max-w-[calc(100%-2rem)]',
   };
 
-  const modalContent = (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-obsidian/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
-      onClick={(e) => {
-        // Close modal only when clicking precisely on the outer backdrop overlay
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-    >
-      <div
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
         className={cn(
-          "w-full bg-white rounded-3xl border border-slate/20 shadow-2xl relative max-h-[90vh] flex flex-col overflow-hidden animate-scale-up my-auto",
+          'max-h-[90vh] flex flex-col gap-0 overflow-hidden',
           maxWidthClasses[maxWidth],
           className
         )}
+        hideCloseButton={!showCloseButton}
       >
-        {/* Modal Header */}
-        {(title || showCloseButton) && (
-          <div
+        {title && (
+          <DialogHeader
             className={cn(
-              "flex items-center justify-between px-6 py-4 border-b border-slate/10 shrink-0 bg-slate/5",
+              'flex-row items-center justify-between border-b px-6 py-4 text-left shrink-0',
               headerClassName
             )}
           >
-            <div className="text-base font-extrabold text-obsidian font-heading flex items-center gap-2">
-              {title}
-            </div>
-            {showCloseButton && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="p-1.5 rounded-xl text-slate hover:text-obsidian hover:bg-slate/10 transition-colors shrink-0 cursor-pointer"
-                aria-label="Tutup Modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
-          </div>
+            <DialogTitle className="text-base font-extrabold">{title}</DialogTitle>
+          </DialogHeader>
         )}
-
-        {/* Modal Body */}
-        <div className={cn("p-6 overflow-y-auto flex-1 min-h-0", bodyClassName)}>
-          {children}
-        </div>
-      </div>
-    </div>
+        <div className={cn('p-6 overflow-y-auto flex-1 min-h-0', bodyClassName)}>{children}</div>
+      </DialogContent>
+    </Dialog>
   );
-
-  return createPortal(modalContent, document.body);
 };

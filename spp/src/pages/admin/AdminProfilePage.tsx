@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Badge, Button } from '../../components/ui';
+import { Card, Badge, Button, Input } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { User, ShieldCheck, Key, Mail, Phone, Lock, AlertCircle } from 'lucide-react';
@@ -90,12 +90,12 @@ export const AdminProfilePage: React.FC = () => {
             <div>
               <label className="font-bold text-obsidian block mb-1">Nama Lengkap Admin *</label>
               <div className="relative">
-                <input
+                <Input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full p-2.5 pl-9 rounded-xl border border-slate/25 font-bold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full pl-9 font-bold text-obsidian"
                 />
                 <User className="w-4 h-4 text-slate absolute left-3 top-3" />
               </div>
@@ -104,12 +104,12 @@ export const AdminProfilePage: React.FC = () => {
             <div>
               <label className="font-bold text-obsidian block mb-1">Alamat Email Resmi *</label>
               <div className="relative">
-                <input
+                <Input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-2.5 pl-9 rounded-xl border border-slate/25 font-mono text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full pl-9 font-mono text-obsidian"
                 />
                 <Mail className="w-4 h-4 text-slate absolute left-3 top-3" />
               </div>
@@ -118,12 +118,12 @@ export const AdminProfilePage: React.FC = () => {
             <div>
               <label className="font-bold text-obsidian block mb-1">Nomor WhatsApp / Kontak *</label>
               <div className="relative">
-                <input
+                <Input
                   type="text"
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full p-2.5 pl-9 rounded-xl border border-slate/25 font-mono text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full pl-9 font-mono text-obsidian"
                 />
                 <Phone className="w-4 h-4 text-slate absolute left-3 top-3" />
               </div>
@@ -131,11 +131,11 @@ export const AdminProfilePage: React.FC = () => {
 
             <div>
               <label className="font-bold text-obsidian block mb-1">Level Akses Role (Hanya Baca)</label>
-              <input
+              <Input
                 type="text"
                 disabled
                 value={user?.role || 'ADMIN'}
-                className="w-full p-2.5 rounded-xl border border-slate/15 bg-slate/5 font-mono font-bold text-slate uppercase cursor-not-allowed"
+                className="w-full bg-slate/5 font-mono font-bold text-slate uppercase cursor-not-allowed"
               />
             </div>
 
@@ -159,12 +159,12 @@ export const AdminProfilePage: React.FC = () => {
             <div>
               <label className="font-bold text-obsidian block mb-1">Kata Sandi Saat Ini *</label>
               <div className="relative">
-                <input
+                <Input
                   type="password"
                   placeholder="Masukkan kata sandi lama..."
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full p-2.5 pl-9 rounded-xl border border-slate/25 text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full pl-9 text-obsidian"
                 />
                 <Lock className="w-4 h-4 text-slate absolute left-3 top-3" />
               </div>
@@ -173,12 +173,12 @@ export const AdminProfilePage: React.FC = () => {
             <div>
               <label className="font-bold text-obsidian block mb-1">Kata Sandi Baru *</label>
               <div className="relative">
-                <input
+                <Input
                   type="password"
                   placeholder="Minimal 6 karakter..."
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full p-2.5 pl-9 rounded-xl border border-slate/25 text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full pl-9 text-obsidian"
                 />
                 <Lock className="w-4 h-4 text-slate absolute left-3 top-3" />
               </div>
@@ -187,12 +187,12 @@ export const AdminProfilePage: React.FC = () => {
             <div>
               <label className="font-bold text-obsidian block mb-1">Konfirmasi Kata Sandi Baru *</label>
               <div className="relative">
-                <input
+                <Input
                   type="password"
                   placeholder="Ulangi kata sandi baru..."
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-2.5 pl-9 rounded-xl border border-slate/25 text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full pl-9 text-obsidian"
                 />
                 <Lock className="w-4 h-4 text-slate absolute left-3 top-3" />
               </div>

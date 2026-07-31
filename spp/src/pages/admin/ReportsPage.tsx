@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, EmptyState, Spinner, formatRupiah } from '../../components/ui';
+import { Card, Button, EmptyState, Spinner, formatRupiah, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -130,36 +130,48 @@ export const ReportsPage: React.FC = () => {
           {/* Dynamic Filter Controls */}
           <div className="flex items-center gap-2">
             {reportType === 'monthly' && (
-              <select
-                value={month}
-                onChange={(e) => setMonth(Number(e.target.value))}
-                className="p-2 rounded-xl border border-slate/20 bg-white font-semibold text-xs focus:outline-none"
+              <Select
+                value={month != null ? String(month) : undefined}
+                onValueChange={(v) => setMonth(Number(v))}
               >
-                {monthsList.map(m => (
-                  <option key={m.num} value={m.num}>{m.name}</option>
-                ))}
-              </select>
+                <SelectTrigger className="font-semibold text-xs">
+                  <SelectValue placeholder="Pilih bulan..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {monthsList.map(m => (
+                    <SelectItem key={m.num} value={String(m.num)}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
 
             {reportType === 'spp-semester' && (
-              <select
-                value={semester}
-                onChange={(e) => setSemester(Number(e.target.value))}
-                className="p-2 rounded-xl border border-slate/20 bg-white font-semibold text-xs focus:outline-none"
+              <Select
+                value={semester != null ? String(semester) : undefined}
+                onValueChange={(v) => setSemester(Number(v))}
               >
-                <option value={1}>Semester 1 (Jul-Des)</option>
-                <option value={2}>Semester 2 (Jan-Jun)</option>
-              </select>
+                <SelectTrigger className="font-semibold text-xs">
+                  <SelectValue placeholder="Pilih semester..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Semester 1 (Jul-Des)</SelectItem>
+                  <SelectItem value="2">Semester 2 (Jan-Jun)</SelectItem>
+                </SelectContent>
+              </Select>
             )}
 
-            <select
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              className="p-2 rounded-xl border border-slate/20 bg-white font-mono text-xs focus:outline-none"
+            <Select
+              value={year != null ? String(year) : undefined}
+              onValueChange={(v) => setYear(Number(v))}
             >
-              <option value={2026}>Tahun 2026</option>
-              <option value={2025}>Tahun 2025</option>
-            </select>
+              <SelectTrigger className="font-mono text-xs">
+                <SelectValue placeholder="Pilih tahun..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2026">Tahun 2026</SelectItem>
+                <SelectItem value="2025">Tahun 2025</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </Card>

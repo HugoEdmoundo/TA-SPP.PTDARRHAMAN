@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { cn, formatRupiah, parseRupiah } from '../../utils';
-import { Coins } from 'lucide-react';
+import { cn, formatRupiah, parseRupiah } from '@/utils';
+import { Coins, Zap } from 'lucide-react';
+import { Input } from './Input';
+import { Label } from './Label';
 
 export interface InputCurrencyProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'defaultValue'> {
   value: number;
@@ -37,7 +39,7 @@ export const InputCurrency: React.FC<InputCurrencyProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawStr = e.target.value;
     const num = parseRupiah(rawStr);
-    
+
     if (maxAmount !== undefined && num > maxAmount) {
       onChange(maxAmount);
       setDisplayValue(formatRupiah(maxAmount));
@@ -65,14 +67,14 @@ export const InputCurrency: React.FC<InputCurrencyProps> = ({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-semibold text-obsidian mb-1.5 flex items-center gap-1.5">
-          <Coins className="w-4 h-4 text-emerald-primary" />
+        <Label className="mb-1.5 flex items-center gap-1.5 text-foreground">
+          <Coins className="h-4 w-4 text-primary" />
           {label}
-        </label>
+        </Label>
       )}
 
       <div className="relative">
-        <input
+        <Input
           type="text"
           inputMode="numeric"
           placeholder="Rp 0"
@@ -80,19 +82,16 @@ export const InputCurrency: React.FC<InputCurrencyProps> = ({
           onChange={handleInputChange}
           disabled={disabled}
           className={cn(
-            "w-full px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl font-numbers font-bold text-base sm:text-lg md:text-xl bg-white/90 border-2 transition-all duration-200 shadow-sm",
-            "focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary",
-            "disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed",
-            error ? "border-rose-danger ring-rose-danger/10" : "border-slate/20 hover:border-emerald-primary/40",
+            'font-bold text-base sm:text-lg md:text-xl bg-background',
+            error && 'border-destructive',
             className
           )}
           {...props}
         />
       </div>
 
-      {error && <p className="mt-1.5 text-xs font-semibold text-rose-danger">{error}</p>}
+      {error && <p className="mt-1.5 text-xs font-semibold text-destructive">{error}</p>}
 
-      {/* Quick-Chip Nominal Buttons */}
       {showQuickChips && !disabled && (
         <div className="mt-2.5 flex flex-wrap gap-1.5 sm:gap-2">
           {quickChips.map((chip) => (
@@ -100,7 +99,7 @@ export const InputCurrency: React.FC<InputCurrencyProps> = ({
               key={chip}
               type="button"
               onClick={() => handleAddChip(chip)}
-              className="text-xs sm:text-sm font-bold px-3 py-2 sm:px-3 sm:py-1.5 rounded-xl bg-emerald-light/70 text-emerald-primary border border-emerald-primary/20 hover:bg-emerald-primary hover:text-white transition-all duration-150 active:scale-95 shadow-2xs select-none min-h-[36px] sm:min-h-[34px] flex items-center justify-center"
+              className="flex min-h-[34px] items-center justify-center rounded-lg bg-primary/10 px-3 py-1.5 text-xs sm:text-sm font-bold text-primary border border-primary/20 transition-all duration-150 hover:bg-primary hover:text-white active:scale-95 select-none"
             >
               +{formatRupiah(chip)}
             </button>
@@ -110,9 +109,10 @@ export const InputCurrency: React.FC<InputCurrencyProps> = ({
               key="pay-all"
               type="button"
               onClick={handlePayAll}
-              className="text-xs sm:text-sm font-bold px-3 py-2 sm:px-3.5 sm:py-1.5 rounded-xl bg-gold-bg text-gold-dark border border-gold-accent hover:bg-gold-accent hover:text-obsidian transition-all duration-150 active:scale-95 shadow-2xs select-none min-h-[36px] sm:min-h-[34px] ml-auto flex items-center justify-center gap-1"
+              className="ml-auto flex min-h-[34px] items-center justify-center gap-1 rounded-lg bg-gold-bg px-3 py-1.5 text-xs sm:text-sm font-bold text-gold-dark border border-gold-accent transition-all duration-150 hover:bg-gold-accent hover:text-foreground active:scale-95 select-none"
             >
-              <span>⚡ Bayar Semua ({formatRupiah(maxAmount)})</span>
+              <Zap className="h-3.5 w-3.5" />
+              Bayar Semua ({formatRupiah(maxAmount)})
             </button>
           )}
         </div>

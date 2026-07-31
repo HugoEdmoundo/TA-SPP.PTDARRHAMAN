@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, Modal } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, Modal, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -73,14 +73,18 @@ export const SppGridPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <span className="text-xs font-bold text-obsidian">Tahun SPP:</span>
-            <select
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
-              className="p-2 rounded-xl border border-slate/20 bg-white font-semibold text-xs focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+            <Select
+              value={year != null ? String(year) : undefined}
+              onValueChange={(v) => setYear(Number(v))}
             >
-              <option value={2026}>2026</option>
-              <option value={2025}>2025</option>
-            </select>
+              <SelectTrigger className="font-semibold text-xs">
+                <SelectValue placeholder="Pilih tahun..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2026">2026</SelectItem>
+                <SelectItem value="2025">2025</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex gap-1.5 w-full sm:w-auto">

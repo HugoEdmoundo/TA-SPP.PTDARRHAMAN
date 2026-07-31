@@ -1,24 +1,38 @@
-import React from 'react';
-import { cn } from '../../utils/cn';
-import type { BillStatus, PaymentStatus } from '../../types';
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+import type { BillStatus, PaymentStatus } from '@/types';
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'gold';
+const badgeVariants = cva(
+  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  {
+    variants: {
+      variant: {
+        default: 'border-transparent bg-primary/10 text-primary',
+        success: 'border-transparent bg-emerald-light text-emerald-primary',
+        warning: 'border-transparent bg-amber-50 text-amber-700',
+        danger: 'border-transparent bg-rose-light text-rose-danger',
+        info: 'border-transparent bg-blue-50 text-blue-700',
+        gold: 'border-transparent bg-gold-bg text-gold-dark',
+        secondary: 'border-transparent bg-secondary text-secondary-foreground',
+        outline: 'text-foreground',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof badgeVariants> {
   status?: BillStatus | PaymentStatus | string;
   pulse?: boolean;
   size?: 'sm' | 'md';
 }
 
-export const Badge: React.FC<BadgeProps> = ({
-  children,
-  className,
-  variant,
-  status,
-  pulse = false,
-  size = 'md',
-  ...props
-}) => {
-  // Map status to variant and label if status is provided
+function Badge({ className, variant, status, pulse = false, size = 'md', children, ...props }: BadgeProps) {
   let determinedVariant = variant || 'default';
   let label = children;
 
@@ -55,35 +69,22 @@ export const Badge: React.FC<BadgeProps> = ({
 
   const isOverdue = status === 'OVERDUE' || pulse;
 
-  const variants = {
-    default: "bg-slate/10 text-slate-dark border border-slate/20",
-    success: "bg-emerald-light text-emerald-primary border border-emerald-primary/30 font-semibold",
-    warning: "bg-amber-50 text-amber-700 border border-amber-300",
-    danger: "bg-rose-light text-rose-danger border border-rose-danger/30 font-bold",
-    info: "bg-blue-50 text-blue-700 border border-blue-200",
-    gold: "bg-gold-bg text-gold-dark border border-gold-accent/40 font-semibold",
-  };
-
-  const sizes = {
-    sm: "text-[10px] sm:text-xs px-2 py-0.5 rounded-md font-bold",
-    md: "text-xs sm:text-sm px-2.5 py-1 sm:px-3 sm:py-1 rounded-lg font-bold",
-  };
-
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center font-medium transition-all select-none",
-        variants[determinedVariant],
-        sizes[size],
-        isOverdue && "animate-pulse-subtle ring-2 ring-rose-danger/30",
+        badgeVariants({ variant: determinedVariant }),
+        size === 'sm' && 'px-2 py-0.5 text-[10px]',
+        isOverdue && 'animate-pulse ring-2 ring-rose-danger/30',
         className
       )}
       {...props}
     >
       {isOverdue && (
-        <span className="w-1.5 h-1.5 rounded-full bg-rose-danger mr-1.5 animate-ping" />
+        <span className="mr-1 h-1.5 w-1.5 rounded-full bg-rose-danger animate-ping" />
       )}
       {label}
     </span>
   );
-};
+}
+
+export { Badge, badgeVariants };

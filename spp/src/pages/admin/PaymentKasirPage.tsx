@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -216,12 +216,12 @@ export const PaymentKasirPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="relative w-full sm:w-72">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate/50" />
-            <input
+            <Input
               type="text"
               placeholder="Cari nama santri, NIS, atau no kuitansi..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate/20 bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              className="w-full pl-9 pr-3 text-xs"
             />
           </div>
 
@@ -358,43 +358,55 @@ export const PaymentKasirPage: React.FC = () => {
                 {allStudents.length === 0 ? (
                   <div className="p-3 rounded-xl bg-amber-50 text-amber-800 font-semibold">Belum ada data santri.</div>
                 ) : (
-                  <select
+                  <Select
                     value={selectedStudentId}
-                    onChange={(e) => setSelectedStudentId(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-bold text-xs focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    onValueChange={(v) => setSelectedStudentId(v)}
                   >
-                    {allStudents.map((st: any) => (
-                      <option key={st.id} value={st.id}>
-                        {st.nis} - {st.full_name || st.name} ({st.academic_year || '2025/2026'})
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full font-bold text-xs">
+                      <SelectValue placeholder="Pilih santri..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allStudents.map((st: any) => (
+                        <SelectItem key={st.id} value={String(st.id)}>
+                          {st.nis} - {st.full_name || st.name} ({st.academic_year || '2025/2026'})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Jenis Pembayaran *</label>
-                  <select
+                  <Select
                     value={paymentType}
-                    onChange={(e: any) => setPaymentType(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    onValueChange={(v) => setPaymentType(v as 'spp' | 'non_spp' | 'event')}
                   >
-                    <option value="spp">SPP Bulanan</option>
-                    <option value="non_spp">Tagihan Non-SPP (Buku/Seragam)</option>
-                    <option value="event">Donasi / Event Patungan</option>
-                  </select>
+                    <SelectTrigger className="w-full font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="spp">SPP Bulanan</SelectItem>
+                      <SelectItem value="non_spp">Tagihan Non-SPP (Buku/Seragam)</SelectItem>
+                      <SelectItem value="event">Donasi / Event Patungan</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Metode Pembayaran</label>
-                  <select
+                  <Select
                     value={paymentMethod}
-                    onChange={(e: any) => setPaymentMethod(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    onValueChange={(v) => setPaymentMethod(v as 'cash' | 'transfer')}
                   >
-                    <option value="cash">Tunai</option>
-                    <option value="transfer">Transfer</option>
-                  </select>
+                    <SelectTrigger className="w-full font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cash">Tunai</SelectItem>
+                      <SelectItem value="transfer">Transfer</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -403,26 +415,34 @@ export const PaymentKasirPage: React.FC = () => {
                 <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-slate/5 border border-slate/15">
                   <div>
                     <label className="font-bold text-obsidian block mb-1">Bulan SPP (1-12) *</label>
-                    <select
-                      value={sppMonth}
-                      onChange={(e) => setSppMonth(Number(e.target.value))}
-                      className="w-full p-2 rounded-lg border border-slate/25 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    <Select
+                      value={sppMonth != null ? String(sppMonth) : undefined}
+                      onValueChange={(v) => setSppMonth(Number(v))}
                     >
-                      {monthsList.map(m => (
-                        <option key={m.num} value={m.num}>{m.name} ({m.num})</option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {monthsList.map(m => (
+                          <SelectItem key={m.num} value={String(m.num)}>{m.name} ({m.num})</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <label className="font-bold text-obsidian block mb-1">Tahun SPP *</label>
-                    <select
-                      value={sppYear}
-                      onChange={(e) => setSppYear(Number(e.target.value))}
-                      className="w-full p-2 rounded-lg border border-slate/25 bg-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    <Select
+                      value={sppYear != null ? String(sppYear) : undefined}
+                      onValueChange={(v) => setSppYear(Number(v))}
                     >
-                      <option value={2026}>2026</option>
-                      <option value={2025}>2025</option>
-                    </select>
+                      <SelectTrigger className="w-full font-mono">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2026">2026</SelectItem>
+                        <SelectItem value="2025">2025</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               ) : (
@@ -431,22 +451,25 @@ export const PaymentKasirPage: React.FC = () => {
                   {studentBills.length === 0 ? (
                     <div className="text-slate italic py-2 text-center">Santri ini tidak memiliki tagihan Non-SPP/Event yang belum lunas.</div>
                   ) : (
-                    <select
+                    <Select
                       value={selectedBillId}
-                      onChange={(e) => {
-                        setSelectedBillId(e.target.value);
-                        const b = studentBills.find(x => String(x.id) === e.target.value);
+                      onValueChange={(v) => {
+                        setSelectedBillId(v);
+                        const b = studentBills.find(x => String(x.id) === v);
                         if (b) setAmount(Number(b.remaining_amount || b.amount));
                       }}
-                      className="w-full p-2 rounded-lg border border-slate/25 bg-white font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
                     >
-                      <option value="">-- Pilih Tagihan --</option>
-                      {studentBills.map(b => (
-                        <option key={b.id} value={b.id}>
-                          {b.label} — Sisa Rp {formatRupiah(Number(b.remaining_amount || b.amount))}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full font-bold">
+                        <SelectValue placeholder="-- Pilih Tagihan --" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {studentBills.map(b => (
+                          <SelectItem key={b.id} value={String(b.id)}>
+                            {b.label} — Sisa Rp {formatRupiah(Number(b.remaining_amount || b.amount))}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
                 </div>
               )}
@@ -472,12 +495,12 @@ export const PaymentKasirPage: React.FC = () => {
 
               <div>
                 <label className="font-bold text-obsidian block mb-1">Catatan / Keterangan Loket</label>
-                <input
+                <Input
                   type="text"
                   placeholder="Misal: Pembayaran langsung oleh Ibu santri..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full"
                 />
               </div>
 
@@ -603,13 +626,13 @@ export const PaymentKasirPage: React.FC = () => {
             <form onSubmit={handleConfirmVoid} className="flex flex-col gap-3.5 text-xs">
               <div>
                 <label className="font-bold text-obsidian block mb-1">Alasan Pembatalan / Void *</label>
-                <textarea
+                <Textarea
                   rows={2}
                   required
                   placeholder="Misal: Salah input nominal / duplikasi bayar / permintaan wali..."
                   value={voidReason}
                   onChange={(e) => setVoidReason(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full"
                 />
               </div>
 

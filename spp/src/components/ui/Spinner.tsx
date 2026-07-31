@@ -1,5 +1,6 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
+import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface SpinnerProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -13,27 +14,22 @@ export const Spinner: React.FC<SpinnerProps> = ({
   className,
 }) => {
   const sizes = {
-    sm: "w-4 h-4 border-2",
-    md: "w-6 h-6 border-2",
-    lg: "w-8 h-8 border-3",
-    xl: "w-12 h-12 border-4",
+    sm: 'h-4 w-4',
+    md: 'h-6 w-6',
+    lg: 'h-8 w-8',
+    xl: 'h-12 w-12',
   };
 
   const colors = {
-    emerald: "border-emerald-primary/20 border-t-emerald-primary",
-    gold: "border-gold-accent/20 border-t-gold-accent",
-    white: "border-white/20 border-t-white",
-    slate: "border-slate/20 border-t-slate-dark",
+    emerald: 'text-primary',
+    gold: 'text-accent',
+    white: 'text-white',
+    slate: 'text-muted-foreground',
   };
 
   return (
-    <div
-      className={cn(
-        "inline-block rounded-full animate-spin",
-        sizes[size],
-        colors[color],
-        className
-      )}
+    <Loader2
+      className={cn('animate-spin', sizes[size], colors[color], className)}
       role="status"
       aria-label="Loading"
     />

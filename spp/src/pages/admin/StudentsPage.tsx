@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, EmptyState, Spinner, Modal } from '../../components/ui';
+import { Card, Button, EmptyState, Spinner, Modal, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -289,12 +289,12 @@ export const StudentsPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="relative w-full sm:w-72">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate/50" />
-            <input
+            <Input
               type="text"
               placeholder="Cari nama santri atau NIS..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate/20 bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              className="w-full pl-9 pr-3 text-xs"
             />
           </div>
           <div className="flex gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
@@ -402,98 +402,101 @@ export const StudentsPage: React.FC = () => {
             <form onSubmit={handleCreateStudent} className="flex flex-col gap-3.5 text-xs">
               <div>
                 <label className="font-bold text-obsidian block mb-1">Nomor Induk Santri (NIS) *</label>
-                <input
+                <Input
                   type="text"
                   required
                   placeholder="Misal: 2026001"
                   value={nis}
                   onChange={(e) => setNis(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full font-mono"
                 />
               </div>
               <div>
                 <label className="font-bold text-obsidian block mb-1">Nama Lengkap Santri *</label>
-                <input
+                <Input
                   type="text"
                   required
                   placeholder="Nama sesuai ijazah/akta..."
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Jenis Kelamin</label>
-                  <select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  >
-                    <option value="Laki-laki">Laki-laki</option>
-                    <option value="Perempuan">Perempuan</option>
-                  </select>
+                  <Select value={gender} onValueChange={setGender}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih jenis kelamin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Laki-laki">Laki-laki</SelectItem>
+                      <SelectItem value="Perempuan">Perempuan</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Tahun Ajaran</label>
-                  <select
-                    value={academicYear}
-                    onChange={(e) => handleAcademicYearChange(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  >
-                    {academicYearsList.map((ay) => (
-                      <option key={ay.id} value={ay.name}>
-                        {ay.name} {ay.is_active ? '(Aktif)' : ''}
-                      </option>
-                    ))}
-                    {academicYearsList.length === 0 && <option value="2025/2026">2025/2026</option>}
-                  </select>
+                  <Select value={academicYear} onValueChange={handleAcademicYearChange}>
+                    <SelectTrigger className="w-full font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {academicYearsList.map((ay) => (
+                        <SelectItem key={ay.id} value={ay.name}>
+                          {ay.name} {ay.is_active ? '(Aktif)' : ''}
+                        </SelectItem>
+                      ))}
+                      {academicYearsList.length === 0 && <SelectItem value="2025/2026">2025/2026</SelectItem>}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Tempat Lahir</label>
-                  <input
+                  <Input
                     type="text"
                     placeholder="Misal: Jakarta"
                     value={birthPlace}
                     onChange={(e) => setBirthPlace(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    className="w-full"
                   />
                 </div>
                 <div>
                   <label className="font-bold text-obsidian block mb-1">No. HP / WA</label>
-                  <input
+                  <Input
                     type="text"
                     placeholder="08123456789"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    className="w-full font-mono"
                   />
                 </div>
               </div>
               <div>
                 <label className="font-bold text-obsidian block mb-1">Status Santri</label>
-                <select
-                  value={studentStatus}
-                  onChange={(e) => setStudentStatus(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50 text-emerald-primary"
-                >
-                  <option value="active">Aktif (Sedang Belajar)</option>
-                  <option value="graduated">Lulus / Alumni</option>
-                  <option value="transferred">Pindah Sekolah</option>
-                  <option value="dropout">Dropout (Putus Sekolah)</option>
-                  <option value="inactive">Nonaktif / Lainnya</option>
-                </select>
+                <Select value={studentStatus} onValueChange={setStudentStatus}>
+                  <SelectTrigger className="w-full font-bold text-emerald-primary">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Aktif (Sedang Belajar)</SelectItem>
+                    <SelectItem value="graduated">Lulus / Alumni</SelectItem>
+                    <SelectItem value="transferred">Pindah Sekolah</SelectItem>
+                    <SelectItem value="dropout">Dropout (Putus Sekolah)</SelectItem>
+                    <SelectItem value="inactive">Nonaktif / Lainnya</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="font-bold text-obsidian block mb-1">Alamat Domisili</label>
-                <textarea
+                <Textarea
                   rows={2}
                   placeholder="Alamat lengkap tempat tinggal..."
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full"
                 />
               </div>
               <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
@@ -518,93 +521,96 @@ export const StudentsPage: React.FC = () => {
             <form onSubmit={handleUpdateStudent} className="flex flex-col gap-3.5 text-xs">
               <div>
                 <label className="font-bold text-obsidian block mb-1">Nomor Induk Santri (NIS) *</label>
-                <input
+                <Input
                   type="text"
                   required
                   value={nis}
                   onChange={(e) => setNis(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full font-mono"
                 />
               </div>
               <div>
                 <label className="font-bold text-obsidian block mb-1">Nama Lengkap Santri *</label>
-                <input
+                <Input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Jenis Kelamin</label>
-                  <select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  >
-                    <option value="Laki-laki">Laki-laki</option>
-                    <option value="Perempuan">Perempuan</option>
-                  </select>
+                  <Select value={gender} onValueChange={setGender}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pilih jenis kelamin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Laki-laki">Laki-laki</SelectItem>
+                      <SelectItem value="Perempuan">Perempuan</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Tahun Ajaran</label>
-                  <select
-                    value={academicYear}
-                    onChange={(e) => handleAcademicYearChange(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  >
-                    {academicYearsList.map((ay) => (
-                      <option key={ay.id} value={ay.name}>
-                        {ay.name} {ay.is_active ? '(Aktif)' : ''}
-                      </option>
-                    ))}
-                    {academicYearsList.length === 0 && <option value="2025/2026">2025/2026</option>}
-                  </select>
+                  <Select value={academicYear} onValueChange={handleAcademicYearChange}>
+                    <SelectTrigger className="w-full font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {academicYearsList.map((ay) => (
+                        <SelectItem key={ay.id} value={ay.name}>
+                          {ay.name} {ay.is_active ? '(Aktif)' : ''}
+                        </SelectItem>
+                      ))}
+                      {academicYearsList.length === 0 && <SelectItem value="2025/2026">2025/2026</SelectItem>}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Tempat Lahir</label>
-                  <input
+                  <Input
                     type="text"
                     value={birthPlace}
                     onChange={(e) => setBirthPlace(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    className="w-full"
                   />
                 </div>
                 <div>
                   <label className="font-bold text-obsidian block mb-1">No. HP / WA</label>
-                  <input
+                  <Input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    className="w-full font-mono"
                   />
                 </div>
               </div>
               <div>
                 <label className="font-bold text-obsidian block mb-1">Status Santri</label>
-                <select
-                  value={studentStatus}
-                  onChange={(e) => setStudentStatus(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50 text-emerald-primary"
-                >
-                  <option value="active">Aktif (Sedang Belajar)</option>
-                  <option value="graduated">Lulus / Alumni</option>
-                  <option value="transferred">Pindah Sekolah</option>
-                  <option value="dropout">Dropout (Putus Sekolah)</option>
-                  <option value="inactive">Nonaktif / Lainnya</option>
-                </select>
+                <Select value={studentStatus} onValueChange={setStudentStatus}>
+                  <SelectTrigger className="w-full font-bold text-emerald-primary">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Aktif (Sedang Belajar)</SelectItem>
+                    <SelectItem value="graduated">Lulus / Alumni</SelectItem>
+                    <SelectItem value="transferred">Pindah Sekolah</SelectItem>
+                    <SelectItem value="dropout">Dropout (Putus Sekolah)</SelectItem>
+                    <SelectItem value="inactive">Nonaktif / Lainnya</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="font-bold text-obsidian block mb-1">Alamat Domisili</label>
-                <textarea
+                <Textarea
                   rows={2}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="w-full"
                 />
               </div>
               <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">

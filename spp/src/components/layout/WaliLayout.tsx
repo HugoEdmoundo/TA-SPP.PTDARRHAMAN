@@ -1,21 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { cn } from '../../utils';
-import { useAuth } from '../../contexts/AuthContext';
-import { useSettings } from '../../contexts/SettingsContext';
-import { api } from '../../api/client';
-import { 
-  Home, 
-  CreditCard, 
-  History, 
-  User as UserIcon, 
-  LogOut, 
-  WifiOff, 
-  ChevronDown, 
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSettings } from '@/contexts/SettingsContext';
+import { api } from '@/api/client';
+import {
+  Home,
+  CreditCard,
+  History,
+  User as UserIcon,
+  LogOut,
+  WifiOff,
+  ChevronDown,
   Sparkles,
-  HeartHandshake
+  HeartHandshake,
 } from 'lucide-react';
-import { BottomSheet } from '../ui/BottomSheet';
+import { Avatar, AvatarFallback } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/DropdownMenu';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 
 export const WaliLayout: React.FC = () => {
   const { user, logout } = useAuth();
@@ -25,9 +35,6 @@ export const WaliLayout: React.FC = () => {
 
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [isChildSelectorOpen, setIsChildSelectorOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const profileRef = useRef<HTMLDivElement>(null);
 
   const [childrenList, setChildrenList] = useState<any[]>([]);
   const [selectedChild, setSelectedChild] = useState<any>({
@@ -55,18 +62,6 @@ export const WaliLayout: React.FC = () => {
     fetchChildren();
   }, []);
 
-  // Close profile dropdown on outside click
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
-        setIsProfileOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
-
-  // Offline network status listener
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
@@ -86,133 +81,124 @@ export const WaliLayout: React.FC = () => {
     { label: 'Profil', path: '/wali/profile', icon: UserIcon },
   ];
 
-  const currentTitle = navItems.find((m) => 
-    m.exact ? location.pathname === m.path : location.pathname.startsWith(m.path)
-  )?.label || 'Portal Wali Santri';
+  const currentTitle =
+    navItems.find((m) =>
+      m.exact ? location.pathname === m.path : location.pathname.startsWith(m.path)
+    )?.label || 'Portal Wali Santri';
+
+  const isActive = (item: (typeof navItems)[number]) =>
+    item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path);
 
   return (
-    <div className="min-h-screen text-obsidian flex flex-col font-sans select-none pb-20 md:pb-8 bg-[#F7F5F0]">
-      {/* Offline Resilience Banner */}
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans select-none pb-20 md:pb-8">
       {isOffline && (
-        <div className="bg-gradient-to-r from-rose-danger to-[#C92A20] text-white text-xs font-bold py-2 px-4 text-center flex items-center justify-center gap-2 sticky top-0 z-50 shadow-md animate-slide-down">
+        <div className="bg-gradient-to-r from-destructive to-[#C92A20] text-white text-xs font-bold py-2 px-4 text-center flex items-center justify-center gap-2 sticky top-0 z-50 shadow-md animate-slide-down">
           <WifiOff className="w-4 h-4 animate-pulse" />
           <span>Koneksi terputus. Menampilkan data tersimpan dalam mode offline.</span>
         </div>
       )}
 
-      {/* Sleek Liquid Glass Header Bar (Universal & Responsive) */}
-      <header className="sticky top-0 z-30 glass-navbar">
+      <header className="sticky top-0 z-30 border-b bg-card/80 backdrop-blur">
         <div className="max-w-6xl mx-auto px-2.5 sm:px-4 md:px-6 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
-          {/* Brand Logo & Name */}
           <div className="flex items-center gap-2 sm:gap-3 cursor-pointer min-w-0 flex-1 md:flex-initial" onClick={() => navigate('/wali')}>
-            <div className="relative shrink-0">
-              <img
-                src={settings.logo || '/download.png'}
-                alt="Logo"
-                className="w-7 h-7 sm:w-9 sm:h-9 object-contain rounded-xl bg-white/80 p-0.5 border border-white/90 shadow-2xs"
-              />
-
-            </div>
+            <img
+              src={settings.logo || '/download.png'}
+              alt="Logo"
+              className="w-7 h-7 sm:w-9 sm:h-9 object-contain rounded-xl bg-muted p-0.5 border shrink-0"
+            />
             <div className="min-w-0 flex-1">
-              <h1 className="text-xs sm:text-sm md:text-base font-extrabold text-obsidian leading-tight tracking-tight truncate font-heading">PTDARRAHMAN</h1>
-              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-slate font-medium truncate">
+              <h1 className="text-xs sm:text-sm md:text-base font-extrabold text-foreground leading-tight tracking-tight truncate font-heading">
+                PTDARRAHMAN
+              </h1>
+              <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-muted-foreground font-medium truncate">
                 <span className="hidden sm:inline">Portal Wali • </span>
-                <span className="text-emerald-primary font-bold truncate">{currentTitle}</span>
+                <span className="text-primary font-bold truncate">{currentTitle}</span>
               </div>
             </div>
           </div>
 
-          {/* Tablet & Desktop Widescreen Sleek Pill Navigation (Hidden on Mobile) */}
-          <nav className="hidden md:flex items-center gap-1.5 bg-white/60 backdrop-blur-md p-1.5 rounded-2xl border border-white/80 shadow-2xs">
+          <nav className="hidden md:flex items-center gap-1.5 bg-muted/60 backdrop-blur p-1.5 rounded-xl border">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = item.exact 
-                ? location.pathname === item.path 
-                : location.pathname.startsWith(item.path);
-
+              const active = isActive(item);
               return (
                 <NavLink
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200",
-                    isActive 
-                      ? "bg-emerald-primary text-white shadow-sm scale-[1.02]" 
-                      : "text-slate-dark hover:text-obsidian hover:bg-white/70"
+                    'flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200',
+                    active
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                   )}
                 >
-                  <Icon className={cn("w-4 h-4 shrink-0", isActive ? "stroke-[2.25]" : "stroke-[1.75]")} />
+                  <Icon className={cn('w-4 h-4 shrink-0', active && 'stroke-[2.25]')} />
                   <span>{item.label}</span>
                 </NavLink>
               );
             })}
           </nav>
 
-          {/* Right Controls: Interactive Child Selector & Profile Dropdown */}
           <div className="flex items-center gap-1.5 sm:gap-3 ml-auto md:ml-0 shrink-0">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => setIsChildSelectorOpen(true)}
-              className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/70 backdrop-blur-md border border-white hover:border-emerald-primary/40 text-emerald-primary text-xs font-bold hover:bg-white hover:shadow-md transition-all active:scale-95 shadow-2xs shrink-0"
+              className="gap-1.5 h-8 px-2 sm:h-9 sm:px-3 text-xs font-bold text-primary"
             >
-              <Sparkles className="w-3.5 h-3.5 text-gold-accent shrink-0" />
-              <span className="max-w-[70px] sm:max-w-[150px] truncate">{selectedChild.name.split(' ')[0]} <span className="hidden sm:inline">({selectedChild.grade})</span></span>
-              {childrenList.length > 1 && <ChevronDown className="w-3.5 h-3.5 opacity-80 shrink-0" />}
-            </button>
+              <Sparkles className="h-3.5 w-3.5 text-accent shrink-0" />
+              <span className="max-w-[70px] sm:max-w-[150px] truncate">
+                {selectedChild.name.split(' ')[0]}{' '}
+                <span className="hidden sm:inline">({selectedChild.grade})</span>
+              </span>
+              {childrenList.length > 1 && <ChevronDown className="h-3.5 w-3.5 opacity-80 shrink-0" />}
+            </Button>
 
-            {/* Profile Dropdown */}
-            <div className="relative shrink-0" ref={profileRef}>
-              <button
-                type="button"
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-2xl bg-white/40 hover:bg-white/80 transition-all border border-white/60 hover:border-white shadow-2xs active:scale-95"
-              >
-                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-emerald-primary to-emerald-light flex items-center justify-center text-xs font-bold text-white shadow-xs shrink-0">
-                  {user?.name?.[0] || 'W'}
-                </div>
-                <div className="hidden lg:block text-left">
-                  <div className="text-xs font-bold text-obsidian leading-tight truncate max-w-[110px]">{user?.name || 'Wali Santri'}</div>
-                  <div className="text-[9px] font-extrabold text-emerald-primary uppercase tracking-wider">WALI</div>
-                </div>
-              </button>
-
-              {isProfileOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 glass-modal rounded-2xl overflow-hidden animate-fade-in z-50 shadow-xl border border-white">
-                  <div className="px-4 py-3 border-b border-white/60 bg-white/50">
-                    <p className="text-sm font-bold text-obsidian truncate">{user?.name || 'Wali Santri'}</p>
-                    <p className="text-xs text-slate truncate">{user?.email || 'wali@ptdarrahman.sch.id'}</p>
-                  </div>
-                  <div className="py-1.5 px-1">
-                    <button
-                      type="button"
-                      onClick={() => { setIsProfileOpen(false); navigate('/wali/profile'); }}
-                      className="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-dark hover:bg-white/90 hover:text-emerald-primary transition-all flex items-center gap-2.5"
-                    >
-                      <UserIcon className="w-4 h-4 text-emerald-primary" />
-                      <span>Profil Saya</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={logout}
-                      className="w-full px-3 py-2 rounded-xl text-left text-xs font-bold text-rose-danger hover:bg-rose-danger/10 transition-all flex items-center gap-2.5 mt-1"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Keluar / Logout</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-2.5 px-1.5 py-1.5 h-auto sm:px-2.5 rounded-xl">
+                  <Avatar className="h-7 w-7 rounded-xl bg-primary text-primary-foreground">
+                    <AvatarFallback className="text-xs font-bold">
+                      {user?.name?.[0] || 'W'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden lg:block text-left">
+                    <span className="block text-xs font-bold leading-tight truncate max-w-[110px]">
+                      {user?.name || 'Wali Santri'}
+                    </span>
+                    <span className="block text-[9px] font-extrabold text-primary uppercase tracking-wider">
+                      WALI
+                    </span>
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <p className="text-sm font-bold text-foreground truncate">{user?.name || 'Wali Santri'}</p>
+                  <p className="text-xs font-normal text-muted-foreground truncate">
+                    {user?.email || 'wali@ptdarrahman.sch.id'}
+                  </p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/wali/profile')}>
+                  <UserIcon className="h-4 w-4 text-primary" />
+                  <span>Profil Saya</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
+                  <LogOut className="h-4 w-4" />
+                  <span>Keluar / Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 animate-fade-in">
         <Outlet context={{ selectedChild }} />
       </main>
 
-      {/* Mobile Telegram Translucent Floating Dock Navigation Bar */}
       <nav
         className="md:hidden telegram-floating-dock pb-safe"
         aria-label="Navigasi Bawah Telegram Style"
@@ -220,38 +206,34 @@ export const WaliLayout: React.FC = () => {
         <div className="flex items-center justify-around gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = item.exact 
-              ? location.pathname === item.path 
-              : location.pathname.startsWith(item.path);
-
+            const active = isActive(item);
             return (
               <NavLink
                 key={item.path}
                 to={item.path}
                 title={item.label}
                 className={cn(
-                  "flex flex-col items-center justify-center py-1.5 px-1 min-w-[54px] flex-1 rounded-xl transition-all duration-300 group active:scale-95",
-                  isActive ? "text-telegram-blue font-extrabold" : "text-slate-500 hover:text-obsidian"
+                  'flex flex-col items-center justify-center py-1.5 px-1 min-w-[54px] flex-1 rounded-xl transition-all duration-300 group active:scale-95',
+                  active ? 'text-telegram-blue font-extrabold' : 'text-slate-500 hover:text-foreground'
                 )}
               >
-                <div className={cn("relative p-1 rounded-lg transition-all duration-300", isActive && "bg-telegram-blue/15 scale-105 shadow-2xs")}>
-                  <Icon 
-                    fill={isActive ? 'currentColor' : 'none'}
+                <div className={cn('relative p-1 rounded-lg transition-all duration-300', active && 'bg-telegram-blue/15 scale-105')}>
+                  <Icon
+                    fill={active ? 'currentColor' : 'none'}
                     className={cn(
-                      "w-5 h-5 sm:w-[22px] sm:h-[22px] transition-transform duration-300 group-hover:scale-110", 
-                      isActive ? "text-telegram-blue stroke-[2.25]" : "text-slate-500 stroke-[1.75]"
-                    )} 
+                      'w-5 h-5 sm:w-[22px] sm:h-[22px] transition-transform duration-300 group-hover:scale-110',
+                      active ? 'text-telegram-blue stroke-[2.25]' : 'text-slate-500 stroke-[1.75]'
+                    )}
                   />
-                  {/* Badge Unread Count / Status */}
                   {item.badge && (
-                    <span className="absolute -top-1 -right-1.5 px-1 py-0 min-w-[14px] h-[14px] rounded-full bg-rose-danger text-white text-[8px] font-extrabold flex items-center justify-center border border-white shadow-2xs animate-pulse-subtle z-10">
+                    <span className="absolute -top-1 -right-1.5 px-1 py-0 min-w-[14px] h-[14px] rounded-full bg-destructive text-white text-[8px] font-extrabold flex items-center justify-center border animate-pulse z-10">
                       {item.badge}
                     </span>
                   )}
                 </div>
                 <span className={cn(
-                  "text-[9px] sm:text-[10px] mt-0.5 leading-none tracking-tight truncate max-w-[62px] transition-colors duration-300", 
-                  isActive ? "font-extrabold text-telegram-blue" : "font-medium text-slate-500 group-hover:text-obsidian"
+                  'text-[9px] sm:text-[10px] mt-0.5 leading-none tracking-tight truncate max-w-[62px] transition-colors duration-300',
+                  active ? 'font-extrabold text-telegram-blue' : 'font-medium text-slate-500 group-hover:text-foreground'
                 )}>
                   {item.label}
                 </span>
@@ -261,7 +243,6 @@ export const WaliLayout: React.FC = () => {
         </div>
       </nav>
 
-      {/* Child Selector BottomSheet */}
       <BottomSheet
         isOpen={isChildSelectorOpen}
         onClose={() => setIsChildSelectorOpen(false)}
@@ -280,40 +261,41 @@ export const WaliLayout: React.FC = () => {
                   setIsChildSelectorOpen(false);
                 }}
                 className={cn(
-                  "flex items-center gap-3.5 p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer active:scale-[0.99] group",
+                  'flex items-center gap-3.5 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer active:scale-[0.99] group',
                   isSelected
-                    ? "bg-emerald-primary/10 border-emerald-primary shadow-sm"
-                    : "bg-white/60 border-white/80 hover:border-emerald-primary/40 hover:bg-white hover:shadow-sm"
+                    ? 'bg-primary/10 border-primary shadow-sm'
+                    : 'bg-card border-border hover:border-primary/40 hover:bg-accent'
                 )}
               >
-                {/* Avatar */}
-                <div className={cn(
-                  "w-10 h-10 rounded-2xl flex items-center justify-center font-extrabold text-base shrink-0 transition-all duration-200",
-                  isSelected
-                    ? "bg-emerald-primary text-white shadow-sm"
-                    : "bg-emerald-primary/10 text-emerald-primary group-hover:bg-emerald-primary group-hover:text-white"
-                )}>
+                <div
+                  className={cn(
+                    'w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-base shrink-0 transition-all duration-200',
+                    isSelected
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground'
+                  )}
+                >
                   {child.name.charAt(0)}
                 </div>
-
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <h4 className={cn(
-                    "text-sm font-bold leading-snug truncate transition-colors duration-200",
-                    isSelected ? "text-emerald-primary" : "text-obsidian group-hover:text-emerald-primary"
-                  )}>{child.name}</h4>
-                  <span className="text-[11px] text-slate font-medium">
+                    'text-sm font-bold leading-snug truncate transition-colors duration-200',
+                    isSelected ? 'text-primary' : 'text-foreground group-hover:text-primary'
+                  )}>
+                    {child.name}
+                  </h4>
+                  <span className="text-[11px] text-muted-foreground font-medium">
                     NIS: {child.nis} &nbsp;•&nbsp; Kelas {child.grade}
                   </span>
                 </div>
-
-                {/* Check Indicator */}
-                <div className={cn(
-                  "w-6 h-6 rounded-xl flex items-center justify-center text-xs font-extrabold shrink-0 transition-all duration-200",
-                  isSelected
-                    ? "bg-emerald-primary text-white shadow-2xs scale-100 opacity-100"
-                    : "opacity-0 scale-75"
-                )}>
+                <div
+                  className={cn(
+                    'w-6 h-6 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 transition-all duration-200',
+                    isSelected
+                      ? 'bg-primary text-primary-foreground scale-100 opacity-100'
+                      : 'opacity-0 scale-75'
+                  )}
+                >
                   ✓
                 </div>
               </div>

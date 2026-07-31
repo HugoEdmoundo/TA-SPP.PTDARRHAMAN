@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, Input, Textarea, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -159,12 +159,12 @@ export const EventsPage: React.FC = () => {
 
         <div className="relative w-full sm:w-72">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate/50" />
-          <input
+          <Input
             type="text"
             placeholder="Cari nama kegiatan atau deskripsi..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate/20 bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+            className="w-full pl-9 text-xs"
           />
         </div>
       </Card>
@@ -251,13 +251,13 @@ export const EventsPage: React.FC = () => {
         <form onSubmit={handleCreateEvent} className="flex flex-col gap-3.5 text-xs">
               <div>
                 <label className="font-bold text-obsidian block mb-1">Nama Kegiatan / Event *</label>
-                <input
+                <Input
                   type="text"
                   required
                   placeholder="Misal: Patungan Study Tour Bandung Kelas 11..."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="font-bold"
                 />
               </div>
 
@@ -272,23 +272,23 @@ export const EventsPage: React.FC = () => {
                 </div>
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Batas Waktu (Deadline)</label>
-                  <input
+                  <Input
                     type="date"
                     value={deadline}
                     onChange={(e) => setDeadline(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                    className="font-bold"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="font-bold text-obsidian block mb-1">Deskripsi Tambahan</label>
-                <textarea
+                <Textarea
                   rows={2}
                   placeholder="Opsional: Keterangan singkat mengenai event..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50 resize-none"
+                  className="font-bold resize-none"
                 />
               </div>
 
@@ -323,7 +323,7 @@ export const EventsPage: React.FC = () => {
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => handleToggleStudent(sid)}
-                              className="rounded text-emerald-primary focus:ring-0"
+                              className="rounded accent-emerald-primary"
                             />
                             <span className="truncate">{st.full_name || st.name}</span>
                           </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/lib/utils';
 import { Button } from './Button';
 import { FolderOpen } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -24,12 +24,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   className,
 }) => {
   return (
-    <div className={cn("flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-2xl bg-white/60 border border-dashed border-slate/30", className)}>
-      <div className="w-16 h-16 rounded-2xl bg-emerald-light/60 text-emerald-primary flex items-center justify-center mb-4 shadow-sm">
-        <Icon className="w-8 h-8" />
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl bg-muted/40 border border-dashed border-border',
+        className
+      )}
+    >
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        <Icon className="h-8 w-8" />
       </div>
-      <h3 className="text-lg font-bold text-obsidian mb-1">{title}</h3>
-      {description && <p className="text-sm text-slate max-w-md mb-6">{description}</p>}
+      <h3 className="mb-1 text-lg font-bold text-foreground">{title}</h3>
+      {description && <p className="mb-6 max-w-md text-sm text-muted-foreground">{description}</p>}
       {action ? (
         action
       ) : actionLabel && onAction ? (

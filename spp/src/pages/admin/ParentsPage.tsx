@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, Modal } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, Modal, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -160,12 +160,12 @@ export const ParentsPage: React.FC = () => {
 
         <div className="relative w-full sm:w-72">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate/50" />
-          <input
+          <Input
             type="text"
             placeholder="Cari nama wali atau username..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate/20 bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+            className="w-full pl-9 pr-3 text-xs"
           />
         </div>
       </Card>
@@ -276,57 +276,57 @@ export const ParentsPage: React.FC = () => {
         <form onSubmit={handleCreateParent} className="flex flex-col gap-3.5 text-xs">
           <div>
             <label className="font-bold text-obsidian block mb-1">Username Portal *</label>
-            <input
+            <Input
               type="text"
               required
               placeholder="Misal: wali_ahmad"
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '_'))}
-              className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              className="w-full font-mono"
             />
           </div>
           <div>
             <label className="font-bold text-obsidian block mb-1">Nama Lengkap Wali *</label>
-            <input
+            <Input
               type="text"
               required
               placeholder="Nama orang tua / wali..."
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              className="w-full"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="font-bold text-obsidian block mb-1">Password Awal *</label>
-              <input
+              <Input
                 type="password"
                 required
                 placeholder="Minimal 6 karakter"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                className="w-full font-mono"
               />
             </div>
             <div>
               <label className="font-bold text-obsidian block mb-1">No. WhatsApp / HP</label>
-              <input
+              <Input
                 type="tel"
                 placeholder="081234567890"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                className="w-full font-mono"
               />
             </div>
           </div>
           <div>
             <label className="font-bold text-obsidian block mb-1">Alamat Email (Opsional)</label>
-            <input
+            <Input
               type="email"
               placeholder="contoh@domain.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              className="w-full"
             />
           </div>
           <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
@@ -362,17 +362,18 @@ export const ParentsPage: React.FC = () => {
                     Belum ada data siswa. Silakan daftarkan santri terlebih dahulu di menu Data Siswa.
                   </div>
                 ) : (
-                  <select
-                    value={selectedStudentId}
-                    onChange={(e) => setSelectedStudentId(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  >
-                    {allStudents.map((st: any) => (
-                      <option key={st.id} value={st.id}>
-                        {st.nis} - {st.full_name || st.name} ({st.academic_year || '2025/2026'})
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={selectedStudentId} onValueChange={(v) => setSelectedStudentId(v)}>
+                    <SelectTrigger className="w-full font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allStudents.map((st: any) => (
+                        <SelectItem key={st.id} value={String(st.id)}>
+                          {st.nis} - {st.full_name || st.name} ({st.academic_year || '2025/2026'})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
               </div>
 
