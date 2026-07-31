@@ -82,7 +82,7 @@ export const InfaqPage: React.FC = () => {
       amount: outflowAmount,
       notes: outflowNotes,
       date: new Date(outflowDate).toISOString(),
-      pic: user?.name || 'Admin Bendahara'
+      pic: user?.name || 'Admin Keuangan'
     };
 
     const updated = [newOutflow, ...outflowData];

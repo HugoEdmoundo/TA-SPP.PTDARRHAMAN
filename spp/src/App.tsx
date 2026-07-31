@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { ToastProvider } from './components/ui/ToastContext';
-import { WaliLayout, AdminLayout } from './components/layout';
+import { AdminLayout } from './components/layout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LoginPage } from './pages/auth/LoginPage';
 import { NotFoundPage } from './pages/error/NotFoundPage';
@@ -18,17 +18,9 @@ import { PaymentKasirPage } from './pages/admin/PaymentKasirPage';
 import { ReportsPage } from './pages/admin/ReportsPage';
 import { AuditLogPage } from './pages/admin/AuditLogPage';
 import { StudentsPage } from './pages/admin/StudentsPage';
-import { ParentsPage } from './pages/admin/ParentsPage';
 import { InfaqPage } from './pages/admin/InfaqPage';
 import { AdminProfilePage } from './pages/admin/AdminProfilePage';
 import { StudentHistoryPage } from './pages/admin/StudentHistoryPage';
-
-// Wali Pages
-import { WaliDashboardPage } from './pages/wali/WaliDashboardPage';
-import { WaliSppPage } from './pages/wali/WaliSppPage';
-import { WaliEventPage } from './pages/wali/WaliEventPage';
-import { WaliHistoryPage } from './pages/wali/WaliHistoryPage';
-import { WaliProfilePage } from './pages/wali/WaliProfilePage';
 
 export function App() {
   return (
@@ -68,7 +60,6 @@ export function App() {
                   } 
                 />
                 <Route path="students" element={<StudentsPage />} />
-                <Route path="parents" element={<ParentsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route 
                   path="users" 
@@ -78,22 +69,6 @@ export function App() {
                     </ProtectedRoute>
                   } 
                 />
-              </Route>
-
-              {/* Wali Santri Protected Routes */}
-              <Route
-                path="/wali"
-                element={
-                  <ProtectedRoute allowedRoles={['WALI']}>
-                    <WaliLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<WaliDashboardPage />} />
-                <Route path="spp" element={<WaliSppPage />} />
-                <Route path="event" element={<WaliEventPage />} />
-                <Route path="history" element={<WaliHistoryPage />} />
-                <Route path="profile" element={<WaliProfilePage />} />
               </Route>
 
               {/* Fallback 404 */}

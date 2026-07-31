@@ -13,7 +13,6 @@ import {
   ShieldAlert,
   Settings,
   Users,
-  UserCheck,
   Search,
   PanelLeftClose,
   PanelLeftOpen,
@@ -88,7 +87,6 @@ export const AdminLayout: React.FC = () => {
     { label: 'Laporan Keuangan', path: '/admin/reports', icon: BarChart3 },
     ...(isSuperadmin ? [{ label: 'Audit Log & History', path: '/admin/audit', icon: ShieldAlert }] : []),
     { label: 'Data Siswa', path: '/admin/students', icon: Users },
-    { label: 'Data Wali Santri', path: '/admin/parents', icon: UserCheck },
     ...(isSuperadmin ? [{ label: 'Manajemen Pengguna', path: '/admin/users', icon: ShieldAlert }] : []),
     { label: 'Pengaturan Sekolah', path: '/admin/settings', icon: Settings },
   ];
