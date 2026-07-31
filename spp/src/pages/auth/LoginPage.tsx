@@ -26,13 +26,8 @@ export const LoginPage: React.FC = () => {
     try {
       const loggedUser = await login(userVal, passVal);
       success('Login Berhasil', `Selamat datang kembali, ${loggedUser.name}.`);
-      
-      // Automatic Role-Based Navigation (Unified Auth)
-      if (loggedUser.role === 'WALI') {
-        navigate('/wali');
-      } else {
-        navigate('/admin');
-      }
+
+      navigate('/admin');
     } catch (err: any) {
       error('Gagal Masuk', err.message || 'Username atau password salah.');
     } finally {

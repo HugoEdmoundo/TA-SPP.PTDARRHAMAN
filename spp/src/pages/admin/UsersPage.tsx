@@ -141,7 +141,6 @@ export const UsersPage: React.FC = () => {
     switch (role.toUpperCase()) {
       case 'SUPERADMIN': return <Badge variant="info">Superadmin</Badge>;
       case 'ADMIN': return <Badge variant="success">Admin</Badge>;
-      case 'WALI': return <Badge variant="gold">Wali Santri</Badge>;
       default: return <Badge variant="default">{role}</Badge>;
     }
   };
@@ -190,7 +189,6 @@ export const UsersPage: React.FC = () => {
             <SelectItem value="__all__">Semua Role</SelectItem>
             <SelectItem value="superadmin">Superadmin</SelectItem>
             <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="wali">Wali Santri</SelectItem>
           </SelectContent>
         </Select>
       </Card>
@@ -264,7 +262,7 @@ export const UsersPage: React.FC = () => {
               required
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase() })}
-              placeholder="contoh: budi_bendahara"
+              placeholder="contoh: budi_admin"
               className="text-sm font-semibold text-obsidian"
             />
           </div>
@@ -297,8 +295,7 @@ export const UsersPage: React.FC = () => {
                 <SelectValue placeholder="Pilih role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="wali">Wali Santri</SelectItem>
-                <SelectItem value="admin">Admin (Bendahara)</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="superadmin">Superadmin</SelectItem>
               </SelectContent>
             </Select>
@@ -339,8 +336,7 @@ export const UsersPage: React.FC = () => {
                 <SelectValue placeholder="Pilih role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="wali">Wali Santri</SelectItem>
-                <SelectItem value="admin">Admin (Bendahara)</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
                 <SelectItem value="superadmin">Superadmin</SelectItem>
               </SelectContent>
             </Select>
