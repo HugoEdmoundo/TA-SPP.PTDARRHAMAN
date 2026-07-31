@@ -128,8 +128,8 @@ export const AdminLayout: React.FC = () => {
       >
         <div
           className={cn(
-            'flex items-center border-b h-16',
-            isSidebarCollapsed ? 'justify-center px-2' : 'px-5 justify-between'
+            'relative flex items-center border-b h-16',
+            isSidebarCollapsed ? 'justify-center px-2' : 'px-5'
           )}
         >
           <div
@@ -161,16 +161,13 @@ export const AdminLayout: React.FC = () => {
             variant="ghost"
             size="icon"
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className={cn(
-              'shrink-0 h-8 w-8',
-              isSidebarCollapsed ? 'absolute -bottom-4 bg-card shadow-sm border rounded-full' : ''
-            )}
+            className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full bg-card border shadow-sm p-0 hover:bg-card hover:text-foreground"
             title={isSidebarCollapsed ? 'Buka Sidebar' : 'Lipat Sidebar'}
           >
             {isSidebarCollapsed ? (
-              <PanelLeftOpen className="h-4 w-4 text-primary" />
+              <PanelLeftOpen className="h-3.5 w-3.5 text-primary" />
             ) : (
-              <PanelLeftClose className="h-4 w-4" />
+              <PanelLeftClose className="h-3.5 w-3.5" />
             )}
           </Button>
         </div>
