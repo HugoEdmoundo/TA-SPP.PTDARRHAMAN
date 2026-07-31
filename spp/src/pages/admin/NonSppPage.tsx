@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, formatRupiah, Modal } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, Input, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, formatRupiah, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -200,12 +200,12 @@ export const NonSppPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="relative w-full sm:w-72">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate/50" />
-            <input
+            <Input
               type="text"
               placeholder="Cari label tagihan atau deskripsi..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate/20 bg-white/80 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              className="w-full pl-9 text-xs"
             />
           </div>
 
@@ -339,30 +339,31 @@ export const NonSppPage: React.FC = () => {
               <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
-                  <select
-                    value={category}
-                    onChange={(e) => handleCategoryChange(e.target.value, true)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  >
-                    {categoriesList.map((cat) => (
-                      <option key={cat.id} value={cat.name}>
-                        {cat.name} {cat.default_amount ? `(Default: Rp ${cat.default_amount.toLocaleString('id-ID')})` : ''}
-                      </option>
-                    ))}
-                    {categoriesList.length === 0 && <option value="Seragam">Seragam</option>}
-                  </select>
+                  <Select value={category} onValueChange={(v) => handleCategoryChange(v, true)}>
+                    <SelectTrigger className="font-semibold">
+                      <SelectValue placeholder="Pilih kategori tagihan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoriesList.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.name}>
+                          {cat.name} {cat.default_amount ? `(Default: Rp ${cat.default_amount.toLocaleString('id-ID')})` : ''}
+                        </SelectItem>
+                      ))}
+                      {categoriesList.length === 0 && <SelectItem value="Seragam">Seragam</SelectItem>}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               <div>
                 <label className="font-bold text-obsidian block mb-1">Judul / Label Tagihan *</label>
-                <input
+                <Input
                   type="text"
                   required
                   placeholder="Misal: Buku Modul Semester 1, Seragam Batik..."
                   value={label}
                   onChange={(e) => setLabel(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="font-bold"
                 />
               </div>
 
@@ -377,12 +378,12 @@ export const NonSppPage: React.FC = () => {
 
               <div>
                 <label className="font-bold text-obsidian block mb-1">Deskripsi Tambahan</label>
-                <textarea
+                <Textarea
                   rows={2}
                   placeholder="Opsional: Keterangan singkat mengenai tagihan..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50 resize-none"
+                  className="font-bold resize-none"
                 />
               </div>
 
@@ -417,7 +418,7 @@ export const NonSppPage: React.FC = () => {
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => handleToggleStudent(sid)}
-                              className="rounded text-emerald-primary focus:ring-0"
+                              className="rounded accent-emerald-primary"
                             />
                             <span className="truncate">{st.full_name || st.name}</span>
                           </div>
@@ -454,29 +455,30 @@ export const NonSppPage: React.FC = () => {
               <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
-                  <select
-                    value={category}
-                    onChange={(e) => handleCategoryChange(e.target.value, false)}
-                    className="w-full p-2.5 rounded-xl border border-slate/25 bg-white font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
-                  >
-                    {categoriesList.map((cat) => (
-                      <option key={cat.id} value={cat.name}>
-                        {cat.name}
-                      </option>
-                    ))}
-                    {categoriesList.length === 0 && <option value="Seragam">Seragam</option>}
-                  </select>
+                  <Select value={category} onValueChange={(v) => handleCategoryChange(v, false)}>
+                    <SelectTrigger className="font-semibold">
+                      <SelectValue placeholder="Pilih kategori tagihan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoriesList.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.name}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                      {categoriesList.length === 0 && <SelectItem value="Seragam">Seragam</SelectItem>}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               <div>
                 <label className="font-bold text-obsidian block mb-1">Judul / Label Tagihan *</label>
-                <input
+                <Input
                   type="text"
                   required
                   value={label}
                   onChange={(e) => setLabel(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                  className="font-bold"
                 />
               </div>
 
@@ -491,11 +493,10 @@ export const NonSppPage: React.FC = () => {
 
               <div>
                 <label className="font-bold text-obsidian block mb-1">Deskripsi Tambahan</label>
-                <textarea
+                <Textarea
                   rows={2}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
                 />
               </div>
 

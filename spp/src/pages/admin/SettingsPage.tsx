@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { Card, Button, InputCurrency, LogoInput } from '../../components/ui';
+import { Card, Button, InputCurrency, LogoInput, Input, Textarea } from '../../components/ui';
 import { api } from '../../api/client';
 import type { AcademicYear, BillCategory } from '../../types';
 import { Settings, Save, RefreshCw, Building, Phone, Mail, MapPin, Calendar, CheckCircle2, Image as ImageIcon, Sparkles, Plus, Trash2, Tag, GraduationCap, Layers, Check, X } from 'lucide-react';
@@ -202,11 +202,11 @@ export const SettingsPage: React.FC = () => {
               </label>
               <div className="relative">
                 <Building className="w-4 h-4 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
+                <Input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary shadow-2xs"
+                  className="w-full pl-10 text-sm font-semibold text-obsidian"
                   required
                 />
               </div>
@@ -218,11 +218,11 @@ export const SettingsPage: React.FC = () => {
               </label>
               <div className="relative">
                 <MapPin className="w-4 h-4 text-slate-light absolute left-3.5 top-3.5" />
-                <textarea
+                <Textarea
                   rows={2}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary shadow-2xs"
+                  className="w-full pl-10 text-sm font-semibold text-obsidian"
                   required
                 />
               </div>
@@ -234,11 +234,11 @@ export const SettingsPage: React.FC = () => {
               </label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
+                <Input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary shadow-2xs"
+                  className="w-full pl-10 text-sm font-semibold text-obsidian"
                 />
               </div>
             </div>
@@ -249,11 +249,11 @@ export const SettingsPage: React.FC = () => {
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
+                <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary shadow-2xs"
+                  className="w-full pl-10 text-sm font-semibold text-obsidian"
                 />
               </div>
             </div>
@@ -311,12 +311,12 @@ export const SettingsPage: React.FC = () => {
             </p>
           </div>
           <form onSubmit={handleAddAcademicYear} className="flex items-center gap-2">
-            <input
+            <Input
               type="text"
               placeholder="Contoh: 2026/2027"
               value={newAyName}
               onChange={(e) => setNewAyName(e.target.value)}
-              className="px-3.5 py-2 rounded-xl bg-white border border-slate/20 text-xs font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary w-40 sm:w-48 shadow-2xs"
+              className="text-xs font-semibold text-obsidian w-40 sm:w-48"
             />
             <Button type="submit" variant="primary" size="sm" isLoading={isAddingAy} leftIcon={<Plus className="w-4 h-4" />}>
               Tambah

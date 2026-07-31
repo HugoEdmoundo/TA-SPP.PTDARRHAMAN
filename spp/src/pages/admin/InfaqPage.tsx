@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Badge, Button, Modal, ReceiptShareCard, EmptyState, Spinner, formatRupiah, formatDateIndo } from '../../components/ui';
+import { Card, Badge, Button, Modal, ReceiptShareCard, EmptyState, Spinner, Input, Textarea, formatRupiah, formatDateIndo } from '../../components/ui';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -344,49 +344,48 @@ export const InfaqPage: React.FC = () => {
         <form onSubmit={handleAddOutflow} className="flex flex-col gap-4 text-xs">
           <div>
             <label className="font-bold text-obsidian block mb-1">Judul / Tujuan Penyaluran Infaq *</label>
-            <input
+            <Input
               type="text"
               required
               placeholder="Misal: Perbaikan Sound System Masjid, Santunan Yatim..."
               value={outflowTitle}
               onChange={(e) => setOutflowTitle(e.target.value)}
-              className="w-full p-2.5 rounded-xl border border-slate/25 font-bold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+              className="font-bold text-obsidian"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="font-bold text-obsidian block mb-1">Nominal Pengeluaran (Rp) *</label>
-              <input
+              <Input
                 type="number"
                 required
                 min={1000}
                 step={1000}
                 value={outflowAmount}
                 onChange={(e) => setOutflowAmount(Number(e.target.value))}
-                className="w-full p-2.5 rounded-xl border border-slate/25 font-mono font-bold text-rose-danger focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                className="font-mono font-bold text-rose-danger"
               />
             </div>
             <div>
               <label className="font-bold text-obsidian block mb-1">Tanggal Pengeluaran</label>
-              <input
+              <Input
                 type="date"
                 required
                 value={outflowDate}
                 onChange={(e) => setOutflowDate(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-slate/25 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                className="font-mono"
               />
             </div>
           </div>
 
           <div>
             <label className="font-bold text-obsidian block mb-1">Catatan Tambahan / Rincian Penerima (Opsional)</label>
-            <textarea
+            <Textarea
               rows={3}
               placeholder="Jelaskan detail penerima manfaat atau vendor penyedia barang/jasa..."
               value={outflowNotes}
               onChange={(e) => setOutflowNotes(e.target.value)}
-              className="w-full p-2.5 rounded-xl border border-slate/25 focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
             />
           </div>
 

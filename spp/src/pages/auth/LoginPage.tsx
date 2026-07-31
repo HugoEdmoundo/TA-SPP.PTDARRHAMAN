@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
-import { Button, Card } from '../../components/ui';
+import { Button, Card, Input } from '../../components/ui';
 import { Lock, User, ArrowRight, Sparkles, Rocket, Users, ShieldCheck } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
@@ -75,12 +75,12 @@ export const LoginPage: React.FC = () => {
             </label>
             <div className="relative">
               <User className="w-5 h-5 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
+              <Input
                 type="text"
                 placeholder="contoh: admin atau admin_demo"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian placeholder:text-slate-light focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary shadow-2xs transition-all"
+                className="w-full pl-11 text-sm font-semibold text-obsidian placeholder:text-slate-light"
               />
             </div>
           </div>
@@ -91,12 +91,12 @@ export const LoginPage: React.FC = () => {
             </label>
             <div className="relative">
               <Lock className="w-5 h-5 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
+              <Input
                 type="password"
                 placeholder="Masukkan sandi Anda"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian placeholder:text-slate-light focus:outline-none focus:ring-2 focus:ring-emerald-primary/20 focus:border-emerald-primary shadow-2xs transition-all"
+                className="w-full pl-11 text-sm font-semibold text-obsidian placeholder:text-slate-light"
               />
             </div>
           </div>

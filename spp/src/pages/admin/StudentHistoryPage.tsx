@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Badge, Button, Modal, ReceiptShareCard, EmptyState, Spinner, formatRupiah, formatDateIndo } from '../../components/ui';
+import { Card, Badge, Button, Modal, ReceiptShareCard, EmptyState, Spinner, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, formatRupiah, formatDateIndo } from '../../components/ui';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -125,12 +125,12 @@ export const StudentHistoryPage: React.FC = () => {
             <p className="text-xs text-slate mt-1">Pilih kartu nama santri untuk memantau langsung riwayat aktivitas transaksi secara lengkap dari awal hingga akhir.</p>
           </div>
           <div className="relative w-full sm:w-72">
-            <input
+            <Input
               type="text"
               placeholder="Cari nama santri, NIS, atau kelas..."
               value={searchStudent}
               onChange={(e) => setSearchStudent(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate/25 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-primary/50 shadow-2xs font-bold"
+              className="w-full pl-9 pr-3 text-xs font-bold"
             />
             <Search className="w-4 h-4 text-slate absolute left-3 top-2.5" />
           </div>
@@ -254,27 +254,31 @@ export const StudentHistoryPage: React.FC = () => {
           {/* Search & Filter Bar */}
           <Card variant="glass" padding="sm" className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/90">
             <div className="relative flex-1">
-              <input
+              <Input
                 type="text"
                 placeholder="Cari transaksi, no kuitansi, atau invoice..."
                 value={searchHistory}
                 onChange={(e) => setSearchHistory(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate/25 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-primary/50 shadow-2xs font-semibold"
+                className="w-full pl-9 pr-3 text-xs font-semibold"
               />
               <Search className="w-4 h-4 text-slate absolute left-3 top-2.5" />
             </div>
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-slate shrink-0" />
-              <select
+              <Select
                 value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="text-xs bg-white border border-slate/25 rounded-xl px-3 py-2 font-bold text-obsidian focus:outline-none focus:ring-2 focus:ring-emerald-primary/50"
+                onValueChange={(v) => setFilterType(v)}
               >
-                <option value="all">Semua Jenis Tagihan</option>
-                <option value="spp">SPP Bulanan</option>
-                <option value="non_spp">Tagihan Non-SPP</option>
-                <option value="event">Event & Kegiatan</option>
-              </select>
+                <SelectTrigger className="text-xs font-bold text-obsidian">
+                  <SelectValue placeholder="Semua Jenis Tagihan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Jenis Tagihan</SelectItem>
+                  <SelectItem value="spp">SPP Bulanan</SelectItem>
+                  <SelectItem value="non_spp">Tagihan Non-SPP</SelectItem>
+                  <SelectItem value="event">Event & Kegiatan</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </Card>
 

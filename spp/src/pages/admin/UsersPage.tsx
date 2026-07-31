@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, Modal } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, Modal, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
@@ -174,24 +174,25 @@ export const UsersPage: React.FC = () => {
       <Card variant="glass" padding="md" className="flex flex-col sm:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
+          <Input
             type="text"
             placeholder="Cari username atau nama lengkap..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate/20 text-sm font-semibold text-obsidian placeholder:text-slate focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 shadow-2xs transition-all"
+            className="w-full pl-10 text-sm font-semibold text-obsidian"
           />
         </div>
-        <select
-          value={filterRole}
-          onChange={(e) => setFilterRole(e.target.value)}
-          className="w-full sm:w-48 px-4 py-2.5 rounded-xl bg-white border border-slate/20 text-sm font-bold text-obsidian focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 shadow-2xs"
-        >
-          <option value="">Semua Role</option>
-          <option value="superadmin">Superadmin</option>
-          <option value="admin">Admin</option>
-          <option value="wali">Wali Santri</option>
-        </select>
+        <Select value={filterRole || '__all__'} onValueChange={(v) => setFilterRole(v === '__all__' ? '' : v)}>
+          <SelectTrigger className="w-full sm:w-48 font-bold">
+            <SelectValue placeholder="Semua Role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">Semua Role</SelectItem>
+            <SelectItem value="superadmin">Superadmin</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="wali">Wali Santri</SelectItem>
+          </SelectContent>
+        </Select>
       </Card>
 
       {isLoading ? (
@@ -258,48 +259,49 @@ export const UsersPage: React.FC = () => {
         <form onSubmit={handleAddUser} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Username <span className="text-rose-danger">*</span></label>
-            <input
+            <Input
               type="text"
               required
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase() })}
               placeholder="contoh: budi_bendahara"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 transition-all"
+              className="text-sm font-semibold text-obsidian"
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nama Lengkap <span className="text-rose-danger">*</span></label>
-            <input
+            <Input
               type="text"
               required
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
               placeholder="contoh: Budi Santoso"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 transition-all"
+              className="text-sm font-semibold text-obsidian"
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Password <span className="text-rose-danger">*</span></label>
-            <input
+            <Input
               type="password"
               required
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder="Minimal 6 karakter"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 transition-all"
+              className="text-sm font-semibold text-obsidian"
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Role <span className="text-rose-danger">*</span></label>
-            <select
-              value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate/20 text-sm font-bold text-obsidian focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 transition-all"
-            >
-              <option value="wali">Wali Santri</option>
-              <option value="admin">Admin (Bendahara)</option>
-              <option value="superadmin">Superadmin</option>
-            </select>
+            <Select value={formData.role} onValueChange={(v) => setFormData({ ...formData, role: v })}>
+              <SelectTrigger className="font-bold">
+                <SelectValue placeholder="Pilih role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="wali">Wali Santri</SelectItem>
+                <SelectItem value="admin">Admin (Bendahara)</SelectItem>
+                <SelectItem value="superadmin">Superadmin</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => setShowAddModal(false)}>Batal</Button>
@@ -313,34 +315,35 @@ export const UsersPage: React.FC = () => {
         <form onSubmit={handleEditUser} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate uppercase tracking-wider mb-1.5">Username (Tidak Bisa Diubah)</label>
-            <input
+            <Input
               type="text"
               disabled
               value={formData.username}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-100 border border-slate/20 text-sm font-semibold text-slate-dark cursor-not-allowed"
+              className="text-sm font-semibold text-slate-dark"
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nama Lengkap <span className="text-rose-danger">*</span></label>
-            <input
+            <Input
               type="text"
               required
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 transition-all"
+              className="text-sm font-semibold text-obsidian"
             />
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Role <span className="text-rose-danger">*</span></label>
-            <select
-              value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate/20 text-sm font-bold text-obsidian focus:outline-none focus:ring-2 focus:ring-purple-600/20 focus:border-purple-600 transition-all"
-            >
-              <option value="wali">Wali Santri</option>
-              <option value="admin">Admin (Bendahara)</option>
-              <option value="superadmin">Superadmin</option>
-            </select>
+            <Select value={formData.role} onValueChange={(v) => setFormData({ ...formData, role: v })}>
+              <SelectTrigger className="font-bold">
+                <SelectValue placeholder="Pilih role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="wali">Wali Santri</SelectItem>
+                <SelectItem value="admin">Admin (Bendahara)</SelectItem>
+                <SelectItem value="superadmin">Superadmin</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex items-center gap-3 pt-2">
             <input
@@ -348,7 +351,7 @@ export const UsersPage: React.FC = () => {
               id="isActive"
               checked={formData.is_active}
               onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-              className="w-5 h-5 rounded border-slate/30 text-purple-600 focus:ring-purple-600"
+              className="w-5 h-5 rounded border-slate/30 accent-purple-600"
             />
             <label htmlFor="isActive" className="text-sm font-bold text-obsidian">Akun Aktif (Dapat Login)</label>
           </div>
@@ -369,13 +372,13 @@ export const UsersPage: React.FC = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Password Baru <span className="text-rose-danger">*</span></label>
-            <input
+            <Input
               type="password"
               required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Masukkan password baru"
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate/20 text-sm font-semibold text-obsidian focus:outline-none focus:ring-2 focus:ring-gold-dark/30 focus:border-gold-dark transition-all"
+              className="text-sm font-semibold text-obsidian"
             />
           </div>
           <div className="pt-4 flex justify-end gap-3">
