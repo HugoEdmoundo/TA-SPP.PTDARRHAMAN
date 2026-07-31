@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { Button, Card, Input } from '../../components/ui';
-import { Lock, User, ArrowRight, Sparkles, Rocket, Users, ShieldCheck } from 'lucide-react';
+import { Lock, User, ArrowRight } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, Badge, Button, Modal, ReceiptShareCard, EmptyState, Spinner, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue, formatRupiah, formatDateIndo } from '../../components/ui';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { History, Search, ArrowLeft, User, Phone, Mail, GraduationCap, ShieldCheck, CheckCircle2, XCircle, Filter, Calendar } from 'lucide-react';
 import type { Student, Receipt } from '../../types';
@@ -10,7 +9,6 @@ import type { Student, Receipt } from '../../types';
 export const StudentHistoryPage: React.FC = () => {
   const { settings } = useSettings();
   const { error: toastError } = useToast();
-  const { user } = useAuth();
 
   const [studentsList, setStudentsList] = useState<Student[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);

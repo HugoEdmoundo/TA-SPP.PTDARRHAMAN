@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Badge, EmptyState, Spinner, InputCurrency, Input, Textarea, formatRupiah, formatDateIndo, Modal } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { Calendar, Plus, Search, CheckCircle2, Eye, Users, TrendingUp } from 'lucide-react';
 import type { Student } from '../../types';
 
 export const EventsPage: React.FC = () => {
-  const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
   const [events, setEvents] = useState<any[]>([]);
