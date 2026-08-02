@@ -417,7 +417,7 @@ export const AdminLayout: React.FC = () => {
               <Search className="h-5 w-5 text-primary shrink-0" />
               <Input
                 type="text"
-                placeholder="Cari fitur (contoh: SPP, Siswa, Laporan, Kasir)..."
+                placeholder="Cari fitur (contoh: SPP, Siswa, Laporan, Pembayaran Manual)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus

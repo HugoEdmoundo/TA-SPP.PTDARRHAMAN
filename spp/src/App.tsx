@@ -14,7 +14,7 @@ import { UsersPage } from './pages/admin/UsersPage';
 import { SppGridPage } from './pages/admin/SppGridPage';
 import { NonSppPage } from './pages/admin/NonSppPage';
 import { EventsPage } from './pages/admin/EventsPage';
-import { PaymentKasirPage } from './pages/admin/PaymentKasirPage';
+import { ManualPaymentPage } from './pages/admin/ManualPaymentPage';
 import { ReportsPage } from './pages/admin/ReportsPage';
 import { AuditLogPage } from './pages/admin/AuditLogPage';
 import { StudentsPage } from './pages/admin/StudentsPage';
@@ -47,7 +47,7 @@ export function App() {
                 <Route path="non-spp" element={<NonSppPage />} />
                 <Route path="event" element={<EventsPage />} />
                 <Route path="infaq" element={<InfaqPage />} />
-                <Route path="payment" element={<PaymentKasirPage />} />
+                <Route path="payment" element={<ManualPaymentPage />} />
                 <Route path="student-history" element={<StudentHistoryPage />} />
                 <Route path="profile" element={<AdminProfilePage />} />
                 <Route path="reports" element={<ReportsPage />} />

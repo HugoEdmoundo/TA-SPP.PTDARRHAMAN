@@ -79,6 +79,19 @@ class SppSettingRead(SppSettingBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class SppSettingLogRead(BaseModel):
+    """Riwayat perubahan nominal SPP."""
+    id: int
+    spp_setting_id: Optional[int] = None
+    old_nominal: Optional[Decimal] = None
+    new_nominal: Decimal
+    changed_by: Optional[int] = None
+    changed_at: datetime
+    notes: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 # ─── Academic Year Schemas ───────────────────────────────────
 
 class AcademicYearBase(BaseModel):

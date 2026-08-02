@@ -205,6 +205,16 @@ export interface SppSetting {
   updated_at?: string;
 }
 
+export interface SppSettingLog {
+  id: number;
+  spp_setting_id?: number | null;
+  old_nominal?: number | string | null;
+  new_nominal: number | string;
+  changed_by?: number | null;
+  changed_at: string;
+  notes?: string | null;
+}
+
 export interface SppStatusItem {
   period: number;
   month: number;

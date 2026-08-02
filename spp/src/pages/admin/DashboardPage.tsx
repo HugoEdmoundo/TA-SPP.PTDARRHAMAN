@@ -177,8 +177,8 @@ export const DashboardPage: React.FC = () => {
                 <Card variant="glass" padding="lg">
                   <EmptyState
                     title="Belum Ada Transaksi"
-                    description="Belum ada transaksi. Klik tombol 'Catat Bayar Manual' atau lakukan uji coba tagihan di menu kasir."
-                    action={<Button variant="primary" size="sm" onClick={() => navigate('/admin/payment')}>Ke Menu Kasir</Button>}
+                    description="Belum ada transaksi. Klik tombol 'Catat Bayar Manual' di menu Pembayaran Manual untuk mencatat pembayaran cash dari orang tua."
+                    action={<Button variant="primary" size="sm" onClick={() => navigate('/admin/payment')}>Ke Menu Pembayaran Manual</Button>}
                   />
                 </Card>
               ) : (
