@@ -3,7 +3,7 @@ import { Card, Button, Badge, EmptyState, Spinner, Modal, Input, SearchableSelec
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
-import { UsersRound, Search, Key, Edit, Trash2, Link2, Unlink, GraduationCap, UserPlus, Dices, Eye, EyeOff } from 'lucide-react';
+import { UsersRound, Search, Key, Edit, Trash2, Link2, Unlink, GraduationCap, UserPlus, Dices, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import type { User, Student } from '../../types';
 
 interface WaliWithStudents extends User {
@@ -358,8 +358,8 @@ export const ParentsPage: React.FC = () => {
       )}
 
       {/* Add Wali Modal */}
-      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Tambah Akun Parents">
-        <form onSubmit={handleAddWali} className="space-y-4">
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Tambah Akun Parents" icon={<UserPlus className="w-5 h-5" />}>
+        <form onSubmit={handleAddWali} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Username <span className="text-rose-danger">*</span></label>
             <Input
@@ -436,16 +436,16 @@ export const ParentsPage: React.FC = () => {
               </Button>
             </div>
           </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setShowAddModal(false)}>Batal</Button>
-            <Button type="submit" variant="primary" isLoading={isSubmitting} className="bg-amber-600 hover:bg-amber-700 border-none">Simpan Parents</Button>
+          <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
+            <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting} className="bg-amber-600 hover:bg-amber-700 border-none">Simpan Parents</Button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Modal */}
-      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Data Parents">
-        <form onSubmit={handleEditWali} className="space-y-4">
+      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Data Parents" icon={<Edit className="w-5 h-5" />}>
+        <form onSubmit={handleEditWali} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Username <span className="text-rose-danger">*</span></label>
             <Input
@@ -488,16 +488,16 @@ export const ParentsPage: React.FC = () => {
             />
             <label htmlFor="isActive" className="text-sm font-bold text-obsidian">Akun Aktif (Dapat Login)</label>
           </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setShowEditModal(false)}>Batal</Button>
-            <Button type="submit" variant="primary" isLoading={isSubmitting} className="bg-amber-600 hover:bg-amber-700 border-none">Update Data</Button>
+          <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowEditModal(false)}>Batal</Button>
+            <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting} className="bg-amber-600 hover:bg-amber-700 border-none">Update Data</Button>
           </div>
         </form>
       </Modal>
 
       {/* Reset Password Modal */}
-      <Modal isOpen={showResetModal} onClose={() => setShowResetModal(false)} title="Reset Password Parents">
-        <form onSubmit={handleResetPassword} className="space-y-4">
+      <Modal isOpen={showResetModal} onClose={() => setShowResetModal(false)} title="Reset Password Parents" icon={<Key className="w-5 h-5" />}>
+        <form onSubmit={handleResetPassword} className="flex flex-col gap-4">
           <div className="p-3 bg-gold-bg/30 border border-gold-accent/30 rounded-xl">
             <p className="text-xs font-medium text-obsidian">
               Anda akan mereset password untuk <span className="font-bold">{selectedWali?.full_name}</span> (@{selectedWali?.username}).
@@ -530,16 +530,16 @@ export const ParentsPage: React.FC = () => {
               </Button>
             </div>
           </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setShowResetModal(false)}>Batal</Button>
-            <Button type="submit" variant="primary" isLoading={isSubmitting} className="bg-gold-dark hover:bg-gold-dark/90 text-white border-none">Simpan Password</Button>
+          <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowResetModal(false)}>Batal</Button>
+            <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting} className="bg-gold-dark hover:bg-gold-dark/90 text-white border-none">Simpan Password</Button>
           </div>
         </form>
       </Modal>
 
       {/* Kelola Santri Modal */}
-      <Modal isOpen={showManageModal} onClose={() => setShowManageModal(false)} title={`Kelola Santri — ${selectedWali?.full_name || ''}`} maxWidth="2xl">
-        <div className="space-y-5">
+      <Modal isOpen={showManageModal} onClose={() => setShowManageModal(false)} title="Kelola Santri" subtitle={selectedWali?.full_name || ''} icon={<Link2 className="w-5 h-5" />} maxWidth="2xl">
+        <div className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-2">Siswa Terhubung</label>
             {selectedWali && selectedWali.linked_students.length === 0 ? (
@@ -596,17 +596,17 @@ export const ParentsPage: React.FC = () => {
       </Modal>
 
       {/* Delete/Deactivate Modal */}
-      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Konfirmasi Penonaktifan">
-        <div className="space-y-4">
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Konfirmasi Penonaktifan" icon={<AlertTriangle className="w-5 h-5" />}>
+        <div className="flex flex-col gap-4">
           <div className="p-4 bg-rose-50 border border-rose-danger/20 rounded-xl">
             <p className="text-sm font-medium text-rose-900">
               Apakah Anda yakin ingin menonaktifkan akun parents <span className="font-bold">{selectedWali?.full_name}</span>?
               Mereka tidak akan bisa login ke dalam sistem lagi.
             </p>
           </div>
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>Batal</Button>
-            <Button variant="danger" isLoading={isSubmitting} onClick={handleDeactivate}>Ya, Nonaktifkan</Button>
+          <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
+            <Button variant="outline" size="sm" onClick={() => setShowDeleteModal(false)}>Batal</Button>
+            <Button variant="danger" size="sm" isLoading={isSubmitting} onClick={handleDeactivate}>Ya, Nonaktifkan</Button>
           </div>
         </div>
       </Modal>

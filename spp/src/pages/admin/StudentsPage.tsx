@@ -464,17 +464,13 @@ export const StudentsPage: React.FC = () => {
       <Modal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title={
-          <>
-            <Plus className="w-5 h-5 text-emerald-primary" />
-            <span>Daftarkan Santri Baru</span>
-          </>
-        }
+        title="Daftarkan Santri Baru"
+        icon={<Plus className="w-5 h-5" />}
         maxWidth="md"
       >
-            <form onSubmit={handleCreateStudent} className="flex flex-col gap-3.5 text-xs">
+            <form onSubmit={handleCreateStudent} className="flex flex-col gap-4 text-xs">
               <div>
-                <label className="font-bold text-obsidian block mb-1">Nomor Induk Santri (NIS) *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nomor Induk Santri (NIS) *</label>
                 <Input
                   type="text"
                   required
@@ -486,7 +482,7 @@ export const StudentsPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="font-bold text-obsidian block mb-1">Nama Lengkap Santri *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nama Lengkap Santri *</label>
                 <Input
                   type="text"
                   required
@@ -507,7 +503,7 @@ export const StudentsPage: React.FC = () => {
               />
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Jenis Kelamin</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Jenis Kelamin</label>
                   <Select value={gender} onValueChange={setGender}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih jenis kelamin" />
@@ -519,7 +515,7 @@ export const StudentsPage: React.FC = () => {
                   </Select>
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Tahun Ajaran</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Tahun Ajaran</label>
                   <Select value={academicYear} onValueChange={handleAcademicYearChange}>
                     <SelectTrigger className="w-full font-semibold">
                       <SelectValue />
@@ -537,7 +533,7 @@ export const StudentsPage: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Tempat Lahir</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Tempat Lahir</label>
                   <Input
                     type="text"
                     maxLength={100}
@@ -548,7 +544,7 @@ export const StudentsPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">No. HP / WA</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">No. HP / WA</label>
                   <Input
                     type="text"
                     inputMode="numeric"
@@ -561,7 +557,7 @@ export const StudentsPage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="font-bold text-obsidian block mb-1">Status Santri</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Status Santri</label>
                 <Select value={studentStatus} onValueChange={setStudentStatus}>
                   <SelectTrigger className="w-full font-bold text-emerald-primary">
                     <SelectValue />
@@ -576,7 +572,7 @@ export const StudentsPage: React.FC = () => {
                 </Select>
               </div>
               <div>
-                <label className="font-bold text-obsidian block mb-1">Alamat Domisili</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Alamat Domisili</label>
                 <Textarea
                   rows={2}
                   placeholder="Alamat lengkap tempat tinggal..."
@@ -585,7 +581,7 @@ export const StudentsPage: React.FC = () => {
                   className="w-full"
                 />
               </div>
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
+              <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
                 <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Simpan Santri</Button>
               </div>
@@ -596,17 +592,13 @@ export const StudentsPage: React.FC = () => {
       <Modal
         isOpen={showEditModal && !!selectedStudent}
         onClose={() => setShowEditModal(false)}
-        title={
-          <>
-            <Edit2 className="w-5 h-5 text-emerald-primary" />
-            <span>Edit Data & Status Santri</span>
-          </>
-        }
+        title="Edit Data & Status Santri"
+        icon={<Edit2 className="w-5 h-5" />}
         maxWidth="md"
       >
-            <form onSubmit={handleUpdateStudent} className="flex flex-col gap-3.5 text-xs">
+            <form onSubmit={handleUpdateStudent} className="flex flex-col gap-4 text-xs">
               <div>
-                <label className="font-bold text-obsidian block mb-1">Nomor Induk Santri (NIS) *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nomor Induk Santri (NIS) *</label>
                 <Input
                   type="text"
                   required
@@ -617,7 +609,7 @@ export const StudentsPage: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="font-bold text-obsidian block mb-1">Nama Lengkap Santri *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nama Lengkap Santri *</label>
                 <Input
                   type="text"
                   required
@@ -638,7 +630,7 @@ export const StudentsPage: React.FC = () => {
               />
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Jenis Kelamin</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Jenis Kelamin</label>
                   <Select value={gender} onValueChange={setGender}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Pilih jenis kelamin" />
@@ -650,7 +642,7 @@ export const StudentsPage: React.FC = () => {
                   </Select>
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Tahun Ajaran</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Tahun Ajaran</label>
                   <Select value={academicYear} onValueChange={handleAcademicYearChange}>
                     <SelectTrigger className="w-full font-semibold">
                       <SelectValue />
@@ -668,7 +660,7 @@ export const StudentsPage: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Tempat Lahir</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Tempat Lahir</label>
                   <Input
                     type="text"
                     maxLength={100}
@@ -678,7 +670,7 @@ export const StudentsPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">No. HP / WA</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">No. HP / WA</label>
                   <Input
                     type="text"
                     inputMode="numeric"
@@ -690,7 +682,7 @@ export const StudentsPage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="font-bold text-obsidian block mb-1">Status Santri</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Status Santri</label>
                 <Select value={studentStatus} onValueChange={setStudentStatus}>
                   <SelectTrigger className="w-full font-bold text-emerald-primary">
                     <SelectValue />
@@ -705,7 +697,7 @@ export const StudentsPage: React.FC = () => {
                 </Select>
               </div>
               <div>
-                <label className="font-bold text-obsidian block mb-1">Alamat Domisili</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Alamat Domisili</label>
                 <Textarea
                   rows={2}
                   value={address}
@@ -713,7 +705,7 @@ export const StudentsPage: React.FC = () => {
                   className="w-full"
                 />
               </div>
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
+              <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowEditModal(false)}>Batal</Button>
                 <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Simpan Perubahan</Button>
               </div>
@@ -724,12 +716,8 @@ export const StudentsPage: React.FC = () => {
       <Modal
         isOpen={showImportModal}
         onClose={() => { setShowImportModal(false); setImportPreview([]); setImportFile(null); }}
-        title={
-          <>
-            <FileSpreadsheet className="w-5 h-5 text-emerald-primary" />
-            <span>Impor Santri Massal dari Excel / CSV</span>
-          </>
-        }
+        title="Impor Santri Massal dari Excel / CSV"
+        icon={<FileSpreadsheet className="w-5 h-5" />}
         maxWidth="lg"
       >
             <div className="flex flex-col gap-4 text-xs">
@@ -836,7 +824,7 @@ export const StudentsPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
+              <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
                 <Button type="button" variant="outline" size="sm" onClick={() => { setShowImportModal(false); setImportPreview([]); setImportFile(null); }}>
                   Batal
                 </Button>
@@ -863,7 +851,7 @@ const StudentPhotoField: React.FC<{
   onClear: () => void;
 }> = ({ preview, onFileChange, onClear }) => (
   <div>
-    <label className="font-bold text-obsidian block mb-1">Foto Santri</label>
+    <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Foto Santri</label>
     <div className="flex items-center gap-3">
       <div className="h-16 w-16 shrink-0 rounded-2xl overflow-hidden border border-slate/20 bg-slate/10 flex items-center justify-center">
         {preview ? (

@@ -356,7 +356,7 @@ export const StudentHistoryPage: React.FC = () => {
         onClose={() => setSelectedReceipt(null)}
         showCloseButton={false}
         maxWidth="sm"
-        className="!bg-transparent !border-0 !shadow-none !p-0 !overflow-visible"
+        className="!bg-transparent !border-0 !shadow-none !overflow-visible"
         bodyClassName="!p-0 !overflow-visible"
       >
         {selectedReceipt && (

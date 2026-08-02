@@ -244,17 +244,13 @@ export const EventsPage: React.FC = () => {
       <Modal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title={
-          <>
-            <Plus className="w-5 h-5 text-emerald-primary" />
-            <span>Buat Event Patungan Baru</span>
-          </>
-        }
+        title="Buat Event Patungan Baru"
+        icon={<Plus className="w-5 h-5" />}
         maxWidth="lg"
       >
-        <form onSubmit={handleCreateEvent} className="flex flex-col gap-3.5 text-xs">
+        <form onSubmit={handleCreateEvent} className="flex flex-col gap-4 text-xs">
               <div>
-                <label className="font-bold text-obsidian block mb-1">Nama Kegiatan / Event *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nama Kegiatan / Event *</label>
                 <Input
                   type="text"
                   required
@@ -267,7 +263,7 @@ export const EventsPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Nominal per Siswa (Rp) *</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nominal per Siswa (Rp) *</label>
                   <InputCurrency
                     value={perStudentAmount}
                     onChange={(val) => setPerStudentAmount(val)}
@@ -275,7 +271,7 @@ export const EventsPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Batas Waktu (Deadline)</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Batas Waktu (Deadline)</label>
                   <Input
                     type="date"
                     value={deadline}
@@ -286,7 +282,7 @@ export const EventsPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Deskripsi Tambahan</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Deskripsi Tambahan</label>
                 <Textarea
                   rows={2}
                   placeholder="Opsional: Keterangan singkat mengenai event..."
@@ -308,7 +304,7 @@ export const EventsPage: React.FC = () => {
                 </label>
                 {allowInstallment ? (
                   <div>
-                    <label className="font-bold text-obsidian block mb-1">Minimal Nominal per Cicilan (Rp)</label>
+                    <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Minimal Nominal per Cicilan (Rp)</label>
                     <InputCurrency
                       value={minInstallmentAmount}
                       onChange={(val) => setMinInstallmentAmount(val)}
@@ -363,7 +359,7 @@ export const EventsPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15 shrink-0">
+              <div className="flex justify-end gap-2.5 mt-1 pt-4 border-t border-slate/15 shrink-0">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
                 <Button type="submit" variant="primary" size="sm" disabled={selectedStudentIds.length === 0 || perStudentAmount <= 0} isLoading={isSubmitting}>
                   Terbitkan Event & Tagihan ({selectedStudentIds.length} Siswa)
@@ -376,12 +372,9 @@ export const EventsPage: React.FC = () => {
       <Modal
         isOpen={showTrackingModal}
         onClose={() => setShowTrackingModal(false)}
-        title={
-          <div className="flex flex-col">
-            <span>Progres Kontribusi Santri</span>
-            <span className="text-xs text-slate font-normal mt-0.5">{trackingData?.event?.name || 'Memuat...'}</span>
-          </div>
-        }
+        title="Progres Kontribusi Santri"
+        subtitle={trackingData?.event?.name || 'Memuat...'}
+        icon={<TrendingUp className="w-5 h-5" />}
         maxWidth="3xl"
       >
             {isTrackingLoading ? (
@@ -468,7 +461,7 @@ export const EventsPage: React.FC = () => {
             ) : null}
 
             {trackingData && trackingData.event?.status === 'active' && (
-              <div className="flex justify-end gap-2.5 mt-4 pt-3 border-t border-slate/15 shrink-0">
+              <div className="flex justify-end gap-2.5 mt-1 pt-4 border-t border-slate/15 shrink-0">
                 <Button
                   variant="primary"
                   size="sm"

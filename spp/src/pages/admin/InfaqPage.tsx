@@ -348,10 +348,11 @@ export const InfaqPage: React.FC = () => {
         isOpen={showOutflowModal}
         onClose={() => setShowOutflowModal(false)}
         title="Catat Pengeluaran / Penyaluran Dana Infaq"
+        icon={<ArrowUpRight className="w-5 h-5" />}
       >
         <form onSubmit={handleAddOutflow} className="flex flex-col gap-4 text-xs">
           <div>
-            <label className="font-bold text-obsidian block mb-1">Judul / Tujuan Penyaluran Infaq *</label>
+            <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Judul / Tujuan Penyaluran Infaq *</label>
             <Input
               type="text"
               required
@@ -364,7 +365,7 @@ export const InfaqPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="font-bold text-obsidian block mb-1">Nominal Pengeluaran (Rp) *</label>
+              <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nominal Pengeluaran (Rp) *</label>
               <Input
                 type="number"
                 required
@@ -376,7 +377,7 @@ export const InfaqPage: React.FC = () => {
               />
             </div>
             <div>
-              <label className="font-bold text-obsidian block mb-1">Tanggal Pengeluaran</label>
+              <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Tanggal Pengeluaran</label>
               <Input
                 type="date"
                 required
@@ -388,7 +389,7 @@ export const InfaqPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="font-bold text-obsidian block mb-1">Catatan Tambahan / Rincian Penerima (Opsional)</label>
+            <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Catatan Tambahan / Rincian Penerima (Opsional)</label>
             <Textarea
               rows={3}
               placeholder="Jelaskan detail penerima manfaat atau vendor penyedia barang/jasa..."
@@ -401,7 +402,7 @@ export const InfaqPage: React.FC = () => {
             ℹ️ Catatan pengeluaran ini akan mengurangi saldo kas infaq yang tampil di halaman ini. Data tersimpan di browser dan belum terhubung ke pembukuan resmi pesantren.
           </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-slate/15">
+          <div className="flex justify-end gap-2.5 mt-1 pt-4 border-t border-slate/15">
             <Button variant="outline" size="sm" type="button" onClick={() => setShowOutflowModal(false)}>Batal</Button>
             <Button variant="primary" size="sm" type="submit" isLoading={isSubmitting}>Simpan Pengeluaran Infaq</Button>
           </div>
@@ -414,7 +415,7 @@ export const InfaqPage: React.FC = () => {
         onClose={() => setSelectedReceipt(null)}
         showCloseButton={false}
         maxWidth="sm"
-        className="!bg-transparent !border-0 !shadow-none !p-0 !overflow-visible"
+        className="!bg-transparent !border-0 !shadow-none !overflow-visible"
         bodyClassName="!p-0 !overflow-visible"
       >
         {selectedReceipt && (
