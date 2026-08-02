@@ -4,7 +4,7 @@ import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { normalizeRole } from '../../utils/role';
-import { ShieldAlert, Plus, Search, UserCheck, Shield, Key, Edit, Trash2, Dices } from 'lucide-react';
+import { ShieldAlert, Plus, Search, UserCheck, Shield, Key, Edit, Trash2, Dices, Eye, EyeOff } from 'lucide-react';
 import type { User } from '../../types';
 
 const generatePassword = () => {
@@ -41,6 +41,8 @@ export const UsersPage: React.FC = () => {
   });
   const [newPassword, setNewPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -298,15 +300,25 @@ export const UsersPage: React.FC = () => {
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Password <span className="text-rose-danger">*</span></label>
             <div className="flex gap-2">
-              <Input
-                type="text"
-                required
-                minLength={6}
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="Minimal 6 karakter"
-                className="text-sm font-semibold text-obsidian flex-1"
-              />
+              <div className="relative flex-1">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="Minimal 6 karakter"
+                  className="text-sm font-semibold text-obsidian w-full pr-9"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-slate hover:text-obsidian"
+                  aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               <Button type="button" variant="outline" size="sm" leftIcon={<Dices className="w-4 h-4" />} onClick={() => setFormData({ ...formData, password: generatePassword() })}>
                 Generate
               </Button>
@@ -396,15 +408,25 @@ export const UsersPage: React.FC = () => {
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Password Baru <span className="text-rose-danger">*</span></label>
             <div className="flex gap-2">
-              <Input
-                type="text"
-                required
-                minLength={6}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Masukkan password baru"
-                className="text-sm font-semibold text-obsidian flex-1"
-              />
+              <div className="relative flex-1">
+                <Input
+                  type={showNewPassword ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Masukkan password baru"
+                  className="text-sm font-semibold text-obsidian w-full pr-9"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-slate hover:text-obsidian"
+                  aria-label={showNewPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                >
+                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               <Button type="button" variant="outline" size="sm" leftIcon={<Dices className="w-4 h-4" />} onClick={() => setNewPassword(generatePassword())}>
                 Generate
               </Button>

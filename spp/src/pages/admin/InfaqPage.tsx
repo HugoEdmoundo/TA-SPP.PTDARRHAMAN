@@ -4,7 +4,7 @@ import { useSettings } from '../../contexts/SettingsContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
-import { HeartHandshake, Plus, ArrowUpRight, ArrowDownRight, Wallet, Trash2, ShieldCheck } from 'lucide-react';
+import { HeartHandshake, Plus, ArrowUpRight, ArrowDownRight, Wallet, Trash2, ShieldCheck, Info } from 'lucide-react';
 import type { Receipt } from '../../types';
 
 export const InfaqPage: React.FC = () => {
@@ -111,7 +111,7 @@ export const InfaqPage: React.FC = () => {
     const mockReceipt = {
       id: `rcp-inf-${item.id}`,
       receipt_number: item.receipt_number,
-      verification_code: `VER-INF-${item.id}`,
+      verification_code: '-',
       created_at: item.date || new Date().toISOString(),
       payment_id: String(item.id),
       payment: item.raw_payment || {
@@ -284,6 +284,10 @@ export const InfaqPage: React.FC = () => {
       {/* Tab Content 2: Outflow (Uang Keluar) */}
       {activeTab === 'outflow' && (
         <Card variant="glass" padding="none" className="overflow-hidden">
+          <div className="px-5 py-2.5 bg-amber-50/70 border-b border-amber/20 text-[11px] font-semibold text-amber-800 flex items-center gap-1.5">
+            <Info className="w-3.5 h-3.5 shrink-0" />
+            <span>Catatan pengeluaran tersimpan lokal di browser ini dan belum terhubung ke pembukuan resmi pesantren.</span>
+          </div>
           {outflowData.length === 0 ? (
             <EmptyState
               title="Belum Ada Catatan Pengeluaran Infaq"

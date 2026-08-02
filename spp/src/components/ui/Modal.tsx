@@ -56,6 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
             <DialogTitle className="text-base font-extrabold">{title}</DialogTitle>
           </DialogHeader>
         )}
+        {!title && <DialogTitle className="sr-only">Detail</DialogTitle>}
         <div className={cn('p-6 overflow-y-auto flex-1 min-h-0', bodyClassName)}>{children}</div>
       </DialogContent>
     </Dialog>

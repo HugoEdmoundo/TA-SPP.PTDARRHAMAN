@@ -4,6 +4,7 @@ import { useToast } from '../../components/ui/ToastContext';
 import { api } from '../../api/client';
 import { Users, Plus, FileSpreadsheet, Search, Edit2, CheckCircle2, XCircle, Upload, AlertCircle, GraduationCap, ArrowRightLeft, UserX } from 'lucide-react';
 import type { Student, AcademicYear } from '../../types';
+import { currentAcademicYearLabel } from '../../utils/academicYear';
 
 export const StudentsPage: React.FC = () => {
   const { success, error: toastError } = useToast();
@@ -262,7 +263,7 @@ export const StudentsPage: React.FC = () => {
         birth_place: r.birth_place || '',
         address: r.address || '',
         phone: r.phone || '',
-        academic_year: r.academic_year || '2025/2026',
+        academic_year: r.academic_year || currentAcademicYearLabel(),
         status: 'active',
         is_active: true,
       }));
@@ -529,7 +530,7 @@ export const StudentsPage: React.FC = () => {
                           {ay.name} {ay.is_active ? '(Aktif)' : ''}
                         </SelectItem>
                       ))}
-                      {academicYearsList.length === 0 && <SelectItem value="2025/2026">2025/2026</SelectItem>}
+                      {academicYearsList.length === 0 && <SelectItem value={currentAcademicYearLabel()}>{currentAcademicYearLabel()}</SelectItem>}
                     </SelectContent>
                   </Select>
                 </div>
@@ -660,7 +661,7 @@ export const StudentsPage: React.FC = () => {
                           {ay.name} {ay.is_active ? '(Aktif)' : ''}
                         </SelectItem>
                       ))}
-                      {academicYearsList.length === 0 && <SelectItem value="2025/2026">2025/2026</SelectItem>}
+                      {academicYearsList.length === 0 && <SelectItem value={currentAcademicYearLabel()}>{currentAcademicYearLabel()}</SelectItem>}
                     </SelectContent>
                   </Select>
                 </div>
@@ -745,7 +746,7 @@ export const StudentsPage: React.FC = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      const csvContent = "data:text/csv;charset=utf-8,nis,full_name,gender,birth_place,phone,address,academic_year\n2026001,Ahmad Zaki,Laki-laki,Jakarta,08123456789,Jl. Merdeka No 1,2025/2026\n2026002,Nadia Rahma,Perempuan,Bogor,08198765432,Jl. Mawar No 5,2025/2026";
+                      const csvContent = "data:text/csv;charset=utf-8,nis,full_name,gender,birth_place,phone,address,academic_year\n2026001,Ahmad Zaki,Laki-laki,Jakarta,08123456789,Jl. Merdeka No 1," + currentAcademicYearLabel() + "\n2026002,Nadia Rahma,Perempuan,Bogor,08198765432,Jl. Mawar No 5," + currentAcademicYearLabel();
                       const encodedUri = encodeURI(csvContent);
                       const link = document.createElement("a");
                       link.setAttribute("href", encodedUri);
@@ -823,7 +824,7 @@ export const StudentsPage: React.FC = () => {
                             <td className="p-2.5 font-mono">{str(row.nis)}</td>
                             <td className="p-2.5">{row.full_name || '-'}</td>
                             <td className="p-2.5">{row.gender || '-'}</td>
-                            <td className="p-2.5 font-mono">{row.academic_year || '2025/2026'}</td>
+                            <td className="p-2.5 font-mono">{row.academic_year || currentAcademicYearLabel()}</td>
                             <td className="p-2.5 text-rose-600 font-normal">
                               {row.errors && row.errors.length > 0 ? row.errors.join(', ') : '-'}
                             </td>

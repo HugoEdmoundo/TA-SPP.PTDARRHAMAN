@@ -4,6 +4,7 @@ import { useToast } from '../../components/ui/ToastContext';
 import { api } from '../../api/client';
 import { FileText, Plus, Search, Edit2, Trash2, CheckCircle2, AlertCircle, Clock, Users, Tag } from 'lucide-react';
 import type { Student, BillCategory } from '../../types';
+import { currentAcademicYearLabel } from '../../utils/academicYear';
 
 export const NonSppPage: React.FC = () => {
   const { success, error: toastError } = useToast();
@@ -349,7 +350,7 @@ export const NonSppPage: React.FC = () => {
                           {cat.name} {cat.default_amount ? `(Default: Rp ${cat.default_amount.toLocaleString('id-ID')})` : ''}
                         </SelectItem>
                       ))}
-                      {categoriesList.length === 0 && <SelectItem value="Seragam">Seragam</SelectItem>}
+                      {categoriesList.length === 0 && <SelectItem value="__empty__" disabled>Kategori belum tersedia</SelectItem>}
                     </SelectContent>
                   </Select>
                 </div>
@@ -422,7 +423,7 @@ export const NonSppPage: React.FC = () => {
                             />
                             <span className="truncate">{st.full_name || st.name}</span>
                           </div>
-                          <span className="font-mono text-[10px] text-slate shrink-0">NIS: {st.nis} ({st.academic_year || '2025/2026'})</span>
+                          <span className="font-mono text-[10px] text-slate shrink-0">NIS: {st.nis} ({st.academic_year || currentAcademicYearLabel()})</span>
                         </label>
                       );
                     })}
@@ -465,7 +466,7 @@ export const NonSppPage: React.FC = () => {
                           {cat.name}
                         </SelectItem>
                       ))}
-                      {categoriesList.length === 0 && <SelectItem value="Seragam">Seragam</SelectItem>}
+                      {categoriesList.length === 0 && <SelectItem value="__empty__" disabled>Kategori belum tersedia</SelectItem>}
                     </SelectContent>
                   </Select>
                 </div>
