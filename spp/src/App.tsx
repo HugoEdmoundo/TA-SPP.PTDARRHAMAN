@@ -18,6 +18,7 @@ import { ManualPaymentPage } from './pages/admin/ManualPaymentPage';
 import { ReportsPage } from './pages/admin/ReportsPage';
 import { AuditLogPage } from './pages/admin/AuditLogPage';
 import { StudentsPage } from './pages/admin/StudentsPage';
+import { ParentsPage } from './pages/admin/ParentsPage';
 import { InfaqPage } from './pages/admin/InfaqPage';
 import { AdminProfilePage } from './pages/admin/AdminProfilePage';
 import { StudentHistoryPage } from './pages/admin/StudentHistoryPage';
@@ -60,6 +61,7 @@ export function App() {
                   }
                 />
                 <Route path="students" element={<StudentsPage />} />
+                <Route path="wali" element={<ParentsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route
                   path="users"
