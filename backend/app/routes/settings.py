@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File,
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import SchoolSetting, BankAccount, SppSetting, User, AcademicYear, BillCategory
+from app.models import SchoolSetting, BankAccount, SppSetting, SppSettingLog, User, AcademicYear, BillCategory
 from app.schemas.settings import (
     SchoolSettingItem,
     SchoolSettingUpdate,
@@ -15,6 +15,7 @@ from app.schemas.settings import (
     SppSettingCreate,
     SppSettingUpdate,
     SppSettingRead,
+    SppSettingLogRead,
     AcademicYearCreate,
     AcademicYearUpdate,
     AcademicYearRead,
@@ -428,10 +429,85 @@ def delete_bank_account(
 # ─── SPP Settings Endpoints ──────────────────────────────────
 
 @router.get("/spp-settings", response_model=List[SppSettingRead])
+@router.get("/settings/spp-settings", response_model=List[SppSettingRead])
 def list_spp_settings(session: Session = Depends(get_session)):
     """Menampilkan daftar pengaturan SPP per tahun ajaran."""
     return session.exec(
         select(SppSetting).order_by(SppSetting.academic_year_id.desc(), SppSetting.id.desc())
+    ).all()
+
+
+@router.get("/spp-settings/active", response_model=SppSettingRead)
+@router.get("/settings/spp-settings/active", response_model=SppSettingRead)
+def get_active_spp_setting_endpoint(session: Session = Depends(get_session)):
+    """
+    Mengambil pengaturan SPP aktif untuk tahun ajaran berjalan.
+    Jika belum ada, sistem membuat default otomatis (nominal Rp 500.000).
+    """
+    from app.services.spp import get_active_spp_setting
+    from app.services.ay import get_current_academic_year
+
+    ay = get_current_academic_year(session)
+    if not ay:
+        raise HTTPException(status_code=404, detail="Tahun ajaran belum tersedia.")
+    return get_active_spp_setting(session, ay)
+
+
+@router.put("/spp-settings/nominal", response_model=SppSettingRead)
+@router.put("/settings/spp-settings/nominal", response_model=SppSettingRead)
+def update_spp_nominal(
+    payload: SppSettingUpdate,
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """
+    Memperbarui nominal SPP aktif untuk tahun ajaran berjalan.
+    Setiap perubahan dicatat ke riwayat (SppSettingLog) — dari nominal lama ke baru.
+    """
+    from app.services.spp import get_active_spp_setting
+    from app.services.ay import get_current_academic_year
+
+    ay = get_current_academic_year(session)
+    if not ay:
+        raise HTTPException(status_code=404, detail="Tahun ajaran belum tersedia.")
+
+    spp_set = get_active_spp_setting(session, ay)
+    old_nominal = spp_set.monthly_nominal
+
+    update_data = payload.model_dump(exclude_unset=True, exclude={"academic_year", "academic_year_id"})
+    for key, value in update_data.items():
+        setattr(spp_set, key, value)
+
+    spp_set.updated_at = datetime.utcnow()
+    session.add(spp_set)
+
+    # Catat riwayat perubahan nominal
+    log = SppSettingLog(
+        spp_setting_id=spp_set.id,
+        old_nominal=old_nominal,
+        new_nominal=spp_set.monthly_nominal,
+        changed_by=admin.id,
+        changed_at=datetime.utcnow(),
+        notes=f"Perubahan nominal SPP {ay.name}",
+    )
+    session.add(log)
+
+    session.commit()
+    session.refresh(spp_set)
+    return spp_set
+
+
+@router.get("/spp-settings/history", response_model=List[SppSettingLogRead])
+@router.get("/settings/spp-settings/history", response_model=List[SppSettingLogRead])
+def list_spp_nominal_history(
+    session: Session = Depends(get_session),
+    admin: User = Depends(require_admin),
+):
+    """
+    Riwayat perubahan nominal SPP: dari nominal berapa ke nominal berapa, kapan diubah.
+    """
+    return session.exec(
+        select(SppSettingLog).order_by(SppSettingLog.changed_at.desc()).limit(100)
     ).all()
 
 

@@ -2,7 +2,8 @@
 TA SPP Payment System - Database Models (B-03 Rewrite + Production-Grade Upgrade)
 
 Berdasarkan spesifikasi final:
-  1. SPP        → Tagihan rutin bulanan bersifat VIRTUAL (tidak disimpan di tabel bills).
+  1. SPP        → Tagihan rutin bulanan dibuat OTOMATIS oleh sistem (per awal bulan)
+                  untuk seluruh santri aktif, disimpan di tabel bills dengan spp_month/spp_year.
   2. Non-SPP    → Tagihan ad-hoc (denda, seragam, buku, dll) disimpan di tabel bills.
   3. Event      → Patungan besar disimpan di tabel events & bills.
 
@@ -11,6 +12,7 @@ Upgrade Production-Grade:
   - BillCategory master table (jenis tagihan dinamis)
   - StudentStatus enum (menggantikan is_active boolean)
   - PaymentStatus enum (tracking status pembayaran gateway)
+  - SppSettingLog: riwayat perubahan nominal SPP
 """
 
 from datetime import datetime, date
@@ -193,6 +195,19 @@ class SppSetting(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
+class SppSettingLog(SQLModel, table=True):
+    """Riwayat perubahan nominal SPP — mencatat perubahan dari nominal lama ke baru."""
+    __tablename__ = "spp_setting_logs"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    spp_setting_id: Optional[int] = Field(default=None, foreign_key="spp_settings.id", index=True)
+    old_nominal: Optional[Decimal] = Field(default=None, max_digits=12, decimal_places=2)
+    new_nominal: Decimal = Field(max_digits=12, decimal_places=2)
+    changed_by: Optional[int] = Field(default=None, foreign_key="users.id")
+    changed_at: datetime = Field(default_factory=datetime.utcnow)
+    notes: Optional[str] = Field(default=None)
+
+
 # ─── Events (Patungan) ───────────────────────────────────────
 
 class Event(SQLModel, table=True):
@@ -223,7 +238,8 @@ class Event(SQLModel, table=True):
 class Bill(SQLModel, table=True):
     """
     Satu tagihan = satu siswa + satu kewajiban bayar.
-    NOTE: SPP bills are VIRTUAL — not stored. Only non_spp and event bills are stored in this table.
+    SPP bills dibuat OTOMATIS oleh sistem per bulan (spp_month/spp_year) untuk santri aktif.
+    non_spp dan event bills dibuat manual oleh admin.
     """
     __tablename__ = "bills"
 
@@ -232,6 +248,10 @@ class Bill(SQLModel, table=True):
     bill_type: BillType = Field(index=True)             # DEPRECATED — gunakan category_id untuk fleksibilitas
     category_id: Optional[int] = Field(default=None, foreign_key="bill_categories.id", index=True)
     academic_year_id: Optional[int] = Field(default=None, foreign_key="academic_years.id", index=True)
+
+    # Period (khusus tagihan SPP bulanan)
+    spp_month: Optional[int] = Field(default=None, index=True)      # 1-12
+    spp_year: Optional[int] = Field(default=None, index=True)       # e.g. 2025
 
     # Identifiers & Category
     label: str = Field(max_length=200)                  # "Denda Buku", "Study Tour Bali"
@@ -266,7 +286,7 @@ class Bill(SQLModel, table=True):
 class Payment(SQLModel, table=True):
     """
     Satu payment = satu kali bayar.
-    NOTE: Untuk SPP, bill_id bernilai null karena tagihan SPP bersifat virtual.
+    Untuk SPP, bill_id menunjuk ke tagihan SPP bulanan yang dibuat sistem (tabel bills).
     """
     __tablename__ = "payments"
 

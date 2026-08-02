@@ -5,7 +5,7 @@ import { api } from '../../api/client';
 import { DollarSign, Plus, Search, Printer, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import type { Student } from '../../types';
 
-export const PaymentKasirPage: React.FC = () => {
+export const ManualPaymentPage: React.FC = () => {
   const { success, error: toastError } = useToast();
 
   const [payments, setPayments] = useState<any[]>([]);
@@ -204,7 +204,9 @@ export const PaymentKasirPage: React.FC = () => {
               <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-primary shrink-0" />
               <span>Pembayaran Manual</span>
             </h2>
-            <p className="text-xs text-slate mt-1">Pencatatan pembayaran manual.</p>
+            <p className="text-xs text-slate mt-1">
+              Catat pembayaran langsung dari orang tua/wali santri yang membayar cash (atau transfer manual) di loket. Admin cukup menginput nominal ke sistem, kuitansi digital otomatis terbit.
+            </p>
           </div>
           <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd} className="shrink-0 w-full sm:w-auto justify-center">
             Catat Pembayaran
@@ -338,7 +340,7 @@ export const PaymentKasirPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Modal Add Kasir Payment */}
+      {/* Modal Add Manual Payment */}
       <Modal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
@@ -647,4 +649,4 @@ export const PaymentKasirPage: React.FC = () => {
   );
 };
 
-export default PaymentKasirPage;
+export default ManualPaymentPage;

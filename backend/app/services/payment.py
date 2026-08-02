@@ -209,9 +209,44 @@ def process_payment_items(
                     detail=f"SPP untuk periode {item.month}/{item.year} sudah lunas (Rp {nominal_spp:,.2f})."
                 )
 
+            # Cari / buat tagihan SPP bulanan yang dibuat sistem (materialized bill)
+            bill = session.exec(
+                select(Bill).where(
+                    Bill.student_id == student_id,
+                    Bill.bill_type == "spp",
+                    Bill.spp_month == item.month,
+                    Bill.spp_year == item.year,
+                )
+            ).first()
+            if not bill:
+                bill = Bill(
+                    student_id=student_id,
+                    bill_type="spp",
+                    academic_year_id=active_ay_id,
+                    spp_month=item.month,
+                    spp_year=item.year,
+                    label=f"SPP Bulan {item.month} Tahun {item.year}",
+                    amount=nominal_spp,
+                    status="unpaid",
+                    notes=f"Auto-generated dari pembayaran SPP {item.month}/{item.year}",
+                    created_at=now,
+                    updated_at=now,
+                )
+                session.add(bill)
+                session.flush()
+
+            # Update progres tagihan SPP
+            bill.total_paid += item.amount
+            if bill.total_paid >= bill.amount:
+                bill.status = "paid"
+            elif bill.total_paid > 0:
+                bill.status = "partial"
+            bill.updated_at = now
+            session.add(bill)
+
             payment = Payment(
                 student_id=student_id,
-                bill_id=None,
+                bill_id=bill.id,
                 payment_type="spp",
                 spp_month=item.month,
                 spp_year=item.year,
