@@ -23,14 +23,16 @@ export const ReceiptShareCard: React.FC<ReceiptShareCardProps> = ({
 
   const handleShareWhatsApp = () => {
     if (!payment) return;
-    const itemsText = payment.items.map((it) => `• ${it.title}: ${formatRupiah(it.nominal)}`).join('\n');
+    const itemsText = (payment.items || [])
+      .map((it) => `• ${it.title}: ${formatRupiah(it.nominal)}`)
+      .join('\n');
     const msg = `*BUKTI PEMBAYARAN RESMI - ${settings.name.toUpperCase()}*\n\n` +
       `No. Kuitansi: *${receipt.receipt_number}*\n` +
       `Tanggal: ${formatDateIndo(receipt.created_at, true)}\n` +
       `Nama Siswa: *${payment.student?.name || payment.user?.name || '-'}* (${payment.student?.nis || '-'}) - Kelas ${payment.student?.grade || '-'}\n\n` +
       `*Rincian Pembayaran:*\n${itemsText}\n\n` +
       `*TOTAL DIBAYAR: ${formatRupiah(payment.total_amount)}*\n` +
-      `Metode: ${payment.payment_method.replace('_', ' ')}\n` +
+      `Metode: ${(payment.payment_method || 'Transfer').replace('_', ' ')}\n` +
       `Status: *LUNAS (TERVERIFIKASI)*\n\n` +
       `Kode Verifikasi: \`${receipt.verification_code}\`\n\n` +
       `_Terima kasih atas kepedulian dan partisipasi Bapak/Ibu Wali Santri dalam mendukung pendidikan di ${settings.name}._`;
@@ -99,7 +101,7 @@ export const ReceiptShareCard: React.FC<ReceiptShareCardProps> = ({
               Rincian Pembayaran
             </span>
             <div className="flex flex-col gap-2">
-              {payment.items.map((item, idx) => (
+              {(payment.items || []).map((item, idx) => (
                 <div key={idx} className="flex items-start justify-between gap-2 text-xs">
                   <span className="flex-1 font-medium text-foreground">{item.title}</span>
                   <span className="font-mono font-bold text-foreground">{formatRupiah(item.nominal)}</span>
@@ -115,7 +117,7 @@ export const ReceiptShareCard: React.FC<ReceiptShareCardProps> = ({
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="rounded-lg border border-border bg-white p-3">
               <span className="block text-[10px] text-muted-foreground">Metode Bayar</span>
-              <span className="font-bold capitalize text-foreground">{payment.payment_method.replace('_', ' ')}</span>
+              <span className="font-bold capitalize text-foreground">{(payment.payment_method || 'Transfer').replace('_', ' ')}</span>
             </div>
             <div className="rounded-lg border border-border bg-white p-3">
               <span className="block text-[10px] text-muted-foreground">Waktu Bayar</span>

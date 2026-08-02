@@ -155,8 +155,22 @@ def process_payment_items(
     month = now.month
 
     from app.models import AcademicYear
-    active_ay = session.exec(select(AcademicYear).where(AcademicYear.is_active == True)).first()
+    from app.services.ay import get_current_academic_year
+    active_ay = get_current_academic_year(session)
     active_ay_id = active_ay.id if active_ay else None
+
+    def _validate_in_academic_year(period_year: int, period_month: int):
+        """Pastikan periode kalender berada dalam rentang tahun ajaran aktif."""
+        if not active_ay or not active_ay.start_date or not active_ay.end_date:
+            return
+        from datetime import date as _date
+        period_date = _date(period_year, period_month, 1)
+        if not (active_ay.start_date <= period_date <= active_ay.end_date):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Periode {period_month}/{period_year} di luar tahun ajaran aktif "
+                       f"'{active_ay.name}' ({active_ay.start_date.isoformat()} - {active_ay.end_date.isoformat()}).",
+            )
 
     for idx, item in enumerate(items):
         item_infaq = remaining_infaq if idx == 0 else Decimal("0")
@@ -166,7 +180,9 @@ def process_payment_items(
         if item.type == "spp":
             if not item.month or not item.year:
                 raise HTTPException(status_code=400, detail="Bulan dan tahun wajib diisi untuk pembayaran SPP.")
-            
+
+            _validate_in_academic_year(item.year, item.month)
+
             # Cek apakah SPP bulan ini sudah dibayar sebelumnya (abaikan yang void/refunded)
             existing_spp = session.exec(
                 select(Payment).where(
@@ -174,19 +190,23 @@ def process_payment_items(
                     Payment.payment_type == "spp",
                     Payment.spp_month == item.month,
                     Payment.spp_year == item.year,
-                    Payment.status == PaymentStatus.paid,
+                    Payment.status.in_([PaymentStatus.paid, PaymentStatus.pending]),
                 )
             ).all()
             paid_spp = sum(p.amount for p in existing_spp)
-            
-            # Ambil nominal SPP dari master tabel SppSetting (Global)
-            spp_set = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
+
+            # Ambil nominal SPP dari master tabel SppSetting untuk tahun ajaran aktif
+            spp_set = session.exec(
+                select(SppSetting).where(SppSetting.academic_year_id == active_ay_id).order_by(SppSetting.id.desc())
+            ).first()
+            if not spp_set:
+                spp_set = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
             nominal_spp = Decimal(str(spp_set.monthly_nominal)) if spp_set else Decimal("500000")
-            
-            if paid_spp + item.amount > nominal_spp and paid_spp >= nominal_spp:
+
+            if paid_spp + item.amount > nominal_spp:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"SPP untuk periode {item.month}/{item.year} sudah lunas."
+                    detail=f"SPP untuk periode {item.month}/{item.year} sudah lunas (Rp {nominal_spp:,.2f})."
                 )
 
             payment = Payment(

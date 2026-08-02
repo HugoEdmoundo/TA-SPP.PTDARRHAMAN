@@ -51,23 +51,23 @@ export function App() {
                 <Route path="student-history" element={<StudentHistoryPage />} />
                 <Route path="profile" element={<AdminProfilePage />} />
                 <Route path="reports" element={<ReportsPage />} />
-                <Route 
-                  path="audit" 
+                <Route
+                  path="audit"
                   element={
-                    <ProtectedRoute allowedRoles={['SUPERADMIN', 'superadmin', 'SUPER_ADMIN']}>
+                    <ProtectedRoute allowedRoles={['SUPERADMIN']}>
                       <AuditLogPage />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
                 <Route path="students" element={<StudentsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
-                <Route 
-                  path="users" 
+                <Route
+                  path="users"
                   element={
-                    <ProtectedRoute allowedRoles={['SUPERADMIN', 'superadmin', 'SUPER_ADMIN']}>
+                    <ProtectedRoute allowedRoles={['SUPERADMIN']}>
                       <UsersPage />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
               </Route>
 

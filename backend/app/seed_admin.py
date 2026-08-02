@@ -14,11 +14,11 @@ import argparse
 import sys
 from sqlmodel import Session, select
 from app.database import engine
-from app.models import User
+from app.models import User, Role
 from app.utils.auth import get_password_hash
 
 
-def seed_user(username: str, password: str, full_name: str, role: str):
+def seed_user(username: str, password: str, full_name: str, role: Role):
     """Membuat user baru jika belum ada."""
     with Session(engine) as session:
         existing = session.exec(select(User).where(User.username == username)).first()
@@ -36,15 +36,15 @@ def seed_user(username: str, password: str, full_name: str, role: str):
         session.add(user)
         session.commit()
         session.refresh(user)
-        print(f"[OK] User '{username}' berhasil dibuat (ID: {user.id}, role: {role}).")
+        print(f"[OK] User '{username}' berhasil dibuat (ID: {user.id}, role: {role.value}).")
 
 
 def seed_all_defaults():
     """Seed 3 role utama sistem PTDARRAHMAN: Superadmin, Admin, dan Wali."""
     print("=== Memulai Seeding Akun Default PTDARRAHMAN ===")
-    seed_user("superadmin", "superadmin123", "Superadmin PTDARRAHMAN", "superadmin")
-    seed_user("admin", "admin123", "Administrator PTDARRAHMAN", "admin")
-    seed_user("wali_demo", "wali123", "H. Ahmad Syafi'i (Wali Santri)", "wali")
+    seed_user("superadmin", "superadmin123", "Superadmin PTDARRAHMAN", Role.superadmin)
+    seed_user("admin", "admin123", "Administrator PTDARRAHMAN", Role.admin)
+    seed_user("wali_demo", "wali123", "H. Ahmad Syafi'i (Wali Santri)", Role.wali)
     print("=== Seeding Selesai ===")
 
 
@@ -62,7 +62,7 @@ def main():
     else:
         if args.password == "admin123":
             print("[WARN] Anda menggunakan password default 'admin123'. Ganti segera di production!")
-        seed_user(args.username, args.password, args.full_name, args.role)
+        seed_user(args.username, args.password, args.full_name, Role(args.role.lower()))
 
 
 if __name__ == "__main__":

@@ -5,8 +5,9 @@ from fastapi import APIRouter, Depends, Query, HTTPException, Response
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import User, Student, Bill, Payment, Receipt, Event, SchoolSetting, ParentStudent, StudentStatus, PaymentStatus, SppSetting
-from app.dependencies import require_admin, get_current_user
+from app.models import User, Student, Bill, Payment, Receipt, Event, SchoolSetting, ParentStudent, StudentStatus, PaymentStatus, SppSetting, AcademicYear
+from app.dependencies import require_admin, get_current_user, is_admin_role
+from app.services.ay import get_current_academic_year, ay_months
 from app.services.report_generator import export_to_excel, export_to_pdf
 
 router = APIRouter()
@@ -67,27 +68,37 @@ def serve_report(
 
 @router.get("/spp-semester")
 def get_spp_semester_report(
-    year: int = Query(2025, description="Tahun ajaran SPP"),
-    semester: int = Query(1, ge=1, le=2, description="Semester 1 (Jul-Des) atau 2 (Jan-Jun)"),
+    academic_year_id: int = Query(None, description="ID tahun ajaran. Default: tahun ajaran aktif."),
+    semester: int = Query(1, ge=1, le=2, description="Semester 1 (6 bulan pertama AY) atau 2 (6 bulan terakhir AY)"),
     format: str = Query("json", description="Format output: json | pdf | excel"),
     session: Session = Depends(get_session),
     admin: User = Depends(require_admin),
 ):
     """
-    Laporan tagihan & koleksi SPP per semester (6 bulan) - B-24.
+    Laporan tagihan & koleksi SPP per semester (6 bulan) pada tahun ajaran tertentu - B-24.
     """
-    months = [7, 8, 9, 10, 11, 12] if semester == 1 else [1, 2, 3, 4, 5, 6]
-    
-    # Ambil nominal SPP dari tabel master SppSetting
-    spp_set = session.exec(select(SppSetting).where(SppSetting.academic_year.ilike(f"%{year}%")).order_by(SppSetting.id.desc())).first()
+    ay = session.get(AcademicYear, academic_year_id) if academic_year_id else None
+    if not ay:
+        ay = get_current_academic_year(session)
+    if not ay:
+        raise HTTPException(status_code=404, detail="Tahun ajaran belum tersedia.")
+
+    months = ay_months(ay, semester)  # list of (month, year)
+    month_numbers = [m for m, _ in months]
+    years = {y for _, y in months}
+
+    # Ambil nominal SPP dari tabel master SppSetting milik AY ini
+    spp_set = session.exec(select(SppSetting).where(SppSetting.academic_year_id == ay.id).order_by(SppSetting.id.desc())).first()
     if not spp_set:
         spp_set = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
     nominal_spp = Decimal(str(spp_set.monthly_nominal)) if spp_set else Decimal("500000")
     target_per_student = nominal_spp * 6
 
-    students = session.exec(select(Student).where(Student.is_active == True, Student.status == StudentStatus.active)).all()
+    students = session.exec(
+        select(Student).where(Student.is_active == True, Student.status == StudentStatus.active)
+    ).all()
     all_spp_pmts = session.exec(
-        select(Payment).where(Payment.payment_type == "spp", Payment.spp_year == year, Payment.spp_month.in_(months), Payment.status == PaymentStatus.paid)
+        select(Payment).where(Payment.payment_type == "spp", Payment.spp_year.in_(years), Payment.spp_month.in_(month_numbers), Payment.status == PaymentStatus.paid)
     ).all()
 
     pmt_map: Dict[int, Decimal] = {}
@@ -107,7 +118,8 @@ def get_spp_semester_report(
             idx,
             st.nis,
             st.full_name,
-            st.academic_year or '-',
+            st.grade or '-',
+            st.academic_year or ay.name,
             float(target_per_student),
             float(paid),
             float(rem),
@@ -119,9 +131,10 @@ def get_spp_semester_report(
     total_rem = max(Decimal("0"), total_target - total_collected)
     pct = (total_collected / total_target * 100) if total_target > 0 else Decimal("0")
 
-    headers = ["No", "NIS", "Nama Siswa", "Tahun Ajaran", "Target SPP (Rp)", "Dibayar (Rp)", "Tunggakan (Rp)", "Status"]
+    headers = ["No", "NIS", "Nama Siswa", "Kelas", "Tahun Ajaran", "Target SPP (Rp)", "Dibayar (Rp)", "Tunggakan (Rp)", "Status"]
+    period_label = f"{months[0][1]}-{months[-1][0]}-{months[-1][1]}" if months else "-"
     summary = {
-        "Tahun / Semester": f"{year} / Semester {semester}",
+        "Tahun Ajaran / Semester": f"{ay.name} / Semester {semester}",
         "Total Siswa Aktif": len(students),
         "Total Target SPP (Rp)": float(total_target),
         "Total Terkumpul (Rp)": float(total_collected),
@@ -131,12 +144,12 @@ def get_spp_semester_report(
 
     return serve_report(
         format,
-        f"Laporan SPP Semester {semester} Tahun {year}",
-        f"Periode Bulan {months[0]}-{months[-1]} {year}",
+        f"Laporan SPP Semester {semester} - {ay.name}",
+        f"Periode Bulan {period_label}",
         headers,
         rows,
         summary,
-        f"Laporan_SPP_Sem{semester}_{year}",
+        f"Laporan_SPP_Sem{semester}_{ay.name.replace('/', '')}",
         is_landscape=True
     )
 
@@ -241,7 +254,7 @@ def get_student_report(
     Laporan riwayat & status kewajiban tagihan seorang siswa - B-24.
     Dapat diakses oleh Admin atau Wali dari siswa tersebut.
     """
-    if (user.role or "").lower() not in ["admin", "superadmin"]:
+    if not is_admin_role(user.role):
         link = session.exec(
             select(ParentStudent).where(
                 ParentStudent.parent_id == user.id,

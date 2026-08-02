@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session, select
 from app.database import get_session
-from app.models import User
+from app.models import User, Role
 from app.utils.auth import decode_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -37,23 +37,32 @@ def get_current_user(
     return user
 
 
+def is_admin_role(role) -> bool:
+    """Cek apakah sebuah role termasuk admin/superadmin."""
+    return (role or "").lower() in [Role.admin.value, Role.superadmin.value]
+
+
 def require_admin(current_user: User = Depends(get_current_user)) -> User:
     """Dependency: Mengizinkan role 'admin' atau 'superadmin'."""
-    user_role = (current_user.role or "").lower()
-    if user_role not in ["admin", "superadmin"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Akses ditolak: Fitur ini hanya untuk Administrator atau Superadmin.",
-        )
-    return current_user
+    return require_roles(Role.admin, Role.superadmin)(current_user)
 
 
 def require_wali(current_user: User = Depends(get_current_user)) -> User:
     """Dependency: Mengizinkan role 'wali', 'admin', atau 'superadmin'."""
-    user_role = (current_user.role or "").lower()
-    if user_role not in ["wali", "admin", "superadmin"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Akses ditolak: Fitur ini hanya untuk Wali Siswa, Admin, atau Superadmin.",
-        )
-    return current_user
+    return require_roles(Role.wali, Role.admin, Role.superadmin)(current_user)
+
+
+def require_roles(*allowed_roles: Role):
+    """Dependency factory: Mengizinkan user dengan salah satu dari allowed_roles."""
+    allowed = {r.value for r in allowed_roles}
+
+    def checker(current_user: User = Depends(get_current_user)) -> User:
+        user_role = (current_user.role or "").lower()
+        if user_role not in allowed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Akses ditolak: Role Anda tidak memiliki izin untuk fitur ini.",
+            )
+        return current_user
+
+    return checker

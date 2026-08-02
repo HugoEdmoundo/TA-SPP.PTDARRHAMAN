@@ -1,54 +1,63 @@
 from typing import List, Dict, Any
+
 from sqlmodel import Session, select
 from sqlalchemy import or_
-from app.models import Student, SppSetting, Payment, StudentStatus, PaymentStatus
+
+from app.models import Student, SppSetting, Payment, AcademicYear, StudentStatus, PaymentStatus
+from app.services.ay import get_current_academic_year, period_to_calendar, ay_months
 
 
-def get_student_spp_status(session: Session, student_id: int, year: int) -> List[Dict[str, Any]]:
+def _resolve_spp_setting(session: Session, ay: AcademicYear) -> SppSetting:
+    """Nominal SPP untuk AY tertentu; fallback ke setting terbaru bila AY belum punya."""
+    setting = session.exec(
+        select(SppSetting).where(SppSetting.academic_year_id == ay.id).order_by(SppSetting.id.desc())
+    ).first()
+    if not setting:
+        setting = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
+    return setting
+
+
+def get_student_spp_status(session: Session, student_id: int, academic_year_id: int) -> List[Dict[str, Any]]:
     """
-    Menghitung status SPP bulanan (bulan 1-12) per siswa untuk tahun tertentu secara virtual.
-    Tidak menyimpan record tagihan statis, melainkan mencocokkan total pembayaran sukses dengan nominal SppSetting.
+    Menghitung status SPP bulanan (periode 1-12 relatif ke AY) per siswa secara virtual.
+    Mencocokkan total pembayaran SPP sukses per bulan kalender dengan nominal SppSetting AY tersebut.
     """
     student = session.get(Student, student_id)
     if not student:
         return []
 
-    # Cari nominal SPP berdasarkan tahun ajaran siswa atau tahun yang diminta
-    conds = [SppSetting.academic_year.ilike(f"%{year}%")]
-    if student.academic_year:
-        conds.append(SppSetting.academic_year == student.academic_year)
-    if student.academic_year_id:
-        conds.append(SppSetting.academic_year_id == student.academic_year_id)
+    ay = session.get(AcademicYear, academic_year_id)
+    if not ay:
+        ay = get_current_academic_year(session)
+    if not ay:
+        return []
 
-    spp_setting = session.exec(
-        select(SppSetting).where(or_(*conds)).order_by(SppSetting.id.desc())
-    ).first()
-
-    # Jika tidak ada setting spesifik, ambil setting terbaru atau fallback default 500.000
-    if not spp_setting:
-        spp_setting = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
-    
+    spp_setting = _resolve_spp_setting(session, ay)
     nominal = float(spp_setting.monthly_nominal) if spp_setting else 500000.0
 
-    # Ambil semua pembayaran SPP yang SUKSES/PAID untuk siswa ini di tahun tersebut
+    # Ambil semua pembayaran SPP yang SUKSES/PAID untuk siswa ini dalam rentang kalender AY
+    months_of_ay = [period_to_calendar(ay, p) for p in range(1, 13)]
+    years_in_ay = {y for _, y in months_of_ay}
+
     payments = session.exec(
         select(Payment).where(
             Payment.student_id == student_id,
             Payment.payment_type == "spp",
-            Payment.spp_year == year,
+            Payment.spp_year.in_(years_in_ay),
             Payment.status == PaymentStatus.paid,
         )
     ).all()
 
-    # Group pembayaran per bulan
-    paid_by_month: Dict[int, float] = {m: 0.0 for m in range(1, 13)}
+    paid_by_calendar: Dict[tuple, float] = {}
     for p in payments:
-        if p.spp_month and 1 <= p.spp_month <= 12:
-            paid_by_month[p.spp_month] += float(p.amount)
+        if p.spp_month and 1 <= p.spp_month <= 12 and p.spp_year:
+            key = (p.spp_month, p.spp_year)
+            paid_by_calendar[key] = paid_by_calendar.get(key, 0.0) + float(p.amount)
 
     status_list = []
-    for m in range(1, 13):
-        total_paid = paid_by_month[m]
+    for period in range(1, 13):
+        month, year = period_to_calendar(ay, period)
+        total_paid = paid_by_calendar.get((month, year), 0.0)
         if total_paid >= nominal:
             status = "paid"
         elif total_paid > 0:
@@ -57,7 +66,8 @@ def get_student_spp_status(session: Session, student_id: int, year: int) -> List
             status = "unpaid"
 
         status_list.append({
-            "month": m,
+            "period": period,
+            "month": month,
             "year": year,
             "nominal": nominal,
             "total_paid": total_paid,
@@ -67,41 +77,55 @@ def get_student_spp_status(session: Session, student_id: int, year: int) -> List
     return status_list
 
 
-def get_spp_grid(session: Session, year: int, semester: int) -> List[Dict[str, Any]]:
+def get_spp_grid(session: Session, academic_year_id: int, semester: int) -> List[Dict[str, Any]]:
     """
-    Menghasilkan grid status SPP untuk seluruh siswa aktif dalam 1 semester (6 bulan).
-    Semester 1 = Juli - Desember (bulan 7 - 12).
-    Semester 2 = Januari - Juni (bulan 1 - 6).
+    Menghasilkan grid status SPP untuk seluruh siswa aktif dalam 1 semester pada AY tertentu.
+    Semester 1 = 6 bulan pertama AY, Semester 2 = 6 bulan terakhir AY.
     """
-    months_range = range(7, 13) if semester == 1 else range(1, 7)
-    students = session.exec(select(Student).where(Student.is_active == True, Student.status == 'active').order_by(Student.full_name)).all()
+    ay = session.get(AcademicYear, academic_year_id)
+    if not ay:
+        ay = get_current_academic_year(session)
+    if not ay:
+        return []
 
-    # Query semua pembayaran SPP yang SUKSES/PAID di tahun & bulan dalam range semester ini
+    months = ay_months(ay, semester)
+    months_in_sem = [(m, y) for m, y in months]
+
+    spp_setting = _resolve_spp_setting(session, ay)
+    nominal = float(spp_setting.monthly_nominal) if spp_setting else 500000.0
+
+    # Siswa aktif: milik AY ini, atau legacy yang belum punya AY (academic_year_id kosong)
+    students = session.exec(
+        select(Student).where(
+            Student.is_active == True,  # noqa: E712
+            Student.status == StudentStatus.active,
+            or_(Student.academic_year_id == ay.id, Student.academic_year_id.is_(None)),
+        ).order_by(Student.full_name)
+    ).all()
+
+    years_in_sem = {y for _, y in months_in_sem}
+    month_numbers = {m for m, _ in months_in_sem}
+
     payments = session.exec(
         select(Payment).where(
             Payment.payment_type == "spp",
-            Payment.spp_year == year,
+            Payment.spp_year.in_(years_in_sem),
             Payment.status == PaymentStatus.paid,
         )
     ).all()
 
-    # Lookup dict: (student_id, month) -> total_paid
     paid_lookup: Dict[tuple, float] = {}
     for p in payments:
-        if p.student_id and p.spp_month and p.spp_month in months_range:
-            key = (p.student_id, p.spp_month)
+        if p.student_id and p.spp_month and p.spp_month in month_numbers and p.spp_year:
+            key = (p.student_id, p.spp_month, p.spp_year)
             paid_lookup[key] = paid_lookup.get(key, 0.0) + float(p.amount)
-
-    # Lookup setting nominal SPP default
-    latest_setting = session.exec(select(SppSetting).order_by(SppSetting.id.desc())).first()
-    default_nominal = float(latest_setting.monthly_nominal) if latest_setting else 500000.0
 
     grid_data = []
     for student in students:
         months_data = []
-        for m in months_range:
-            amount_paid = paid_lookup.get((student.id, m), 0.0)
-            if amount_paid >= default_nominal:
+        for month, year in months_in_sem:
+            amount_paid = paid_lookup.get((student.id, month, year), 0.0)
+            if amount_paid >= nominal:
                 status = "paid"
             elif amount_paid > 0:
                 status = "partial"
@@ -109,7 +133,8 @@ def get_spp_grid(session: Session, year: int, semester: int) -> List[Dict[str, A
                 status = "unpaid"
 
             months_data.append({
-                "month": m,
+                "month": month,
+                "year": year,
                 "status": status,
                 "amount_paid": amount_paid,
             })
@@ -118,6 +143,8 @@ def get_spp_grid(session: Session, year: int, semester: int) -> List[Dict[str, A
             "student_id": student.id,
             "student_name": student.full_name,
             "nis": student.nis,
+            "grade": student.grade,
+            "academic_year": ay.name,
             "months": months_data,
         })
 

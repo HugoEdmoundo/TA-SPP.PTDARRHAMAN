@@ -71,7 +71,7 @@ export const StudentHistoryPage: React.FC = () => {
 
   const handleOpenReceipt = (item: any) => {
     if (!selectedStudent) return;
-    const mockReceipt: Receipt = {
+    const mockReceipt = {
       id: `rcp-${item.id}`,
       receipt_number: item.receipt_number,
       verification_code: `VER-PTD-${item.id}`,
@@ -90,14 +90,14 @@ export const StudentHistoryPage: React.FC = () => {
         items: [{ id: `itm-${item.id}`, payment_id: String(item.id), item_type: item.type, title: item.title, nominal: item.amount }]
       },
       is_void: item.status === 'VOID'
-    };
+    } as unknown as Receipt;
     setSelectedReceipt(mockReceipt);
   };
 
   const filteredStudents = studentsList.filter(s => 
-    s.name.toLowerCase().includes(searchStudent.toLowerCase()) ||
+    (s.name || '').toLowerCase().includes(searchStudent.toLowerCase()) ||
     s.nis.includes(searchStudent) ||
-    s.grade.toLowerCase().includes(searchStudent.toLowerCase())
+    (s.grade || '').toLowerCase().includes(searchStudent.toLowerCase())
   );
 
   const filteredHistory = historyData.filter(item => {

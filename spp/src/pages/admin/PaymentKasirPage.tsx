@@ -27,7 +27,7 @@ export const PaymentKasirPage: React.FC = () => {
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
   const [paymentType, setPaymentType] = useState<'spp' | 'non_spp' | 'event'>('spp');
   const [sppMonth, setSppMonth] = useState<number>(new Date().getMonth() + 1);
-  const [sppYear, setSppYear] = useState<number>(2026);
+  const [sppYear, setSppYear] = useState<number>(new Date().getFullYear());
   const [selectedBillId, setSelectedBillId] = useState<string>('');
   const [amount, setAmount] = useState<number>(500000);
   const [infaqAmount, setInfaqAmount] = useState<number>(0);
@@ -81,7 +81,7 @@ export const PaymentKasirPage: React.FC = () => {
     setSelectedStudentId(allStudents[0]?.id ? String(allStudents[0].id) : '');
     setPaymentType('spp');
     setSppMonth(new Date().getMonth() + 1);
-    setSppYear(2026);
+    setSppYear(new Date().getFullYear());
     setSelectedBillId('');
     setAmount(500000);
     setInfaqAmount(0);
@@ -437,8 +437,9 @@ export const PaymentKasirPage: React.FC = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="2026">2026</SelectItem>
-                        <SelectItem value="2025">2025</SelectItem>
+                        {[new Date().getFullYear() - 1, new Date().getFullYear(), new Date().getFullYear() + 1].map((y) => (
+                          <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

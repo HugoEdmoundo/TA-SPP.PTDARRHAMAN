@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from pydantic import BaseModel, Field, ConfigDict, EmailStr, field_validator
+
+from app.models import Role
 
 
 class UserBase(BaseModel):
@@ -8,8 +10,16 @@ class UserBase(BaseModel):
     email: Optional[str] = Field(None, max_length=100, example="ahmad@gmail.com")
     full_name: str = Field(..., max_length=100, example="Ahmad Fauzi")
     phone: Optional[str] = Field(None, max_length=20, example="08123456789")
-    role: str = Field(default="wali", example="wali")  # "admin" atau "wali"
+    role: str = Field(default="admin", example="admin")  # admin / superadmin / wali
     is_active: bool = True
+
+    @field_validator("role")
+    @classmethod
+    def validate_role(cls, v: str) -> str:
+        try:
+            return Role(v.lower()).value
+        except ValueError:
+            raise ValueError(f"Role tidak valid. Pilihan: {[r.value for r in Role]}.")
 
 
 class UserCreate(UserBase):
@@ -22,6 +32,16 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = Field(None, max_length=20)
     role: Optional[str] = Field(None, max_length=20)
     is_active: Optional[bool] = None
+
+    @field_validator("role")
+    @classmethod
+    def validate_role(cls, v):
+        if v is None:
+            return v
+        try:
+            return Role(v.lower()).value
+        except ValueError:
+            raise ValueError(f"Role tidak valid. Pilihan: {[r.value for r in Role]}.")
 
 
 class UserResetPassword(BaseModel):

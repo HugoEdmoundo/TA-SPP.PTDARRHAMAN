@@ -18,9 +18,17 @@ from decimal import Decimal
 from enum import Enum
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, String
 
 
 # ─── Enums ───────────────────────────────────────────────────
+
+class Role(str, Enum):
+    """Role pengguna sistem — selalu disimpan lowercase di DB."""
+    superadmin = "superadmin"
+    admin = "admin"
+    wali = "wali"
+
 
 class BillType(str, Enum):
     spp = "spp"          # Digunakan untuk referensi virtual atau tipe
@@ -125,7 +133,7 @@ class User(SQLModel, table=True):
     hashed_password: str
     full_name: str = Field(max_length=100)
     phone: Optional[str] = Field(default=None, max_length=20)
-    role: str = Field(default="admin", max_length=20)  # "admin", "wali"
+    role: Role = Field(default=Role.admin, max_length=20, sa_column=Column(String(20), nullable=False))
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -144,6 +152,7 @@ class Student(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     nis: str = Field(unique=True, index=True, max_length=20)
     full_name: str = Field(max_length=100)
+    grade: Optional[str] = Field(default=None, max_length=20)  # Kelas, e.g. "VII-A"
     gender: Optional[str] = Field(default=None, max_length=10)
     birth_place: Optional[str] = Field(default=None, max_length=100)
     birth_date: Optional[date] = Field(default=None)

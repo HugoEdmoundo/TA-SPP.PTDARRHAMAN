@@ -1,23 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Button, EmptyState, Spinner, Modal, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Card, Button, EmptyState, Spinner, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { api } from '../../api/client';
-import { CreditCard, Plus, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { CreditCard, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import type { AcademicYear } from '../../types';
+import { academicYearMonths, monthName } from '../../utils/academicYear';
 
 export const SppGridPage: React.FC = () => {
-  const { success, error: toastError } = useToast();
+  const { error: toastError } = useToast();
 
   const [gridData, setGridData] = useState<any[]>([]);
+  const [academicYearsList, setAcademicYearsList] = useState<AcademicYear[]>([]);
+  const [academicYearId, setAcademicYearId] = useState<number | undefined>(undefined);
+  const [semester, setSemester] = useState<1 | 2>(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [year, setYear] = useState<number>(2026);
-  const [semester, setSemester] = useState<number>(1);
-  const [showMassModal, setShowMassModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    api
+      .get('/settings/academic-years')
+      .then((res) => {
+        const list: AcademicYear[] = res.data || [];
+        setAcademicYearsList(list);
+        const active = list.find((a) => a.is_active);
+        const current = list.find((a) => a.id === academicYearId);
+        if (!current) {
+          setAcademicYearId(active?.id || list[0]?.id);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const selectedAy = useMemo(
+    () => academicYearsList.find((a) => a.id === academicYearId) || null,
+    [academicYearsList, academicYearId]
+  );
+
+  const months = useMemo(
+    () => (selectedAy ? academicYearMonths(selectedAy, semester) : []),
+    [selectedAy, semester]
+  );
 
   const fetchGrid = async () => {
+    if (!academicYearId) return;
     setIsLoading(true);
     try {
-      const res = await api.get(`/spp/grid?year=${year}&semester=${semester}`);
+      const res = await api.get(`/spp/grid?academic_year_id=${academicYearId}&semester=${semester}`);
       setGridData(res.data || []);
     } catch (err: any) {
       toastError('Gagal Memuat Grid SPP', err?.response?.data?.detail || 'Terjadi kesalahan koneksi.');
@@ -27,22 +54,10 @@ export const SppGridPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchGrid();
-  }, [year, semester]);
-
-  const months = semester === 1 
-    ? [{ num: 7, name: 'Juli' }, { num: 8, name: 'Agustus' }, { num: 9, name: 'September' }, { num: 10, name: 'Oktober' }, { num: 11, name: 'November' }, { num: 12, name: 'Desember' }]
-    : [{ num: 1, name: 'Januari' }, { num: 2, name: 'Februari' }, { num: 3, name: 'Maret' }, { num: 4, name: 'April' }, { num: 5, name: 'Mei' }, { num: 6, name: 'Juni' }];
-
-  const handleGenerateMass = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setShowMassModal(false);
-      success('Tagihan SPP Diaktifkan', `Tagihan SPP semester ${semester} tahun ${year} aktif secara virtual untuk seluruh santri.`);
+    if (academicYearId !== undefined) {
       fetchGrid();
-    }, 600);
-  };
+    }
+  }, [academicYearId, semester]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -55,32 +70,34 @@ export const SppGridPage: React.FC = () => {
             </h2>
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <p className="text-xs text-slate mt-1">Pantau status pembayaran bulanan seluruh santri secara mudah dan cepat per kelas atau semester.</p>
+            <p className="text-xs text-slate mt-1">Pantau status pembayaran bulanan seluruh santri secara mudah dan cepat per tahun ajaran atau semester.</p>
           </div>
           <div className="flex gap-2 items-center shrink-0">
             <Button variant="outline" size="sm" leftIcon={<RefreshCw className="w-4 h-4" />} onClick={fetchGrid}>
               Refresh Grid
             </Button>
-            <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={() => setShowMassModal(true)}>
-              Buat Tagihan Massal
-            </Button>
           </div>
         </div>
 
-        {/* Filters Year & Semester */}
+        {/* Filters Academic Year & Semester */}
         <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-xs font-bold text-obsidian">Tahun SPP:</span>
+            <span className="text-xs font-bold text-obsidian">Tahun Ajaran:</span>
             <Select
-              value={year != null ? String(year) : undefined}
-              onValueChange={(v) => setYear(Number(v))}
+              value={academicYearId != null ? String(academicYearId) : undefined}
+              onValueChange={(v) => setAcademicYearId(Number(v))}
             >
               <SelectTrigger className="font-semibold text-xs">
-                <SelectValue placeholder="Pilih tahun..." />
+                <SelectValue placeholder="Pilih tahun ajaran..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="2026">2026</SelectItem>
-                <SelectItem value="2025">2025</SelectItem>
+                {academicYearsList.map((ay) => (
+                  <SelectItem key={ay.id} value={String(ay.id)}>
+                    {ay.name}
+                    {ay.is_active ? ' (Aktif)' : ''}
+                  </SelectItem>
+                ))}
+                {academicYearsList.length === 0 && <SelectItem value="0">Memuat...</SelectItem>}
               </SelectContent>
             </Select>
           </div>
@@ -111,7 +128,7 @@ export const SppGridPage: React.FC = () => {
         <Card variant="glass" padding="lg">
           <EmptyState
             title="Data SPP Kosong"
-            description="Belum ada data santri aktif untuk ditampilkan dalam grid SPP ini. Silakan daftarkan santri terlebih dahulu di menu Data Siswa."
+            description="Belum ada data santri aktif pada tahun ajaran ini. Silakan daftarkan santri terlebih dahulu di menu Data Siswa."
 
           />
         </Card>
@@ -124,7 +141,9 @@ export const SppGridPage: React.FC = () => {
                   <th className="p-3 pl-5 min-w-[180px]">Santri / NIS</th>
                   <th className="p-3">Kelas / Tahun</th>
                   {months.map((m) => (
-                    <th key={m.num} className="p-3 text-center min-w-[100px]">{m.name}</th>
+                    <th key={`${m.month}-${m.year}`} className="p-3 text-center min-w-[100px]">
+                      {monthName(m.month)} {m.year}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -135,17 +154,25 @@ export const SppGridPage: React.FC = () => {
                       <div>{row.student_name || row.full_name || 'Santri'}</div>
                       <span className="text-[10px] font-mono text-slate font-normal">NIS: {row.nis}</span>
                     </td>
-                    <td className="p-3 font-semibold text-slate">{row.academic_year || '2025/2026'}</td>
-                    {months.map((m) => {
-                      const monthData = row.months ? row.months[String(m.num)] || row.months[m.num] : null;
-                      const status = monthData?.status || 'UNPAID';
+                    <td className="p-3 font-semibold text-slate">
+                      {row.grade || '-'}
+                      <span className="block text-[10px] font-normal">{row.academic_year || ''}</span>
+                    </td>
+                    {months.map((m, monthIdx) => {
+                      const monthData = row.months?.[monthIdx];
+                      const status = monthData?.status || 'unpaid';
                       const isPaid = status === 'paid' || status === 'PAID' || status === 'lunas' || status === 'LUNAS';
-                      
+                      const isPartial = status === 'partial' || status === 'PARTIAL';
+
                       return (
-                        <td key={m.num} className="p-3 text-center">
+                        <td key={`${m.month}-${m.year}`} className="p-3 text-center">
                           {isPaid ? (
                             <span className="inline-flex items-center justify-center gap-1 px-2 py-1 rounded-lg bg-emerald-light/60 text-emerald-primary font-bold text-[10px]">
                               <CheckCircle2 className="w-3 h-3" /> LUNAS
+                            </span>
+                          ) : isPartial ? (
+                            <span className="inline-flex items-center justify-center gap-1 px-2 py-1 rounded-lg bg-sky-50 text-sky-700 font-bold text-[10px] border border-sky-200/50">
+                              <AlertCircle className="w-3 h-3" /> CICILAN
                             </span>
                           ) : (
                             <span className="inline-flex items-center justify-center gap-1 px-2 py-1 rounded-lg bg-amber-50 text-amber-800 font-bold text-[10px] border border-amber-200/50">
@@ -162,34 +189,6 @@ export const SppGridPage: React.FC = () => {
           </div>
         </Card>
       )}
-
-      {/* Modal Mass Generate */}
-      <Modal
-        isOpen={showMassModal}
-        onClose={() => setShowMassModal(false)}
-        title={
-          <>
-            <Plus className="w-5 h-5 text-emerald-primary" />
-            <span>Aktivasi Tagihan SPP Massal</span>
-          </>
-        }
-        maxWidth="md"
-      >
-            <p className="text-xs text-slate mb-4">
-              Tagihan bulanan otomatis berlaku untuk seluruh santri aktif sesuai nominal standar pesantren.
-            </p>
-            
-            <div className="p-3.5 rounded-2xl bg-emerald-light/30 border border-emerald-primary/20 text-xs text-obsidian font-semibold mb-4">
-              ✨ Konfirmasi aktivasi notifikasi tagihan SPP untuk Semester {semester} Tahun {year}.
-            </div>
-
-            <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
-              <Button type="button" variant="outline" size="sm" onClick={() => setShowMassModal(false)}>Batal</Button>
-              <Button type="button" variant="primary" size="sm" isLoading={isSubmitting} onClick={handleGenerateMass}>
-                Aktifkan Sekarang
-              </Button>
-            </div>
-      </Modal>
     </div>
   );
 };

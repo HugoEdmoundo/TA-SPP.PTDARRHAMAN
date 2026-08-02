@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User, Role } from '../types';
 import { api } from '../api/client';
+import { normalizeRole } from '../utils/role';
 
 interface AuthContextType {
   user: User | null;
@@ -25,8 +26,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (storedToken && storedUser) {
       try {
+        const parsed = JSON.parse(storedUser);
+        parsed.role = normalizeRole(parsed.role);
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        setUser(parsed);
       } catch {
         localStorage.removeItem('spp_token');
         localStorage.removeItem('spp_user');
@@ -41,14 +44,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Real Live API Authentication
       const res = await api.post('/auth/login', { username, password });
       const data = res.data;
-      const upperRole = String(data.role || 'ADMIN').toUpperCase();
+      const upperRole = normalizeRole(data.role);
 
       const loggedInUser: User = {
-        id: String(data.user_id),
+        id: Number(data.user_id),
         name: data.full_name || data.username,
+        full_name: data.full_name || data.username,
+        username: data.username,
         email: data.username,
         role: upperRole as Role,
-        phone: '',
+        phone: data.phone || '',
       };
 
       setUser(loggedInUser);
@@ -74,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const hasRole = (roles: Role[]) => {
     if (!user) return false;
-    return roles.includes(user.role);
+    return roles.includes(normalizeRole(user.role));
   };
 
   return (

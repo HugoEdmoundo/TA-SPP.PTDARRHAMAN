@@ -3,6 +3,7 @@ import { Card, Button, EmptyState, Spinner, formatRupiah, Select, SelectTrigger,
 import { useToast } from '../../components/ui/ToastContext';
 import { api } from '../../api/client';
 import { FileBarChart, FileSpreadsheet, FileText, RefreshCw } from 'lucide-react';
+import type { AcademicYear } from '../../types';
 
 export const ReportsPage: React.FC = () => {
   const { success, error: toastError } = useToast();
@@ -14,7 +15,21 @@ export const ReportsPage: React.FC = () => {
   // Filters
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
   const [year, setYear] = useState<number>(2026);
-  const [semester, setSemester] = useState<number>(1);
+  const [semester, setSemester] = useState<1 | 2>(1);
+  const [academicYearsList, setAcademicYearsList] = useState<AcademicYear[]>([]);
+  const [academicYearId, setAcademicYearId] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    api
+      .get('/settings/academic-years')
+      .then((res) => {
+        const list: AcademicYear[] = res.data || [];
+        setAcademicYearsList(list);
+        const active = list.find((a) => a.is_active);
+        setAcademicYearId((prev) => prev ?? active?.id ?? list[0]?.id);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchReport = async () => {
     setIsLoading(true);
@@ -23,7 +38,7 @@ export const ReportsPage: React.FC = () => {
       if (reportType === 'monthly') {
         url = `/reports/monthly?month=${month}&year=${year}&format=json`;
       } else if (reportType === 'spp-semester') {
-        url = `/reports/spp-semester?year=${year}&semester=${semester}&format=json`;
+        url = `/reports/spp-semester?academic_year_id=${academicYearId}&semester=${semester}&format=json`;
       } else if (reportType === 'infaq') {
         url = `/reports/infaq?year=${year}&format=json`;
       } else if (reportType === 'events') {
@@ -41,14 +56,15 @@ export const ReportsPage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (reportType === 'spp-semester' && academicYearId === undefined) return;
     fetchReport();
-  }, [reportType, month, year, semester]);
+  }, [reportType, month, year, semester, academicYearId]);
 
   const handleDownload = async (format: 'excel' | 'pdf') => {
     try {
       let url = `/reports/${reportType}?format=${format}`;
       if (reportType === 'monthly') url += `&month=${month}&year=${year}`;
-      if (reportType === 'spp-semester') url += `&year=${year}&semester=${semester}`;
+      if (reportType === 'spp-semester') url += `&academic_year_id=${academicYearId}&semester=${semester}`;
       if (reportType === 'infaq') url += `&year=${year}`;
 
       const res = await api.get(url, { responseType: 'blob' });
@@ -146,7 +162,7 @@ export const ReportsPage: React.FC = () => {
             {reportType === 'spp-semester' && (
               <Select
                 value={semester != null ? String(semester) : undefined}
-                onValueChange={(v) => setSemester(Number(v))}
+                onValueChange={(v) => setSemester(Number(v) as 1 | 2)}
               >
                 <SelectTrigger className="font-semibold text-xs">
                   <SelectValue placeholder="Pilih semester..." />
@@ -158,18 +174,38 @@ export const ReportsPage: React.FC = () => {
               </Select>
             )}
 
-            <Select
-              value={year != null ? String(year) : undefined}
-              onValueChange={(v) => setYear(Number(v))}
-            >
-              <SelectTrigger className="font-mono text-xs">
-                <SelectValue placeholder="Pilih tahun..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="2026">Tahun 2026</SelectItem>
-                <SelectItem value="2025">Tahun 2025</SelectItem>
-              </SelectContent>
-            </Select>
+            {reportType === 'spp-semester' ? (
+              <Select
+                value={academicYearId != null ? String(academicYearId) : undefined}
+                onValueChange={(v) => setAcademicYearId(Number(v))}
+              >
+                <SelectTrigger className="font-mono text-xs">
+                  <SelectValue placeholder="Pilih tahun ajaran..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {academicYearsList.map((ay) => (
+                    <SelectItem key={ay.id} value={String(ay.id)}>
+                      {ay.name}
+                      {ay.is_active ? ' (Aktif)' : ''}
+                    </SelectItem>
+                  ))}
+                  {academicYearsList.length === 0 && <SelectItem value="0">Memuat...</SelectItem>}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Select
+                value={year != null ? String(year) : undefined}
+                onValueChange={(v) => setYear(Number(v))}
+              >
+                <SelectTrigger className="font-mono text-xs">
+                  <SelectValue placeholder="Pilih tahun..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2026">Tahun 2026</SelectItem>
+                  <SelectItem value="2025">Tahun 2025</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
       </Card>

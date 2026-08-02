@@ -11,6 +11,12 @@ interface SettingsContextType {
 const rawApiBase = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') ? 'https://ta-spp-ptdarrhaman.vercel.app' : 'http://localhost:8000');
 const API_BASE = rawApiBase.replace(/\/+$/, '');
 
+function currentAcademicYearName(): string {
+  const now = new Date();
+  const startYear = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+  return `${startYear}/${startYear + 1}`;
+}
+
 const DEFAULT_SETTINGS: SchoolSettings = {
   id: 'set-ptdarrahman-01',
   name: 'PTDARRAHMAN',
@@ -20,7 +26,7 @@ const DEFAULT_SETTINGS: SchoolSettings = {
   logo: `${API_BASE}/settings/logo/default`,
   favicon: `${API_BASE}/settings/logo/default`,
   spp_nominal_default: 1500000,
-  academic_year_current: '2025/2026',
+  academic_year_current: currentAcademicYearName(),
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);

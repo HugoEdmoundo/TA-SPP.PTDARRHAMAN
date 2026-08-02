@@ -46,7 +46,8 @@ class BankAccountRead(BankAccountBase):
 # ─── SPP Setting Schemas ─────────────────────────────────────
 
 class SppSettingBase(BaseModel):
-    academic_year: str = Field(..., max_length=10, example="2025/2026")
+    academic_year: Optional[str] = Field(None, max_length=10, example="2025/2026")  # DEPRECATED — gunakan academic_year_id
+    academic_year_id: Optional[int] = Field(None, description="ID tahun ajaran")
     monthly_nominal: Decimal = Field(..., example="350000.00")
     due_day: int = Field(default=10, ge=1, le=31, example=10)
     is_active: bool = True
@@ -61,6 +62,7 @@ class SppSettingCreate(SppSettingBase):
 
 class SppSettingUpdate(BaseModel):
     academic_year: Optional[str] = Field(None, max_length=10)
+    academic_year_id: Optional[int] = None
     monthly_nominal: Optional[Decimal] = None
     due_day: Optional[int] = Field(None, ge=1, le=31)
     is_active: Optional[bool] = None

@@ -430,17 +430,28 @@ def delete_bank_account(
 @router.get("/spp-settings", response_model=List[SppSettingRead])
 def list_spp_settings(session: Session = Depends(get_session)):
     """Menampilkan daftar pengaturan SPP per tahun ajaran."""
-    return session.exec(select(SppSetting).order_by(SppSetting.academic_year.desc())).all()
+    return session.exec(
+        select(SppSetting).order_by(SppSetting.academic_year_id.desc(), SppSetting.id.desc())
+    ).all()
 
 
 @router.post("/spp-settings", response_model=SppSettingRead, status_code=status.HTTP_201_CREATED)
 def create_spp_setting(
-    payload: SppSettingCreate, 
+    payload: SppSettingCreate,
     session: Session = Depends(get_session),
     admin: User = Depends(require_admin),
 ):
     """Membuat pengaturan SPP baru untuk tahun ajaran tertentu."""
-    spp_set = SppSetting.model_validate(payload)
+    data = payload.model_dump()
+    if data.get("academic_year_id"):
+        ay = session.get(AcademicYear, data["academic_year_id"])
+        if ay and not data.get("academic_year"):
+            data["academic_year"] = ay.name
+    elif data.get("academic_year"):
+        ay = session.exec(select(AcademicYear).where(AcademicYear.name == data["academic_year"])).first()
+        if ay:
+            data["academic_year_id"] = ay.id
+    spp_set = SppSetting.model_validate(data)
     session.add(spp_set)
     session.commit()
     session.refresh(spp_set)
@@ -449,8 +460,8 @@ def create_spp_setting(
 
 @router.put("/spp-settings/{id}", response_model=SppSettingRead)
 def update_spp_setting(
-    id: int, 
-    payload: SppSettingUpdate, 
+    id: int,
+    payload: SppSettingUpdate,
     session: Session = Depends(get_session),
     admin: User = Depends(require_admin),
 ):
@@ -458,12 +469,18 @@ def update_spp_setting(
     spp_set = session.get(SppSetting, id)
     if not spp_set:
         raise HTTPException(status_code=404, detail="Pengaturan SPP tidak ditemukan.")
-    
+
     update_data = payload.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(spp_set, key, value)
+
+    if spp_set.academic_year_id and not spp_set.academic_year:
+        ay = session.get(AcademicYear, spp_set.academic_year_id)
+        if ay:
+            spp_set.academic_year = ay.name
+
     spp_set.updated_at = datetime.utcnow()
-    
+
     session.add(spp_set)
     session.commit()
     session.refresh(spp_set)

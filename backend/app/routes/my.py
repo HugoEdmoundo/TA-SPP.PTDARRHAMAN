@@ -4,9 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import User, Student, Bill, Payment, ParentStudent, StudentStatus, PaymentStatus
+from app.models import User, Student, Bill, Payment, ParentStudent, Role, StudentStatus, PaymentStatus
 from app.dependencies import require_wali
 from app.services.spp import get_student_spp_status
+from app.services.ay import get_current_academic_year
 from app.services.payment import create_gateway_checkout_session
 from app.schemas.bills import BillRead
 from app.schemas.payments import GatewayCreateRequest, GatewayCreateResponse
@@ -29,7 +30,7 @@ def get_my_children(
                 "id": s.id,
                 "name": s.full_name,
                 "nis": s.nis,
-                "grade": s.academic_year or "Umum",
+                "grade": s.grade or s.academic_year or "Umum",
             })
     return students_list
 
@@ -37,7 +38,7 @@ def get_my_children(
 @router.get("/bills", response_model=Dict[str, Any])
 def get_my_child_bills(
     child_id: int = Query(..., description="ID siswa/anak yang ingin dilihat tagihannya"),
-    year: int = Query(2025, description="Tahun SPP bulanan yang dicek"),
+    academic_year_id: int = Query(None, description="ID tahun ajaran. Default: tahun ajaran aktif."),
     session: Session = Depends(get_session),
     current_user: User = Depends(require_wali),
 ):
@@ -50,7 +51,7 @@ def get_my_child_bills(
         raise HTTPException(status_code=404, detail="Siswa tidak ditemukan.")
 
     # Verifikasi parent-student linking (wajib terhubung untuk role wali)
-    if current_user.role == "wali":
+    if current_user.role == Role.wali:
         linked_ids = [s.id for s in current_user.students]
         if child_id not in linked_ids:
             raise HTTPException(
@@ -58,8 +59,14 @@ def get_my_child_bills(
                 detail="Akses ditolak: Siswa ini bukan anak yang terhubung dengan akun Wali Anda.",
             )
 
+    if not academic_year_id:
+        ay = get_current_academic_year(session)
+        academic_year_id = ay.id if ay else None
+    if not academic_year_id:
+        raise HTTPException(status_code=404, detail="Tahun ajaran belum tersedia.")
+
     # 1. SPP virtual bills (unpaid / partial)
-    spp_status = get_student_spp_status(session, child_id, year)
+    spp_status = get_student_spp_status(session, child_id, academic_year_id)
     spp_bills = []
     for item in spp_status:
         if item["status"] in ["unpaid", "partial"]:
@@ -69,7 +76,7 @@ def get_my_child_bills(
                 "student_id": child_id,
                 "bill_type": "spp",
                 "label": f"SPP Bulan {item['month']} ({item['year']})",
-                "description": f"Tagihan SPP bulan ke-{item['month']} tahun {item['year']}",
+                "description": f"Tagihan SPP bulan ke-{item['period']} tahun ajaran",
                 "amount": Decimal(str(item["nominal"])),
                 "remaining_amount": rem,
                 "status": item["status"],
@@ -136,7 +143,7 @@ def get_my_child_payments(
     """
     Mengambil riwayat pembayaran untuk siswa/anak tertentu (Wali Only / Admin).
     """
-    if current_user.role == "wali":
+    if current_user.role == Role.wali:
         linked_ids = [s.id for s in current_user.students]
         if child_id not in linked_ids:
             raise HTTPException(
@@ -152,17 +159,14 @@ def get_my_child_payments(
     for p in payments:
         r_num = p.receipt.receipt_number if p.receipt else f"PAY-{p.id}"
         is_void = (p.receipt.is_void if p.receipt else False) or (p.status in ("refunded", "failed", "cancelled"))
-        ver_code = p.receipt.verification_code if p.receipt else f"PTD-VER-{p.id}"
         result.append({
             "id": p.id,
-            "invoice_number": p.invoice_number,
             "receipt_number": r_num,
-            "verification_code": ver_code,
             "payment_type": p.payment_type,
             "amount": float(p.amount),
             "infaq_amount": float(p.infaq_amount),
             "total_amount": float(p.total_amount),
-            "method": p.channel or "transfer",
+            "method": p.method or "transfer",
             "status": "VOID" if is_void else "PAID",
             "created_at": p.created_at.isoformat() if p.created_at else None,
         })

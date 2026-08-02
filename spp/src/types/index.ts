@@ -1,32 +1,43 @@
-export type Role = 'ADMIN' | 'SUPERADMIN' | string;
+export type Role = 'ADMIN' | 'SUPERADMIN' | 'WALI' | string;
 
 export interface User {
-  id: string;
-  name: string;
-  full_name?: string;
-  username?: string;
-  email: string;
+  id: number;
+  username: string;
+  email?: string | null;
+  full_name: string;
+  phone?: string | null;
   role: Role;
-  phone?: string;
-  avatar_url?: string;
-  created_at?: string;
   is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  // Legacy / optional aliases (backend returns full_name)
+  name?: string;
+  avatar_url?: string;
 }
 
 export interface Student {
-  id: string;
+  id: number;
   nis: string;
-  nisn?: string;
-  name: string;
-  full_name?: string;
-  grade: string; // e.g. "X-A", "XI-IPA-1", "XII-IPS-2"
-  class_name?: string;
-  academic_year?: string; // Deprecated in backend, kept for backward compat
-  academic_year_id?: number;
-  status: 'active' | 'graduated' | 'transferred' | 'dropout' | 'inactive' | 'ACTIVE' | 'GRADUATED' | 'DROPPED_OUT' | string;
+  full_name: string;
+  grade?: string | null; // e.g. "X-A", "XI-IPA-1", "XII-IPS-2"
+  gender?: string | null;
+  birth_place?: string | null;
+  birth_date?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  academic_year?: string | null; // Deprecated in backend, kept for backward compat
+  academic_year_id?: number | null;
+  photo_url?: string | null;
+  is_active: boolean;
+  status: string | null;
+  created_at: string;
+  updated_at?: string;
   parent_id?: string;
   parent?: Parent;
-  created_at?: string;
+  // Legacy / optional aliases
+  name?: string;
+  class_name?: string;
+  nisn?: string;
 }
 
 export interface Parent {
@@ -151,31 +162,76 @@ export interface PaymentItem {
 }
 
 export interface Payment {
-  id: string;
-  invoice_number: string;
-  user_id: string;
-  user?: User;
-  student_id?: string;
-  student?: Student;
-  total_amount: number;
-  payment_method: PaymentMethod;
+  id: number;
+  student_id: number;
+  bill_id?: number | null;
+  payment_type: string;
+  spp_month?: number | null;
+  spp_year?: number | null;
+  amount: number | string;
+  infaq_amount: number | string;
+  total_amount: number | string;
+  method: string;
+  channel: string;
+  gateway_transaction_id?: string | null;
+  notes?: string | null;
   status: PaymentStatus;
-  payment_url?: string; // For Gateway
-  qr_code?: string; // For QRIS
-  proof_url?: string; // For Manual Transfer
-  items: PaymentItem[];
   created_at: string;
+  receipt?: Receipt | null;
+  // Legacy / optional aliases
+  invoice_number?: string;
+  user_id?: string;
+  user?: User;
+  student?: Student;
+  payment_method?: PaymentMethod;
+  payment_url?: string;
+  qr_code?: string;
+  proof_url?: string;
+  items?: PaymentItem[];
   paid_at?: string;
 }
 
+export interface SppSetting {
+  id: number;
+  academic_year?: string | null;
+  academic_year_id?: number | null;
+  monthly_nominal: number | string;
+  due_day: number;
+  is_active: boolean;
+  effective_from?: string | null;
+  effective_to?: string | null;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SppStatusItem {
+  period: number;
+  month: number;
+  year: number;
+  nominal: number;
+  total_paid: number;
+  status: 'paid' | 'partial' | 'unpaid' | string;
+}
+
+export interface SppGridRow {
+  student_id: number;
+  student_name: string;
+  nis: string;
+  grade: string | null;
+  academic_year: string;
+  months: { month: number; year: number; status: string; amount_paid: number }[];
+}
+
 export interface Receipt {
-  id: string;
+  id: number;
   receipt_number: string;
-  payment_id: string;
+  payment_id: number;
   payment?: Payment;
-  pdf_url?: string;
-  verification_code: string;
-  is_void?: boolean;
+  pdf_url?: string | null;
+  verification_code?: string;
+  is_void: boolean;
+  void_reason?: string | null;
   created_at: string;
 }
 
