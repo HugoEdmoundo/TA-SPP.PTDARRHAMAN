@@ -51,7 +51,7 @@ export const ReceiptShareCard: React.FC<ReceiptShareCardProps> = ({
 
   return (
     <div className={cn('flex flex-col items-center max-w-sm w-full mx-auto', className)}>
-      <div className="relative w-full select-none overflow-hidden rounded-2xl border-2 border-primary/30 bg-white shadow-2xl print:border-none print:shadow-none">
+      <div className="print-area relative w-full select-none overflow-hidden rounded-2xl border-2 border-primary/30 bg-white shadow-2xl print:border-none print:shadow-none">
         <div className="relative overflow-hidden bg-primary p-6 pb-8 text-center text-white">
           <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-xl" />
           <div className="pointer-events-none absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-accent/20 blur-xl" />

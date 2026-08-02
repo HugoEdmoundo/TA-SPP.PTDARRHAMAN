@@ -13,8 +13,9 @@ export const ReportsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Filters
+  const currentYear = new Date().getFullYear();
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
-  const [year, setYear] = useState<number>(2026);
+  const [year, setYear] = useState<number>(currentYear);
   const [semester, setSemester] = useState<1 | 2>(1);
   const [academicYearsList, setAcademicYearsList] = useState<AcademicYear[]>([]);
   const [academicYearId, setAcademicYearId] = useState<number | undefined>(undefined);
@@ -88,6 +89,14 @@ export const ReportsPage: React.FC = () => {
     { num: 7, name: 'Juli' }, { num: 8, name: 'Agustus' }, { num: 9, name: 'September' },
     { num: 10, name: 'Oktober' }, { num: 11, name: 'November' }, { num: 12, name: 'Desember' }
   ];
+
+  const yearsFromAcademic = academicYearsList
+    .map((a) => a.name.match(/(20\d{2})/)?.[1])
+    .filter(Boolean)
+    .map(Number);
+  const yearOptions = Array.from(new Set([currentYear - 1, currentYear, currentYear + 1, ...yearsFromAcademic]))
+    .sort((a, b) => b - a)
+    .slice(0, 8);
 
   return (
     <div className="flex flex-col gap-6">
@@ -201,8 +210,9 @@ export const ReportsPage: React.FC = () => {
                   <SelectValue placeholder="Pilih tahun..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="2026">Tahun 2026</SelectItem>
-                  <SelectItem value="2025">Tahun 2025</SelectItem>
+                  {yearOptions.map((y) => (
+                    <SelectItem key={y} value={String(y)}>Tahun {y}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             )}

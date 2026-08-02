@@ -11,7 +11,6 @@ import {
   Clock,
   FileText,
   Settings,
-  Send,
   RefreshCw
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +19,7 @@ import { api } from '../../api/client';
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const { success, error: toastError } = useToast();
+  const { error: toastError } = useToast();
 
   const [dashboardData, setDashboardData] = useState<any | null>(null);
   const [recentPayments, setRecentPayments] = useState<any[]>([]);
@@ -199,7 +198,9 @@ export const DashboardPage: React.FC = () => {
                         {recentPayments.map((p: any) => (
                           <tr key={p.id} className="hover:bg-white/70 transition-colors">
                             <td className="p-3.5 pl-5 font-mono font-bold text-obsidian">{p.receipt?.receipt_number || `PMT-${p.id}`}</td>
-                            <td className="p-3.5 font-bold text-obsidian">Santri ID {p.student_id}</td>
+                            <td className="p-3.5 font-bold text-obsidian">
+                              {p.student?.full_name || p.student?.name || `Santri ID ${p.student_id}`}
+                            </td>
                             <td className="p-3.5 uppercase">{p.payment_type}</td>
                             <td className="p-3.5 font-mono font-bold text-emerald-primary">{formatRupiah(Number(p.amount))}</td>
                             <td className="p-3.5 uppercase">{p.method}</td>
@@ -244,10 +245,15 @@ export const DashboardPage: React.FC = () => {
                     <div>
                       <h4 className="font-bold text-rose-dark text-sm">{studentsUnpaid} Santri Belum Bayar SPP</h4>
                       <p className="text-xs text-slate mt-1 leading-relaxed">
-                        Kirim pesan pengingat WhatsApp otomatis kepada parents santri penunggak secara massal.
+                        Kewajiban SPP bulan berjalan masih belum diselesaikan oleh {studentsUnpaid} santri. Cek detailnya di menu Log Transaksi Santri.
                       </p>
-                      <Button variant="danger" size="sm" leftIcon={<Send className="w-3.5 h-3.5" />} className="mt-3 font-bold text-xs" onClick={() => success('Pengingat Terkirim', `Pesan pengingat WhatsApp telah dikirim ke ${studentsUnpaid} parents santri.`)}>
-                        Kirim Reminder WA ({studentsUnpaid} Parents)
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3 font-bold text-xs"
+                        onClick={() => navigate('/admin/student-history')}
+                      >
+                        Lihat Log Transaksi
                       </Button>
                     </div>
                   </div>

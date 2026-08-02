@@ -96,7 +96,7 @@ export const AdminLayout: React.FC = () => {
   const mobileTabItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true, isAction: false },
     { label: 'SPP', path: '/admin/spp', icon: CreditCard, exact: false, isAction: false },
-    { label: 'Bayar', path: '/admin/payment', icon: Wallet, exact: false, isAction: false, badge: '3' },
+    { label: 'Bayar', path: '/admin/payment', icon: Wallet, exact: false, isAction: false },
     { label: 'Riwayat', path: '/admin/student-history', icon: History, exact: false, isAction: false },
     { label: 'Semua Menu', path: '#', icon: Grid, exact: false, isAction: true, badge: 'NEW' },
   ];
@@ -119,7 +119,7 @@ export const AdminLayout: React.FC = () => {
     item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex font-sans select-none">
+    <div className="min-h-screen bg-background text-foreground flex font-sans">
       <aside
         className={cn(
           'hidden md:flex fixed top-0 left-0 z-40 h-screen flex-col shrink-0 border-r bg-card transition-all duration-300',

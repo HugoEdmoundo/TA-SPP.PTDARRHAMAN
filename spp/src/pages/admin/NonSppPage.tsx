@@ -299,6 +299,7 @@ export const NonSppPage: React.FC = () => {
                             disabled={isPaid || isPartial}
                             className={`p-1.5 rounded-lg transition-colors ${isPaid || isPartial ? 'bg-slate/5 text-slate/30 cursor-not-allowed' : 'bg-slate/5 text-slate hover:text-emerald-primary hover:bg-emerald-light/50'}`}
                             title={isPaid || isPartial ? "Tagihan sudah dibayar, tidak bisa diubah" : "Edit Tagihan"}
+                            aria-label={isPaid || isPartial ? "Tagihan sudah dibayar, tidak bisa diubah" : "Edit tagihan"}
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
@@ -307,6 +308,7 @@ export const NonSppPage: React.FC = () => {
                             disabled={isPaid || isPartial}
                             className={`p-1.5 rounded-lg transition-colors ${isPaid || isPartial ? 'bg-slate/5 text-slate/30 cursor-not-allowed' : 'bg-slate/5 text-slate hover:text-rose-danger hover:bg-rose-light/50'}`}
                             title={isPaid || isPartial ? "Tagihan sudah dibayar, tidak bisa dihapus" : "Hapus Tagihan"}
+                            aria-label={isPaid || isPartial ? "Tagihan sudah dibayar, tidak bisa dihapus" : "Hapus tagihan"}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>

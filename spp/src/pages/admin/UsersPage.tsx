@@ -156,51 +156,54 @@ export const UsersPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-obsidian tracking-tight flex items-center gap-2">
-            <ShieldAlert className="w-7 h-7 text-purple-600" />
-            Manajemen Pengguna (Superadmin)
-          </h1>
-          <p className="text-sm text-slate font-medium mt-1">
-            Kelola akses login akun admin &amp; superadmin. Akun parents dikelola di menu Data Parents.
-          </p>
+    <div className="flex flex-col gap-6">
+      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
+          <div>
+            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
+              <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 shrink-0" />
+              <span>Manajemen Pengguna</span>
+            </h2>
+            <p className="text-xs text-slate mt-1">
+              Kelola akses login akun admin &amp; superadmin. Akun parents dikelola di menu Data Parents.
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            size="sm"
+            leftIcon={<Plus className="w-4 h-4" />}
+            onClick={() => {
+              setFormData({ username: '', full_name: '', password: '', role: 'admin', is_active: true });
+              setShowAddModal(true);
+            }}
+            className="shrink-0 w-full sm:w-auto justify-center bg-purple-600 hover:bg-purple-700 border-none"
+          >
+            Buat Akun Baru
+          </Button>
         </div>
-        <Button
-          variant="primary"
-          leftIcon={<Plus className="w-4 h-4" />}
-          onClick={() => {
-            setFormData({ username: '', full_name: '', password: '', role: 'admin', is_active: true });
-            setShowAddModal(true);
-          }}
-          className="shadow-md bg-purple-600 hover:bg-purple-700 border-none"
-        >
-          Buat Akun Baru
-        </Button>
-      </div>
 
-      <Card variant="glass" padding="md" className="flex flex-col sm:flex-row gap-4 items-center">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <Input
-            type="text"
-            placeholder="Cari username atau nama lengkap..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 text-sm font-semibold text-obsidian"
-          />
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1 w-full">
+            <Search className="w-4 h-4 text-slate/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Input
+              type="text"
+              placeholder="Cari username atau nama lengkap..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 text-xs"
+            />
+          </div>
+          <Select value={filterRole || '__all__'} onValueChange={(v) => setFilterRole(v === '__all__' ? '' : v)}>
+            <SelectTrigger className="w-full sm:w-48 font-bold text-xs">
+              <SelectValue placeholder="Semua Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">Semua Role</SelectItem>
+              <SelectItem value="superadmin">Superadmin</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={filterRole || '__all__'} onValueChange={(v) => setFilterRole(v === '__all__' ? '' : v)}>
-          <SelectTrigger className="w-full sm:w-48 font-bold">
-            <SelectValue placeholder="Semua Role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="__all__">Semua Role</SelectItem>
-            <SelectItem value="superadmin">Superadmin</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-          </SelectContent>
-        </Select>
       </Card>
 
       {isLoading ? (
@@ -237,6 +240,7 @@ export const UsersPage: React.FC = () => {
                     onClick={() => { setSelectedUser(u); setShowResetModal(true); }}
                     className="p-2 rounded-lg bg-gold-bg text-gold-dark hover:bg-gold-accent hover:text-white transition-colors"
                     title="Reset Password"
+                    aria-label={`Reset password ${u.full_name || u.name}`}
                   >
                     <Key className="w-4 h-4" />
                   </button>
@@ -244,6 +248,7 @@ export const UsersPage: React.FC = () => {
                     onClick={() => openEditModal(u)}
                     className="p-2 rounded-lg bg-emerald-light text-emerald-primary hover:bg-emerald-primary hover:text-white transition-colors"
                     title="Edit Pengguna"
+                    aria-label={`Edit pengguna ${u.full_name || u.name}`}
                   >
                     <Edit className="w-4 h-4" />
                   </button>
@@ -252,6 +257,7 @@ export const UsersPage: React.FC = () => {
                     disabled={u.is_active === false || u.id === user?.id}
                     className="p-2 rounded-lg bg-rose-50 text-rose-danger hover:bg-rose-danger hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Nonaktifkan"
+                    aria-label={`Nonaktifkan pengguna ${u.full_name || u.name}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

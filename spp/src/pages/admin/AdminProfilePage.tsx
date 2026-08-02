@@ -3,6 +3,7 @@ import { Card, Badge, Button, Input } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/ui/ToastContext';
 import { normalizeRole } from '../../utils/role';
+import { api } from '../../api/client';
 import { User, ShieldCheck, Key, Mail, Phone, Lock, AlertCircle } from 'lucide-react';
 
 export const AdminProfilePage: React.FC = () => {
@@ -18,16 +19,25 @@ export const AdminProfilePage: React.FC = () => {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  const handleUpdateProfile = (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.id) return;
     setIsUpdatingProfile(true);
-    setTimeout(() => {
-      setIsUpdatingProfile(false);
+    try {
+      await api.put(`/users/${user.id}`, {
+        full_name: fullName,
+        email,
+        phone,
+      });
       success('Profil Diperbarui', 'Informasi akun admin Anda berhasil disimpan ke sistem.');
-    }, 800);
+    } catch (err: any) {
+      toastError('Gagal Menyimpan Profil', err?.response?.data?.detail || 'Terjadi kesalahan saat menyimpan.');
+    } finally {
+      setIsUpdatingProfile(false);
+    }
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPassword || !newPassword || !confirmPassword) {
       toastError('Gagal Ganti Password', 'Harap isi seluruh kolom kata sandi.');
@@ -43,13 +53,20 @@ export const AdminProfilePage: React.FC = () => {
     }
 
     setIsChangingPassword(true);
-    setTimeout(() => {
-      setIsChangingPassword(false);
+    try {
+      if (!user?.id) throw new Error('Sesi tidak tersedia');
+      await api.post(`/users/${user.id}/reset-password`, {
+        new_password: newPassword,
+      });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       success('Password Berhasil Diganti', 'Kata sandi akun admin Anda telah diperbarui. Gunakan kata sandi baru untuk login berikutnya.');
-    }, 1000);
+    } catch (err: any) {
+      toastError('Gagal Ganti Password', err?.response?.data?.detail || 'Terjadi kesalahan saat mengganti kata sandi.');
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   return (
