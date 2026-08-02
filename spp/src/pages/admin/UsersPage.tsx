@@ -43,7 +43,7 @@ export const UsersPage: React.FC = () => {
       if (filterRole) url += `role=${encodeURIComponent(filterRole)}&`;
       
       const res = await api.get(url);
-      setUsersList(res.data || []);
+      setUsersList((res.data || []).filter((u: any) => u.role !== 'wali'));
     } catch (err: any) {
       toastError('Gagal Memuat Data', err.response?.data?.detail || err.message);
     } finally {
@@ -156,7 +156,7 @@ export const UsersPage: React.FC = () => {
             Manajemen Pengguna (Superadmin)
           </h1>
           <p className="text-sm text-slate font-medium mt-1">
-            Kelola akses login untuk seluruh ekosistem aplikasi PTDARRAHMAN.
+            Kelola akses login akun admin &amp; superadmin. Akun wali murid dikelola di menu Data Wali.
           </p>
         </div>
         <Button

@@ -5,7 +5,7 @@ Usage:
     python -m app.seed_admin                          # Seed seluruh 3 akun default (superadmin, admin, wali)
     python -m app.seed_admin --role superadmin --username superadmin --password superpass123
     python -m app.seed_admin --role admin --username admin --password securepass123
-    python -m app.seed_admin --role wali --username wali_test --password wali123
+    python -m app.seed_admin --role wali --username wali_murid --password wali123
 
 Jalankan sekali saat pertama kali deploy ke Supabase/PostgreSQL.
 """
@@ -44,7 +44,7 @@ def seed_all_defaults():
     print("=== Memulai Seeding Akun Default PTDARRAHMAN ===")
     seed_user("superadmin", "superadmin123", "Superadmin PTDARRAHMAN", Role.superadmin)
     seed_user("admin", "admin123", "Administrator PTDARRAHMAN", Role.admin)
-    seed_user("wali_demo", "wali123", "H. Ahmad Syafi'i (Wali Santri)", Role.wali)
+    seed_user("wali_murid", "wali123", "H. Ahmad Syafi'i (Wali Murid)", Role.wali)
     print("=== Seeding Selesai ===")
 
 
