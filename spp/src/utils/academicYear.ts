@@ -36,6 +36,12 @@ export function academicYearStartYear(ay: AcademicYear): number {
   return new Date().getFullYear();
 }
 
+/** Label tahun ajaran berjalan dari tanggal sekarang: Jul-Des = "YYYY/YYYY+1", Jan-Jun = "YYYY-1/YYYY". */
+export function currentAcademicYearLabel(date: Date = new Date()): string {
+  const year = date.getFullYear();
+  return date.getMonth() >= 6 ? `${year}/${year + 1}` : `${year - 1}/${year}`;
+}
+
 /**
  * Daftar bulan kalender milik satu semester pada AY (mirror backend `ay_months`).
  * Semester 1 = 6 bulan pertama dari start_date, Semester 2 = 6 bulan terakhir.

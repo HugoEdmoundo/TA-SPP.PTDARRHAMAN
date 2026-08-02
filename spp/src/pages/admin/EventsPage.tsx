@@ -296,6 +296,30 @@ export const EventsPage: React.FC = () => {
                 />
               </div>
 
+              <div className="p-3 rounded-xl bg-slate/5 border border-slate/15 flex flex-col gap-3">
+                <label className="flex items-center gap-2.5 cursor-pointer font-bold text-obsidian">
+                  <input
+                    type="checkbox"
+                    checked={allowInstallment}
+                    onChange={(e) => setAllowInstallment(e.target.checked)}
+                    className="w-4 h-4 rounded accent-emerald-primary"
+                  />
+                  Izinkan Cicilan Bertahap
+                </label>
+                {allowInstallment ? (
+                  <div>
+                    <label className="font-bold text-obsidian block mb-1">Minimal Nominal per Cicilan (Rp)</label>
+                    <InputCurrency
+                      value={minInstallmentAmount}
+                      onChange={(val) => setMinInstallmentAmount(val)}
+                      placeholder="Rp 0"
+                    />
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-slate font-medium">Santri wajib membayar penuh sesuai nominal per siswa.</p>
+                )}
+              </div>
+
               {/* Selector Santri */}
               <div className="flex flex-col gap-1.5 mt-1">
                 <div className="flex items-center justify-between">

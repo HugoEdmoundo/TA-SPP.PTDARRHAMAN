@@ -4,6 +4,7 @@ import { useToast } from '../../components/ui/ToastContext';
 import { api } from '../../api/client';
 import { DollarSign, Plus, Search, Printer, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import type { Student } from '../../types';
+import { currentAcademicYearLabel } from '../../utils/academicYear';
 
 export const ManualPaymentPage: React.FC = () => {
   const { success, error: toastError } = useToast();
@@ -370,7 +371,7 @@ export const ManualPaymentPage: React.FC = () => {
                     <SelectContent>
                       {allStudents.map((st: any) => (
                         <SelectItem key={st.id} value={String(st.id)}>
-                          {st.nis} - {st.full_name || st.name} ({st.academic_year || '2025/2026'})
+                          {st.nis} - {st.full_name || st.name} ({st.academic_year || currentAcademicYearLabel()})
                         </SelectItem>
                       ))}
                     </SelectContent>
