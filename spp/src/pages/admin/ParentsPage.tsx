@@ -221,39 +221,40 @@ export const ParentsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-obsidian tracking-tight flex items-center gap-2">
-            <UsersRound className="w-7 h-7 text-amber-600" />
-            Data Parents
-          </h1>
-          <p className="text-sm text-slate font-medium mt-1">
-            Kelola akun parents beserta koneksi ke siswa-siswi mereka.
-          </p>
+    <div className="flex flex-col gap-6">
+      <Card variant="glass" padding="sm" className="p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate/10 pb-4 mb-4">
+          <div>
+            <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
+              <UsersRound className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 shrink-0" />
+              <span>Data Parents</span>
+            </h2>
+            <p className="text-xs text-slate mt-1">
+              Kelola akun parents beserta koneksi ke siswa-siswi mereka.
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            size="sm"
+            leftIcon={<UserPlus className="w-4 h-4" />}
+            onClick={() => {
+              setFormData({ username: '', full_name: '', phone: '', email: '', password: generatePassword(), is_active: true });
+              setShowAddModal(true);
+            }}
+            className="shrink-0 w-full sm:w-auto justify-center bg-amber-600 hover:bg-amber-700 border-none"
+          >
+            Tambah Parents
+          </Button>
         </div>
-        <Button
-          variant="primary"
-          leftIcon={<UserPlus className="w-4 h-4" />}
-          onClick={() => {
-            setFormData({ username: '', full_name: '', phone: '', email: '', password: generatePassword(), is_active: true });
-            setShowAddModal(true);
-          }}
-          className="shadow-md bg-amber-600 hover:bg-amber-700 border-none"
-        >
-          Tambah Parents
-        </Button>
-      </div>
 
-      <Card variant="glass" padding="md" className="flex flex-col sm:flex-row gap-4 items-center">
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate/50" />
           <Input
             type="text"
             placeholder="Cari nama atau username parents..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 text-sm font-semibold text-obsidian"
+            className="w-full pl-9 pr-3 text-xs"
           />
         </div>
       </Card>
@@ -292,6 +293,7 @@ export const ParentsPage: React.FC = () => {
                     onClick={() => openManageModal(w)}
                     className="p-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition-colors"
                     title="Kelola Santri"
+                    aria-label={`Kelola santri ${w.full_name}`}
                   >
                     <Link2 className="w-4 h-4" />
                   </button>
@@ -299,6 +301,7 @@ export const ParentsPage: React.FC = () => {
                     onClick={() => { setSelectedWali(w); setShowResetModal(true); }}
                     className="p-2 rounded-lg bg-gold-bg text-gold-dark hover:bg-gold-accent hover:text-white transition-colors"
                     title="Reset Password"
+                    aria-label={`Reset password ${w.full_name}`}
                   >
                     <Key className="w-4 h-4" />
                   </button>
@@ -306,6 +309,7 @@ export const ParentsPage: React.FC = () => {
                     onClick={() => openEditModal(w)}
                     className="p-2 rounded-lg bg-emerald-light text-emerald-primary hover:bg-emerald-primary hover:text-white transition-colors"
                     title="Edit Parents"
+                    aria-label={`Edit data ${w.full_name}`}
                   >
                     <Edit className="w-4 h-4" />
                   </button>
@@ -314,6 +318,7 @@ export const ParentsPage: React.FC = () => {
                     disabled={w.is_active === false || w.id === user?.id}
                     className="p-2 rounded-lg bg-rose-50 text-rose-danger hover:bg-rose-danger hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Nonaktifkan"
+                    aria-label={`Nonaktifkan akun ${w.full_name}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

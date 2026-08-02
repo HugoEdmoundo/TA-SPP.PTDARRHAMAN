@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, EmptyState, Spinner, Modal, Input, Textarea, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { api } from '../../api/client';
-import { Users, Plus, FileSpreadsheet, Search, Edit2, Trash2, CheckCircle2, XCircle, Upload, AlertCircle, GraduationCap, ArrowRightLeft, UserX } from 'lucide-react';
+import { Users, Plus, FileSpreadsheet, Search, Edit2, CheckCircle2, XCircle, Upload, AlertCircle, GraduationCap, ArrowRightLeft, UserX } from 'lucide-react';
 import type { Student, AcademicYear } from '../../types';
 
 export const StudentsPage: React.FC = () => {
@@ -435,6 +435,7 @@ export const StudentsPage: React.FC = () => {
                           onClick={() => handleOpenEdit(st)}
                           className="p-1.5 rounded-lg bg-slate/5 text-slate hover:text-emerald-primary hover:bg-emerald-light/50 transition-colors"
                           title="Edit Biodata & Status"
+                          aria-label={`Edit biodata ${st.full_name || st.name}`}
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -442,8 +443,11 @@ export const StudentsPage: React.FC = () => {
                           onClick={() => handleToggleStatus(st)}
                           className={`p-1.5 rounded-lg transition-colors ${st.is_active || st.status === 'active' ? 'bg-slate/5 text-slate hover:text-rose-danger hover:bg-rose-light/50' : 'bg-slate/5 text-slate hover:text-emerald-primary hover:bg-emerald-light/50'}`}
                           title={st.is_active || st.status === 'active' ? "Nonaktifkan Santri" : "Aktifkan Kembali"}
+                          aria-label={st.is_active || st.status === 'active' ? `Nonaktifkan ${st.full_name || st.name}` : `Aktifkan kembali ${st.full_name || st.name}`}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          {st.is_active || st.status === 'active'
+                            ? <UserX className="w-3.5 h-3.5" />
+                            : <CheckCircle2 className="w-3.5 h-3.5" />}
                         </button>
                       </div>
                     </td>

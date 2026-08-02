@@ -8,6 +8,12 @@ import type { Student } from '../../types';
 export const EventsPage: React.FC = () => {
   const { success, error: toastError } = useToast();
 
+  const endOfCurrentMonth = () => {
+    const now = new Date();
+    const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return last.toISOString().substring(0, 10);
+  };
+
   const [events, setEvents] = useState<any[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +29,7 @@ export const EventsPage: React.FC = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [perStudentAmount, setPerStudentAmount] = useState(1500000);
-  const [deadline, setDeadline] = useState('2026-11-30');
+  const [deadline, setDeadline] = useState(endOfCurrentMonth);
   const [allowInstallment, setAllowInstallment] = useState(true);
   const [minInstallmentAmount, setMinInstallmentAmount] = useState(300000);
   const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
@@ -54,7 +60,7 @@ export const EventsPage: React.FC = () => {
     setName('');
     setDescription('');
     setPerStudentAmount(1500000);
-    setDeadline('2026-11-30');
+    setDeadline(endOfCurrentMonth());
     setAllowInstallment(true);
     setMinInstallmentAmount(300000);
     setSelectedStudentIds(allStudents.map(s => Number(s.id)));

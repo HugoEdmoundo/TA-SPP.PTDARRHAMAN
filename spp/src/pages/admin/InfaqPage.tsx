@@ -104,6 +104,10 @@ export const InfaqPage: React.FC = () => {
   };
 
   const handleOpenReceipt = (item: any) => {
+    if (item.raw_payment?.receipt) {
+      setSelectedReceipt(item.raw_payment.receipt);
+      return;
+    }
     const mockReceipt = {
       id: `rcp-inf-${item.id}`,
       receipt_number: item.receipt_number,
@@ -134,9 +138,9 @@ export const InfaqPage: React.FC = () => {
         <div>
           <h2 className="text-lg sm:text-xl font-extrabold text-obsidian flex items-center gap-2 font-heading">
             <HeartHandshake className="w-6 h-6 text-emerald-primary shrink-0" />
-            <span>Kas Infaq (Buku Kas & Ledger)</span>
+            <span>Kas Infaq</span>
           </h2>
-          <p className="text-xs text-slate mt-1">Pencatatan transparan uang masuk infaq dari tagihan dan penyaluran/pengeluaran dana infaq.</p>
+          <p className="text-xs text-slate mt-1">Rekap uang masuk infaq dari pembayaran santri dan pencatatan penyaluran dana infaq.</p>
         </div>
         <Button
           variant="primary"
@@ -173,7 +177,7 @@ export const InfaqPage: React.FC = () => {
           <div className="text-lg sm:text-xl font-mono font-black text-emerald-primary mt-2">
             {formatRupiah(totalInflow)}
           </div>
-          <p className="text-[10px] text-slate mt-1">Terkumpul dari {inflowData.length} transaksi pembayaran bergandeng infaq</p>
+          <p className="text-[10px] text-slate mt-1">Terkumpul dari {inflowData.length} transaksi pembayaran yang menyertakan infaq</p>
         </Card>
 
         <Card variant="glass" padding="md" className="border border-rose-danger/20 bg-white/90">
@@ -321,6 +325,7 @@ export const InfaqPage: React.FC = () => {
                           onClick={() => handleDeleteOutflow(item.id)}
                           className="text-rose-danger hover:bg-rose-light/50"
                           title="Hapus Catatan Pengeluaran"
+                          aria-label={`Hapus catatan pengeluaran ${item.title}`}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -389,7 +394,7 @@ export const InfaqPage: React.FC = () => {
           </div>
 
           <div className="bg-emerald-light/40 p-3 rounded-xl border border-emerald-primary/20 text-slate text-[11px]">
-            ℹ️ Pengeluaran yang dicatat akan mengurangi saldo kas infaq secara langsung pada laporan akuntansi pesantren.
+            ℹ️ Catatan pengeluaran ini akan mengurangi saldo kas infaq yang tampil di halaman ini. Data tersimpan di browser dan belum terhubung ke pembukuan resmi pesantren.
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-slate/15">

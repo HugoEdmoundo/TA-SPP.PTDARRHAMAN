@@ -67,7 +67,6 @@ export const SettingsPage: React.FC = () => {
 
   useEffect(() => {
     loadSppData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSaveIdentity = async (e: React.FormEvent) => {
@@ -406,8 +405,7 @@ export const SettingsPage: React.FC = () => {
           <Info className="w-4 h-4 text-slate shrink-0 mt-0.5" />
           <p className="text-xs text-slate leading-relaxed">
             Tagihan SPP & pembayaran dicatat berdasarkan tahun akademik berjalan (mulai Juli).
-            Semester 1 = Juli – Desember, Semester 2 = Januari – Juni. Sistem menyesuaikan secara otomatis,
-            tidak ada hardcode di sisi aplikasi.
+            Semester 1 = Juli – Desember, Semester 2 = Januari – Juni. Periode ini disesuaikan secara otomatis oleh sistem.
           </p>
         </div>
       </Card>

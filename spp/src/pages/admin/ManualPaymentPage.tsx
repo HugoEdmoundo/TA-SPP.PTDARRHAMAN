@@ -317,6 +317,7 @@ export const ManualPaymentPage: React.FC = () => {
                             onClick={() => handleOpenReceipt(p)}
                             className="p-1.5 rounded-lg bg-slate/5 text-slate hover:text-emerald-primary hover:bg-emerald-light/50 transition-colors"
                             title="Lihat & Cetak Kuitansi Digital"
+                            aria-label="Lihat dan cetak kuitansi"
                           >
                             <Printer className="w-3.5 h-3.5" />
                           </button>
@@ -325,6 +326,7 @@ export const ManualPaymentPage: React.FC = () => {
                               onClick={() => handleOpenVoid(p)}
                               className="p-1.5 rounded-lg bg-slate/5 text-slate hover:text-rose-danger hover:bg-rose-light/50 transition-colors"
                               title="Batalkan / Void Transaksi Ini"
+                              aria-label="Batalkan transaksi"
                             >
                               <AlertTriangle className="w-3.5 h-3.5" />
                             </button>
@@ -544,7 +546,7 @@ export const ManualPaymentPage: React.FC = () => {
               </div>
             ) : receiptDetail ? (
               <div className="flex flex-col gap-4 text-xs">
-                <div className="p-4 rounded-2xl bg-slate/5 border border-slate/20 flex flex-col gap-2 relative overflow-hidden">
+                <div className="print-area p-4 rounded-2xl bg-slate/5 border border-slate/20 flex flex-col gap-2 relative overflow-hidden">
                   {receiptDetail.receipt?.is_void && (
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-20deg] text-rose-danger/20 font-extrabold text-4xl uppercase pointer-events-none">
                       VOID / BATAL
@@ -586,18 +588,10 @@ export const ManualPaymentPage: React.FC = () => {
                     variant="primary"
                     size="sm"
                     leftIcon={<Printer className="w-4 h-4" />}
-                    onClick={() => success('Cetak Kuitansi', 'Perintah cetak thermal 58mm / 80mm berhasil dikirim.')}
+                    onClick={() => window.print()}
                     className="w-full justify-center"
                   >
-                    Cetak Kuitansi Thermal
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => success('Unduh PDF', 'File Kuitansi Digital .PDF sedang diunduh.')}
-                    className="w-full justify-center"
-                  >
-                    Unduh PDF
+                    Cetak / Simpan PDF
                   </Button>
                 </div>
               </div>

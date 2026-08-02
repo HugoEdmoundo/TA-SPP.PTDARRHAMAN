@@ -109,6 +109,12 @@ export const StudentHistoryPage: React.FC = () => {
 
   const totalPaidSum = historyData.reduce((acc, curr) => curr.status !== 'VOID' ? acc + (Number(curr.amount) || 0) : acc, 0);
 
+  const linkedParents = (selectedStudent as any)?.parents || (selectedStudent as any)?.parent ? [(selectedStudent as any).parent] : [];
+  const primaryParent = linkedParents[0];
+  const parentName = primaryParent?.full_name || primaryParent?.name || '-';
+  const parentPhone = primaryParent?.phone || '-';
+  const parentUsername = primaryParent?.username || '-';
+
   // STATE 1: Student Card Grid / Feed View
   if (!selectedStudent) {
     return (
@@ -220,19 +226,19 @@ export const StudentHistoryPage: React.FC = () => {
               <span className="text-slate font-medium flex items-center gap-2">
                 <User className="w-4 h-4 text-emerald-primary" /> Nama Parents / Ortu:
               </span>
-              <span className="font-bold text-obsidian">Bapak/Ibu Parents Santri</span>
+              <span className="font-bold text-obsidian">{parentName}</span>
             </div>
             <div className="flex items-center justify-between py-1.5 border-b border-slate/10">
               <span className="text-slate font-medium flex items-center gap-2">
                 <Phone className="w-4 h-4 text-emerald-primary" /> No. WhatsApp Parents:
               </span>
-              <span className="font-mono font-bold text-obsidian">0812-3456-7890</span>
+              <span className="font-mono font-bold text-obsidian">{parentPhone}</span>
             </div>
             <div className="flex items-center justify-between py-1.5 border-b border-slate/10">
               <span className="text-slate font-medium flex items-center gap-2">
-                <Mail className="w-4 h-4 text-emerald-primary" /> Email Akun Parents:
+                <Mail className="w-4 h-4 text-emerald-primary" /> Username Akun Parents:
               </span>
-              <span className="font-mono font-semibold text-slate truncate max-w-[150px]">parents_{selectedStudent.nis}@ptdarrahman.sch.id</span>
+              <span className="font-mono font-semibold text-slate truncate max-w-[150px]">{parentUsername}</span>
             </div>
           </div>
 
