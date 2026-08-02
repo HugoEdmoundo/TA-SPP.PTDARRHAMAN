@@ -27,6 +27,7 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(BaseModel):
+    username: Optional[str] = Field(None, max_length=50)
     email: Optional[str] = Field(None, max_length=100)
     full_name: Optional[str] = Field(None, max_length=100)
     phone: Optional[str] = Field(None, max_length=20)

@@ -91,6 +91,17 @@ def update_user(
         if payload.role and payload.role not in [r.value for r in Role]:
             raise HTTPException(status_code=400, detail="Role tidak valid.")
 
+    if payload.username is not None:
+        new_username = payload.username.strip().lower()
+        if not new_username:
+            raise HTTPException(status_code=400, detail="Username tidak boleh kosong.")
+        existing = session.exec(
+            select(User).where(User.username == new_username, User.id != id)
+        ).first()
+        if existing:
+            raise HTTPException(status_code=400, detail=f"Username '{new_username}' sudah digunakan.")
+        payload.username = new_username
+
     update_data = payload.model_dump(exclude_unset=True)
     for key, val in update_data.items():
         setattr(user, key, val)

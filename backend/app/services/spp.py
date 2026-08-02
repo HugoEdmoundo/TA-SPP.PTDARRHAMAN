@@ -277,7 +277,6 @@ def get_spp_grid(session: Session, academic_year_id: int, semester: int) -> List
             "student_id": student.id,
             "student_name": student.full_name,
             "nis": student.nis,
-            "grade": student.grade,
             "academic_year": ay.name,
             "months": months_data,
         })

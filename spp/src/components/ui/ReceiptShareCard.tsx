@@ -29,13 +29,13 @@ export const ReceiptShareCard: React.FC<ReceiptShareCardProps> = ({
     const msg = `*BUKTI PEMBAYARAN RESMI - ${settings.name.toUpperCase()}*\n\n` +
       `No. Kuitansi: *${receipt.receipt_number}*\n` +
       `Tanggal: ${formatDateIndo(receipt.created_at, true)}\n` +
-      `Nama Siswa: *${payment.student?.name || payment.user?.name || '-'}* (${payment.student?.nis || '-'}) - Kelas ${payment.student?.grade || '-'}\n\n` +
+      `Nama Siswa: *${payment.student?.name || payment.user?.name || '-'}* (NIS ${payment.student?.nis || '-'})\n\n` +
       `*Rincian Pembayaran:*\n${itemsText}\n\n` +
       `*TOTAL DIBAYAR: ${formatRupiah(payment.total_amount)}*\n` +
       `Metode: ${(payment.payment_method || 'Transfer').replace('_', ' ')}\n` +
       `Status: *LUNAS (TERVERIFIKASI)*\n\n` +
       `Kode Verifikasi: \`${receipt.verification_code}\`\n\n` +
-      `_Terima kasih atas kepedulian dan partisipasi Bapak/Ibu Wali Santri dalam mendukung pendidikan di ${settings.name}._`;
+      `_Terima kasih atas kepedulian dan partisipasi Bapak/Ibu Parents Santri dalam mendukung pendidikan di ${settings.name}._`;
 
     const encodedMsg = encodeURIComponent(msg);
     const waUrl = `https://api.whatsapp.com/send?text=${encodedMsg}`;
@@ -90,8 +90,8 @@ export const ReceiptShareCard: React.FC<ReceiptShareCardProps> = ({
                 <span className="text-sm font-bold text-foreground">{payment.student?.name || payment.user?.name || '-'}</span>
               </div>
               <div>
-                <span className="block text-[10px] font-bold uppercase text-muted-foreground">Kelas / NIS</span>
-                <span className="text-sm font-bold text-foreground">{payment.student?.grade || '-'} ({payment.student?.nis || '-'})</span>
+                <span className="block text-[10px] font-bold uppercase text-muted-foreground">NIS</span>
+                <span className="text-sm font-bold text-foreground">{payment.student?.nis || '-'}</span>
               </div>
             </div>
           </div>

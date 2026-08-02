@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge, EmptyState, Spinner, Modal, Input, Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '../../components/ui';
+import { Card, Button, Badge, EmptyState, Spinner, Modal, Input, SearchableSelect } from '../../components/ui';
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
-import { UsersRound, Plus, Search, Key, Edit, Trash2, Link2, Unlink, GraduationCap, UserPlus, Dices } from 'lucide-react';
+import { UsersRound, Search, Key, Edit, Trash2, Link2, Unlink, GraduationCap, UserPlus, Dices } from 'lucide-react';
 import type { User, Student } from '../../types';
 
 interface WaliWithStudents extends User {
@@ -20,6 +20,8 @@ const generatePassword = () => {
   for (let i = 0; i < 8; i++) pass += chars[Math.floor(Math.random() * chars.length)];
   return pass;
 };
+
+const digitsOnly = (v: string) => v.replace(/\D/g, '').slice(0, 20);
 
 export const ParentsPage: React.FC = () => {
   const { user } = useAuth();
@@ -102,7 +104,7 @@ export const ParentsPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await api.post('/users/', { ...formData, role: 'wali' });
-      success('Berhasil', `Akun wali ${formData.username} berhasil dibuat.`);
+      success('Berhasil', `Akun parents ${formData.username} berhasil dibuat.`);
       setShowAddModal(false);
       setFormData({ username: '', full_name: '', phone: '', email: '', password: '', is_active: true });
       fetchData();
@@ -119,12 +121,13 @@ export const ParentsPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await api.put(`/users/${selectedWali.id}`, {
+        username: formData.username,
         full_name: formData.full_name,
         phone: formData.phone,
         email: formData.email,
         is_active: formData.is_active,
       });
-      success('Berhasil', 'Data wali berhasil diperbarui.');
+      success('Berhasil', 'Data parents berhasil diperbarui.');
       setShowEditModal(false);
       fetchData();
     } catch (err: any) {
@@ -140,7 +143,7 @@ export const ParentsPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await api.post(`/users/${selectedWali.id}/reset-password`, { new_password: newPassword });
-      success('Berhasil', 'Password wali berhasil direset.');
+      success('Berhasil', 'Password parents berhasil direset.');
       setShowResetModal(false);
       setNewPassword('');
     } catch (err: any) {
@@ -155,7 +158,7 @@ export const ParentsPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await api.delete(`/users/${selectedWali.id}`);
-      success('Berhasil', 'Akun wali berhasil dinonaktifkan.');
+      success('Berhasil', 'Akun parents berhasil dinonaktifkan.');
       setShowDeleteModal(false);
       fetchData();
     } catch (err: any) {
@@ -195,7 +198,7 @@ export const ParentsPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await api.delete(`/students/${studentId}/parents/${selectedWali.id}`);
-      success('Berhasil', 'Hubungan wali dan siswa berhasil diputuskan.');
+      success('Berhasil', 'Hubungan parents dan siswa berhasil diputuskan.');
       fetchData();
     } catch (err: any) {
       toastError('Gagal', err.response?.data?.detail || 'Terjadi kesalahan.');
@@ -223,10 +226,10 @@ export const ParentsPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-extrabold text-obsidian tracking-tight flex items-center gap-2">
             <UsersRound className="w-7 h-7 text-amber-600" />
-            Data Wali Murid
+            Data Parents
           </h1>
           <p className="text-sm text-slate font-medium mt-1">
-            Kelola akun wali murid beserta koneksi ke siswa (orang tua / wali santri).
+            Kelola akun parents beserta koneksi ke siswa-siswi mereka.
           </p>
         </div>
         <Button
@@ -238,7 +241,7 @@ export const ParentsPage: React.FC = () => {
           }}
           className="shadow-md bg-amber-600 hover:bg-amber-700 border-none"
         >
-          Tambah Wali
+          Tambah Parents
         </Button>
       </div>
 
@@ -247,7 +250,7 @@ export const ParentsPage: React.FC = () => {
           <Search className="w-4 h-4 text-slate-light absolute left-3.5 top-1/2 -translate-y-1/2" />
           <Input
             type="text"
-            placeholder="Cari nama atau username wali..."
+            placeholder="Cari nama atau username parents..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 text-sm font-semibold text-obsidian"
@@ -262,8 +265,8 @@ export const ParentsPage: React.FC = () => {
       ) : filtered.length === 0 ? (
         <EmptyState
           icon={UsersRound}
-          title="Belum ada akun wali"
-          description="Klik 'Tambah Wali' untuk membuat akun wali murid lalu hubungkan dengan siswa."
+          title="Belum ada akun parents"
+          description="Klik 'Tambah Parents' untuk membuat akun parents lalu hubungkan dengan siswa."
         />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -278,7 +281,7 @@ export const ParentsPage: React.FC = () => {
                     <h3 className="text-sm font-bold text-obsidian">{w.full_name}</h3>
                     <p className="text-xs text-slate font-medium">@{w.username}</p>
                     <div className="mt-1 flex items-center gap-2 flex-wrap">
-                      <Badge variant="gold">Wali Murid</Badge>
+                      <Badge variant="gold">Parents</Badge>
                       {w.is_active === false && <Badge variant="danger">Nonaktif</Badge>}
                     </div>
                   </div>
@@ -302,7 +305,7 @@ export const ParentsPage: React.FC = () => {
                   <button
                     onClick={() => openEditModal(w)}
                     className="p-2 rounded-lg bg-emerald-light text-emerald-primary hover:bg-emerald-primary hover:text-white transition-colors"
-                    title="Edit Wali"
+                    title="Edit Parents"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
@@ -348,16 +351,17 @@ export const ParentsPage: React.FC = () => {
       )}
 
       {/* Add Wali Modal */}
-      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Tambah Akun Wali Murid">
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Tambah Akun Parents">
         <form onSubmit={handleAddWali} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Username <span className="text-rose-danger">*</span></label>
             <Input
               type="text"
               required
+              maxLength={50}
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
-              placeholder="contoh: wali_ahmad"
+              placeholder="contoh: parents_ahmad"
               className="text-sm font-semibold text-obsidian"
             />
           </div>
@@ -366,6 +370,7 @@ export const ParentsPage: React.FC = () => {
             <Input
               type="text"
               required
+              maxLength={100}
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
               placeholder="contoh: H. Ahmad Syafi'i"
@@ -377,8 +382,10 @@ export const ParentsPage: React.FC = () => {
               <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">No. WhatsApp</label>
               <Input
                 type="text"
+                inputMode="numeric"
+                maxLength={20}
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, phone: digitsOnly(e.target.value) })}
                 placeholder="contoh: 08123456789"
                 className="text-sm font-semibold text-obsidian"
               />
@@ -387,6 +394,7 @@ export const ParentsPage: React.FC = () => {
               <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Email</label>
               <Input
                 type="email"
+                maxLength={100}
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="contoh: ahmad@gmail.com"
@@ -413,23 +421,31 @@ export const ParentsPage: React.FC = () => {
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => setShowAddModal(false)}>Batal</Button>
-            <Button type="submit" variant="primary" isLoading={isSubmitting} className="bg-amber-600 hover:bg-amber-700 border-none">Simpan Wali</Button>
+            <Button type="submit" variant="primary" isLoading={isSubmitting} className="bg-amber-600 hover:bg-amber-700 border-none">Simpan Parents</Button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Modal */}
-      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Data Wali">
+      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Data Parents">
         <form onSubmit={handleEditWali} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate uppercase tracking-wider mb-1.5">Username (Tidak Bisa Diubah)</label>
-            <Input type="text" disabled value={formData.username} className="text-sm font-semibold text-slate-dark" />
+            <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Username <span className="text-rose-danger">*</span></label>
+            <Input
+              type="text"
+              required
+              maxLength={50}
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
+              className="text-sm font-semibold text-obsidian"
+            />
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nama Lengkap <span className="text-rose-danger">*</span></label>
             <Input
               type="text"
               required
+              maxLength={100}
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
               className="text-sm font-semibold text-obsidian"
@@ -438,11 +454,11 @@ export const ParentsPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">No. WhatsApp</label>
-              <Input type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="text-sm font-semibold text-obsidian" />
+              <Input type="text" inputMode="numeric" maxLength={20} value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: digitsOnly(e.target.value) })} className="text-sm font-semibold text-obsidian" />
             </div>
             <div>
               <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Email</label>
-              <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="text-sm font-semibold text-obsidian" />
+              <Input type="email" maxLength={100} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="text-sm font-semibold text-obsidian" />
             </div>
           </div>
           <div className="flex items-center gap-3 pt-2">
@@ -463,7 +479,7 @@ export const ParentsPage: React.FC = () => {
       </Modal>
 
       {/* Reset Password Modal */}
-      <Modal isOpen={showResetModal} onClose={() => setShowResetModal(false)} title="Reset Password Wali">
+      <Modal isOpen={showResetModal} onClose={() => setShowResetModal(false)} title="Reset Password Parents">
         <form onSubmit={handleResetPassword} className="space-y-4">
           <div className="p-3 bg-gold-bg/30 border border-gold-accent/30 rounded-xl">
             <p className="text-xs font-medium text-obsidian">
@@ -523,21 +539,19 @@ export const ParentsPage: React.FC = () => {
           <div className="pt-3 border-t border-slate/10">
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-2">Hubungkan Siswa Baru</label>
             {unlinkedStudents.length === 0 ? (
-              <p className="text-xs text-slate font-medium italic">Semua siswa sudah terhubung dengan wali ini.</p>
+              <p className="text-xs text-slate font-medium italic">Semua siswa sudah terhubung dengan parents ini.</p>
             ) : (
               <div className="flex flex-col sm:flex-row gap-2">
-                <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
-                  <SelectTrigger className="flex-1 font-bold">
-                    <SelectValue placeholder="Pilih siswa..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {unlinkedStudents.map((s) => (
-                      <SelectItem key={s.id} value={String(s.id)}>
-                        {s.nis} — {s.full_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SearchableSelect
+                  value={selectedStudentId}
+                  onValueChange={setSelectedStudentId}
+                  options={unlinkedStudents.map((s) => ({
+                    value: String(s.id),
+                    label: `${s.nis} — ${s.full_name}`,
+                  }))}
+                  placeholder="Cari & pilih siswa..."
+                  className="flex-1 font-bold"
+                />
                 <Button
                   variant="primary"
                   leftIcon={<Link2 className="w-4 h-4" />}
@@ -559,7 +573,7 @@ export const ParentsPage: React.FC = () => {
         <div className="space-y-4">
           <div className="p-4 bg-rose-50 border border-rose-danger/20 rounded-xl">
             <p className="text-sm font-medium text-rose-900">
-              Apakah Anda yakin ingin menonaktifkan akun wali <span className="font-bold">{selectedWali?.full_name}</span>?
+              Apakah Anda yakin ingin menonaktifkan akun parents <span className="font-bold">{selectedWali?.full_name}</span>?
               Mereka tidak akan bisa login ke dalam sistem lagi.
             </p>
           </div>

@@ -40,7 +40,6 @@ export const InfaqPage: React.FC = () => {
           receipt_number: p.receipt?.receipt_number || `PMT-${p.id}`,
           student_name: p.student?.name || p.user?.name || 'Santri',
           nis: p.student?.nis || '-',
-          grade: p.student?.grade || '-',
           invoice: p.invoice_number || '-',
           infaq_amount: Number(p.infaq_amount),
           date: p.created_at,
@@ -116,7 +115,7 @@ export const InfaqPage: React.FC = () => {
         invoice_number: item.invoice,
         user_id: 'usr-01',
         student_id: 'std-01',
-        student: { id: 'std-01', nis: item.nis, name: item.student_name, grade: item.grade, status: 'ACTIVE' },
+        student: { id: 'std-01', nis: item.nis, name: item.student_name, status: 'ACTIVE' },
         total_amount: item.infaq_amount,
         payment_method: 'Transfer / Gateway',
         status: 'SUCCESS',
@@ -235,7 +234,7 @@ export const InfaqPage: React.FC = () => {
                 <thead>
                   <tr className="border-b border-slate/15 bg-slate/5 text-slate font-bold uppercase text-[11px]">
                     <th className="p-3.5 pl-5">No Kuitansi / Tanggal & Jam</th>
-                    <th className="p-3.5">Santri & Kelas</th>
+                    <th className="p-3.5">Santri</th>
                     <th className="p-3.5">Sumber Pembayaran</th>
                     <th className="p-3.5 text-right">Nominal Infaq</th>
                     <th className="p-3.5 pr-5 text-right">Kuitansi</th>
@@ -250,7 +249,7 @@ export const InfaqPage: React.FC = () => {
                       </td>
                       <td className="p-3.5">
                         <div className="font-bold text-obsidian">{item.student_name}</div>
-                        <div className="text-[10px] text-slate font-mono">NIS: {item.nis} • Kelas {item.grade}</div>
+                        <div className="text-[10px] text-slate font-mono">NIS: {item.nis}</div>
                       </td>
                       <td className="p-3.5 font-medium text-slate">
                         <span>{item.payment_type}</span>

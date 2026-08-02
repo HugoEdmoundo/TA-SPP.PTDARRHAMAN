@@ -82,7 +82,7 @@ export const StudentHistoryPage: React.FC = () => {
         invoice_number: item.invoice_number,
         user_id: 'usr-wali',
         student_id: String(selectedStudent.id),
-        student: { id: String(selectedStudent.id), nis: selectedStudent.nis, name: selectedStudent.name, grade: selectedStudent.grade, status: 'ACTIVE' },
+        student: { id: String(selectedStudent.id), nis: selectedStudent.nis, name: selectedStudent.name, status: 'ACTIVE' },
         total_amount: item.amount,
         payment_method: item.method,
         status: item.status === 'VOID' ? 'VOID' : 'SUCCESS',
@@ -96,8 +96,7 @@ export const StudentHistoryPage: React.FC = () => {
 
   const filteredStudents = studentsList.filter(s => 
     (s.name || '').toLowerCase().includes(searchStudent.toLowerCase()) ||
-    s.nis.includes(searchStudent) ||
-    (s.grade || '').toLowerCase().includes(searchStudent.toLowerCase())
+    s.nis.includes(searchStudent)
   );
 
   const filteredHistory = historyData.filter(item => {
@@ -125,7 +124,7 @@ export const StudentHistoryPage: React.FC = () => {
           <div className="relative w-full sm:w-72">
             <Input
               type="text"
-              placeholder="Cari nama santri, NIS, atau kelas..."
+              placeholder="Cari nama santri atau NIS..."
               value={searchStudent}
               onChange={(e) => setSearchStudent(e.target.value)}
               className="w-full pl-9 pr-3 text-xs font-bold"
@@ -156,7 +155,7 @@ export const StudentHistoryPage: React.FC = () => {
                     <div className="w-10 h-10 rounded-xl bg-emerald-light text-emerald-primary font-black text-sm flex items-center justify-center group-hover:bg-emerald-primary group-hover:text-white transition-colors">
                       {std.name?.[0]?.toUpperCase() || 'S'}
                     </div>
-                    <Badge status="PAID" size="sm">Kelas {std.grade}</Badge>
+                    <Badge status="INFO" size="sm">{std.status || 'ACTIVE'}</Badge>
                   </div>
                   <h4 className="font-extrabold text-obsidian text-sm font-heading group-hover:text-emerald-primary transition-colors line-clamp-1">{std.name}</h4>
                   <p className="text-[11px] text-slate font-mono mt-0.5">NIS: {std.nis}</p>
@@ -205,7 +204,7 @@ export const StudentHistoryPage: React.FC = () => {
             <h3 className="font-extrabold text-obsidian text-lg font-heading">{selectedStudent.name}</h3>
             <span className="text-xs font-mono text-emerald-primary font-bold mt-0.5">NIS: {selectedStudent.nis}</span>
             <div className="flex items-center gap-2 mt-2">
-              <Badge status="PAID">Kelas {selectedStudent.grade}</Badge>
+              <Badge status="INFO">{selectedStudent.academic_year || 'Aktif'}</Badge>
               <Badge status="INFO">{selectedStudent.status || 'ACTIVE'}</Badge>
             </div>
           </div>
@@ -213,27 +212,27 @@ export const StudentHistoryPage: React.FC = () => {
           <div className="flex flex-col gap-3 text-xs">
             <div className="flex items-center justify-between py-1.5 border-b border-slate/10">
               <span className="text-slate font-medium flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-emerald-primary" /> Rombel Kelas:
+                <GraduationCap className="w-4 h-4 text-emerald-primary" /> Tahun Ajaran:
               </span>
-              <span className="font-bold text-obsidian">{selectedStudent.class_name || `Kelas ${selectedStudent.grade}`}</span>
+              <span className="font-bold text-obsidian">{selectedStudent.academic_year || '-'}</span>
             </div>
             <div className="flex items-center justify-between py-1.5 border-b border-slate/10">
               <span className="text-slate font-medium flex items-center gap-2">
-                <User className="w-4 h-4 text-emerald-primary" /> Nama Wali / Ortu:
+                <User className="w-4 h-4 text-emerald-primary" /> Nama Parents / Ortu:
               </span>
-              <span className="font-bold text-obsidian">Bapak/Ibu Wali Santri</span>
+              <span className="font-bold text-obsidian">Bapak/Ibu Parents Santri</span>
             </div>
             <div className="flex items-center justify-between py-1.5 border-b border-slate/10">
               <span className="text-slate font-medium flex items-center gap-2">
-                <Phone className="w-4 h-4 text-emerald-primary" /> No. WhatsApp Wali:
+                <Phone className="w-4 h-4 text-emerald-primary" /> No. WhatsApp Parents:
               </span>
               <span className="font-mono font-bold text-obsidian">0812-3456-7890</span>
             </div>
             <div className="flex items-center justify-between py-1.5 border-b border-slate/10">
               <span className="text-slate font-medium flex items-center gap-2">
-                <Mail className="w-4 h-4 text-emerald-primary" /> Email Akun Wali:
+                <Mail className="w-4 h-4 text-emerald-primary" /> Email Akun Parents:
               </span>
-              <span className="font-mono font-semibold text-slate truncate max-w-[150px]">wali_{selectedStudent.nis}@ptdarrahman.sch.id</span>
+              <span className="font-mono font-semibold text-slate truncate max-w-[150px]">parents_{selectedStudent.nis}@ptdarrahman.sch.id</span>
             </div>
           </div>
 

@@ -46,7 +46,6 @@ def list_students(
     is_active: Optional[bool] = Query(None, description="Filter status aktif"),
     search: Optional[str] = Query(None, description="Cari nama atau NIS"),
     academic_year: Optional[str] = Query(None, description="Filter tahun ajaran"),
-    grade: Optional[str] = Query(None, description="Filter kelas"),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     session: Session = Depends(get_session),
@@ -61,8 +60,6 @@ def list_students(
         query = query.where(Student.status == status_filter)
     if academic_year:
         query = query.where(Student.academic_year == academic_year)
-    if grade:
-        query = query.where(Student.grade == grade)
     if search:
         search_pattern = f"%{search}%"
         query = query.where(
@@ -161,7 +158,6 @@ async def preview_import_students(
     for idx, row in enumerate(rows_data, start=2):
         nis = row.get("nis") or row.get("no_induk") or ""
         full_name = row.get("full_name") or row.get("nama") or row.get("nama_lengkap") or ""
-        grade = row.get("grade") or row.get("kelas") or row.get("class")
         gender = row.get("gender") or row.get("jk") or row.get("jenis_kelamin")
         birth_place = row.get("birth_place") or row.get("tempat_lahir")
         birth_date = row.get("birth_date") or row.get("tanggal_lahir")
@@ -194,7 +190,6 @@ async def preview_import_students(
                 row_index=idx,
                 nis=nis,
                 full_name=full_name,
-                grade=grade,
                 gender=gender,
                 birth_place=birth_place,
                 birth_date=str(birth_date) if birth_date else None,
@@ -427,7 +422,7 @@ def link_parent_to_student(
     ).first()
 
     if existing_link:
-        raise HTTPException(status_code=400, detail="Akun wali tersebut sudah terhubung dengan siswa ini.")
+        raise HTTPException(status_code=400, detail="Akun parents tersebut sudah terhubung dengan siswa ini.")
 
     link = ParentStudent(student_id=id, parent_id=payload.parent_id)
     session.add(link)
@@ -439,12 +434,12 @@ def link_parent_to_student(
         action="LINK_PARENT_STUDENT",
         entity_type="student",
         entity_id=student.id,
-        detail=f"Admin menghubungkan wali '{parent.username}' ke siswa NIS {student.nis}.",
+        detail=f"Admin menghubungkan parents '{parent.username}' ke siswa NIS {student.nis}.",
     )
     session.add(audit)
     session.commit()
 
-    return {"status": "ok", "message": f"Wali '{parent.full_name}' berhasil dihubungkan ke siswa '{student.full_name}'."}
+    return {"status": "ok", "message": f"Parents '{parent.full_name}' berhasil dihubungkan ke siswa '{student.full_name}'."}
 
 
 @router.delete("/{id}/parents/{parent_id}", status_code=status.HTTP_200_OK)
@@ -463,7 +458,7 @@ def unlink_parent_from_student(
     ).first()
 
     if not link:
-        raise HTTPException(status_code=404, detail="Hubungan wali dan siswa tidak ditemukan.")
+        raise HTTPException(status_code=404, detail="Hubungan parents dan siswa tidak ditemukan.")
 
     session.delete(link)
     session.commit()
@@ -474,12 +469,12 @@ def unlink_parent_from_student(
         action="UNLINK_PARENT_STUDENT",
         entity_type="student",
         entity_id=id,
-        detail=f"Admin memutuskan hubungan wali ID {parent_id} dari siswa ID {id}.",
+        detail=f"Admin memutuskan hubungan parents ID {parent_id} dari siswa ID {id}.",
     )
     session.add(audit)
     session.commit()
 
-    return {"status": "ok", "message": "Hubungan wali dan siswa berhasil diputuskan."}
+    return {"status": "ok", "message": "Hubungan parents dan siswa berhasil diputuskan."}
 
 
 @router.get("/{id}/parents", response_model=List[ParentRead])

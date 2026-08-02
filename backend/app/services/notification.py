@@ -65,7 +65,7 @@ def send_payment_success_notification(
     links = session.exec(select(ParentStudent).where(ParentStudent.student_id == student_id)).all()
     parent_phone = None
     parent_email = None
-    parent_name = "Bapak/Ibu Wali"
+    parent_name = "Bapak/Ibu Parents"
 
     for l in links:
         parent = session.get(User, l.parent_id)
@@ -88,7 +88,7 @@ def send_payment_success_notification(
         f"• Total Bayar: *Rp {amt_str}*\n"
         f"• Saluran: {channel.upper()}\n"
         f"• Waktu: {datetime.utcnow().strftime('%d-%m-%Y %H:%M:%S')} UTC\n\n"
-        f"Kuitansi digital berformat PDF dan gambar PNG siap diunduh melalui portal Wali Siswa. Terima kasih."
+        f"Kuitansi digital berformat PDF dan gambar PNG siap diunduh melalui portal Parents. Terima kasih."
     )
 
     delivery_status = "DELIVERED_PORTAL"

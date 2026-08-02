@@ -139,7 +139,7 @@ export const SppGridPage: React.FC = () => {
               <thead>
                 <tr className="bg-slate/10 font-bold text-slate border-b border-slate/20 uppercase text-[10px] tracking-wider">
                   <th className="p-3 pl-5 min-w-[180px]">Santri / NIS</th>
-                  <th className="p-3">Kelas / Tahun</th>
+                  <th className="p-3">Tahun Ajaran</th>
                   {months.map((m) => (
                     <th key={`${m.month}-${m.year}`} className="p-3 text-center min-w-[100px]">
                       {monthName(m.month)} {m.year}
@@ -155,8 +155,7 @@ export const SppGridPage: React.FC = () => {
                       <span className="text-[10px] font-mono text-slate font-normal">NIS: {row.nis}</span>
                     </td>
                     <td className="p-3 font-semibold text-slate">
-                      {row.grade || '-'}
-                      <span className="block text-[10px] font-normal">{row.academic_year || ''}</span>
+                      {row.academic_year || '-'}
                     </td>
                     {months.map((m, monthIdx) => {
                       const monthData = row.months?.[monthIdx];

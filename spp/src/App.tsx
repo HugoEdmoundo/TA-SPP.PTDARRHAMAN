@@ -61,7 +61,7 @@ export function App() {
                   }
                 />
                 <Route path="students" element={<StudentsPage />} />
-                <Route path="wali" element={<ParentsPage />} />
+                <Route path="parents" element={<ParentsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route
                   path="users"

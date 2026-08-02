@@ -16,7 +16,6 @@ class ParentRead(BaseModel):
 class StudentBase(BaseModel):
     nis: str = Field(..., max_length=20, example="2025001")
     full_name: str = Field(..., max_length=100, example="Budi Santoso")
-    grade: Optional[str] = Field(None, max_length=20, example="VII-A")
     gender: Optional[str] = Field(None, max_length=10, example="Laki-laki")
     birth_place: Optional[str] = Field(None, max_length=100, example="Jakarta")
     birth_date: Optional[date] = None
@@ -36,7 +35,6 @@ class StudentCreate(StudentBase):
 class StudentUpdate(BaseModel):
     nis: Optional[str] = Field(None, max_length=20)
     full_name: Optional[str] = Field(None, max_length=100)
-    grade: Optional[str] = Field(None, max_length=20)
     gender: Optional[str] = Field(None, max_length=10)
     birth_place: Optional[str] = Field(None, max_length=100)
     birth_date: Optional[date] = None
@@ -65,7 +63,6 @@ class StudentImportRow(BaseModel):
     row_index: int
     nis: str
     full_name: str
-    grade: Optional[str] = None
     gender: Optional[str] = None
     birth_place: Optional[str] = None
     birth_date: Optional[str] = None

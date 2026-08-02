@@ -154,7 +154,6 @@ class Student(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     nis: str = Field(unique=True, index=True, max_length=20)
     full_name: str = Field(max_length=100)
-    grade: Optional[str] = Field(default=None, max_length=20)  # Kelas, e.g. "VII-A"
     gender: Optional[str] = Field(default=None, max_length=10)
     birth_place: Optional[str] = Field(default=None, max_length=100)
     birth_date: Optional[date] = Field(default=None)
