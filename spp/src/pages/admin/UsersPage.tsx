@@ -3,6 +3,7 @@ import { Card, Button, Badge, EmptyState, Spinner, Modal, Input, Select, SelectT
 import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
+import { normalizeRole } from '../../utils/role';
 import { ShieldAlert, Plus, Search, UserCheck, Shield, Key, Edit, Trash2 } from 'lucide-react';
 import type { User } from '../../types';
 
@@ -129,18 +130,19 @@ export const UsersPage: React.FC = () => {
     setSelectedUser(u);
     setFormData({
       username: u.email || '',
-      full_name: u.name,
+      full_name: u.full_name || u.name || '',
       password: '',
-      role: u.role.toLowerCase(),
+      role: normalizeRole(u.role).toLowerCase(),
       is_active: u.is_active ?? true,
     });
     setShowEditModal(true);
   };
 
   const getRoleBadge = (role: string) => {
-    switch (role.toUpperCase()) {
+    switch (normalizeRole(role)) {
       case 'SUPERADMIN': return <Badge variant="info">Superadmin</Badge>;
       case 'ADMIN': return <Badge variant="success">Admin</Badge>;
+      case 'WALI': return <Badge variant="default">Wali</Badge>;
       default: return <Badge variant="default">{role}</Badge>;
     }
   };
@@ -213,8 +215,8 @@ export const UsersPage: React.FC = () => {
                     <UserCheck className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-obsidian">{u.name}</h3>
-                    <p className="text-xs text-slate font-medium">@{u.email || u.name}</p>
+                    <h3 className="text-sm font-bold text-obsidian">{u.full_name || u.name}</h3>
+                    <p className="text-xs text-slate font-medium">@{u.email || u.username || u.name}</p>
                     <div className="mt-1 flex items-center gap-2">
                       {getRoleBadge(u.role)}
                       {u.is_active === false && <Badge variant="danger">Nonaktif</Badge>}

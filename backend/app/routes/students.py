@@ -46,6 +46,7 @@ def list_students(
     is_active: Optional[bool] = Query(None, description="Filter status aktif"),
     search: Optional[str] = Query(None, description="Cari nama atau NIS"),
     academic_year: Optional[str] = Query(None, description="Filter tahun ajaran"),
+    grade: Optional[str] = Query(None, description="Filter kelas"),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     session: Session = Depends(get_session),
@@ -60,6 +61,8 @@ def list_students(
         query = query.where(Student.status == status_filter)
     if academic_year:
         query = query.where(Student.academic_year == academic_year)
+    if grade:
+        query = query.where(Student.grade == grade)
     if search:
         search_pattern = f"%{search}%"
         query = query.where(
@@ -158,6 +161,7 @@ async def preview_import_students(
     for idx, row in enumerate(rows_data, start=2):
         nis = row.get("nis") or row.get("no_induk") or ""
         full_name = row.get("full_name") or row.get("nama") or row.get("nama_lengkap") or ""
+        grade = row.get("grade") or row.get("kelas") or row.get("class")
         gender = row.get("gender") or row.get("jk") or row.get("jenis_kelamin")
         birth_place = row.get("birth_place") or row.get("tempat_lahir")
         birth_date = row.get("birth_date") or row.get("tanggal_lahir")
@@ -190,6 +194,7 @@ async def preview_import_students(
                 row_index=idx,
                 nis=nis,
                 full_name=full_name,
+                grade=grade,
                 gender=gender,
                 birth_place=birth_place,
                 birth_date=str(birth_date) if birth_date else None,

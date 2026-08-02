@@ -44,6 +44,16 @@ def init_db():
             print(f"[WARN] Alembic migration gagal, fallback ke create_all(): {e}", file=sys.stderr)
             SQLModel.metadata.create_all(engine)
 
+    # Pastikan minimal ada 1 tahun ajaran (master periode)
+    try:
+        from sqlmodel import Session, select
+        from app.models import AcademicYear
+        from app.services.ay import seed_default_academic_year
+        with Session(engine) as session:
+            seed_default_academic_year(session)
+    except Exception as e:
+        print(f"[WARN] seed_default_academic_year failed: {e}", file=sys.stderr)
+
 
 def get_session():
     """FastAPI dependency — yields a DB session per request."""

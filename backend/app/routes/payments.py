@@ -10,7 +10,7 @@ from app.models import (
     User, Student, Bill, Payment, Receipt, GatewayTransaction, AuditLog, ParentStudent, Event, PaymentStatus
 )
 from app.routes.sse import manager
-from app.dependencies import get_current_user, require_admin
+from app.dependencies import get_current_user, require_admin, is_admin_role
 from app.schemas.payments import (
     PaymentItemRequest,
     GatewayCreateRequest,
@@ -38,7 +38,7 @@ def create_gateway_checkout(
     """
     Inisiasi pembayaran online (Midtrans / Xendit / Simulator) - B-18.
     """
-    if (user.role or "").lower() not in ["admin", "superadmin"]:
+    if not is_admin_role(user.role):
         # Jika bukan admin, pastikan siswa adalah anak dari wali ini
         link = session.exec(
             select(ParentStudent).where(
@@ -183,7 +183,7 @@ def get_receipt_detail(
     if not payment:
         raise HTTPException(status_code=404, detail="Data pembayaran untuk kuitansi ini tidak ditemukan.")
 
-    if (user.role or "").lower() not in ["admin", "superadmin"]:
+    if not is_admin_role(user.role):
         link = session.exec(
             select(ParentStudent).where(
                 ParentStudent.parent_id == user.id,
@@ -333,7 +333,7 @@ def get_student_payment_history(
     """
     Riwayat lengkap pembayaran seorang siswa (SPP, Non-SPP, Event, & Infaq) - B-21.
     """
-    if (user.role or "").lower() not in ["admin", "superadmin"]:
+    if not is_admin_role(user.role):
         link = session.exec(
             select(ParentStudent).where(
                 ParentStudent.parent_id == user.id,

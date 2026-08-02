@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Badge, Button, Input } from '../../components/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/ui/ToastContext';
+import { normalizeRole } from '../../utils/role';
 import { User, ShieldCheck, Key, Mail, Phone, Lock, AlertCircle } from 'lucide-react';
 
 export const AdminProfilePage: React.FC = () => {
@@ -62,8 +63,8 @@ export const AdminProfilePage: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg sm:text-xl font-extrabold text-obsidian font-heading">{fullName}</h2>
-              <Badge status={user?.role === 'SUPERADMIN' || user?.role === 'superadmin' ? 'PAID' : 'INFO'} size="sm">
-                {user?.role || 'ADMIN'}
+              <Badge status={normalizeRole(user?.role) === 'SUPERADMIN' ? 'PAID' : 'INFO'} size="sm">
+                {normalizeRole(user?.role) || 'ADMIN'}
               </Badge>
             </div>
             <p className="text-xs text-slate mt-0.5 font-mono">{email} • Akun Resmi Pengelola Keuangan</p>
@@ -134,8 +135,8 @@ export const AdminProfilePage: React.FC = () => {
               <Input
                 type="text"
                 disabled
-                value={user?.role || 'ADMIN'}
-                className="w-full bg-slate/5 font-mono font-bold text-slate uppercase cursor-not-allowed"
+                value={normalizeRole(user?.role) || 'ADMIN'}
+                className="w-full bg-slate/5 font-mono font-bold text-obsidian uppercase cursor-not-allowed"
               />
             </div>
 

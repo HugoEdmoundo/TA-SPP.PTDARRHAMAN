@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 from sqlalchemy import or_
 
 from app.database import get_session
-from app.models import User, AuditLog
+from app.models import User, Role, AuditLog
 from app.schemas.users import UserCreate, UserUpdate, UserRead, UserResetPassword
 from app.utils.auth import get_password_hash
 from app.dependencies import require_admin
@@ -88,7 +88,7 @@ def update_user(
     if user.id == admin.id:
         if payload.is_active is False:
             raise HTTPException(status_code=400, detail="Admin tidak dapat menonaktifkan akun sendiri.")
-        if payload.role and (payload.role or "").lower() not in ["admin", "superadmin", "wali"]:
+        if payload.role and payload.role not in [r.value for r in Role]:
             raise HTTPException(status_code=400, detail="Role tidak valid.")
 
     update_data = payload.model_dump(exclude_unset=True)

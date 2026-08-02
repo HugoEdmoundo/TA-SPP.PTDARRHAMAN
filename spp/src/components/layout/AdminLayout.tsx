@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
+import { normalizeRole } from '@/utils/role';
 import {
   LayoutDashboard,
   CreditCard,
@@ -73,8 +74,7 @@ export const AdminLayout: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const isSuperadmin =
-    user?.role === 'SUPERADMIN' || user?.role === 'superadmin' || user?.role === 'SUPER_ADMIN';
+  const isSuperadmin = normalizeRole(user?.role) === 'SUPERADMIN';
 
   const menuItems = [
     { label: 'Dashboard', path: '/admin', icon: LayoutDashboard, exact: true },

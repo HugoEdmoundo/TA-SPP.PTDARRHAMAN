@@ -105,7 +105,7 @@ export const InfaqPage: React.FC = () => {
   };
 
   const handleOpenReceipt = (item: any) => {
-    const mockReceipt: Receipt = {
+    const mockReceipt = {
       id: `rcp-inf-${item.id}`,
       receipt_number: item.receipt_number,
       verification_code: `VER-INF-${item.id}`,
@@ -124,7 +124,7 @@ export const InfaqPage: React.FC = () => {
         items: [{ id: `itm-${item.id}`, payment_id: String(item.id), item_type: 'INFAQ', title: `Infaq Sukarela (${item.payment_type})`, nominal: item.infaq_amount }]
       },
       is_void: false
-    };
+    } as unknown as Receipt;
     setSelectedReceipt(mockReceipt);
   };
 

@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 
 from app.database import get_session
 from app.models import User, ParentStudent
-from app.dependencies import get_current_user
+from app.dependencies import get_current_user, is_admin_role
 from app.services.receipt import generate_receipt_pdf, generate_receipt_image, get_payment_and_receipt_data
 
 router = APIRouter()
@@ -16,7 +16,7 @@ def verify_receipt_access(session: Session, user: User, identifier: str):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-    if (user.role or "").lower() not in ["admin", "superadmin"]:
+    if not is_admin_role(user.role):
         link = session.exec(
             select(ParentStudent).where(
                 ParentStudent.parent_id == user.id,
