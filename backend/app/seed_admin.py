@@ -44,7 +44,7 @@ def seed_all_defaults():
     print("=== Memulai Seeding Akun Default PTDARRAHMAN ===")
     seed_user("superadmin", "superadmin123", "Superadmin PTDARRAHMAN", Role.superadmin)
     seed_user("admin", "admin123", "Administrator PTDARRAHMAN", Role.admin)
-    seed_user("wali_murid", "wali123", "H. Ahmad Syafi'i (Wali Murid)", Role.wali)
+    seed_user("wali_murid", "wali123", "H. Ahmad Syafi'i (Parents)", Role.wali)
     print("=== Seeding Selesai ===")
 
 

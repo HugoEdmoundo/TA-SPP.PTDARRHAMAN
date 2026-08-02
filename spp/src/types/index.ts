@@ -19,7 +19,6 @@ export interface Student {
   id: number;
   nis: string;
   full_name: string;
-  grade?: string | null; // e.g. "X-A", "XI-IPA-1", "XII-IPS-2"
   gender?: string | null;
   birth_place?: string | null;
   birth_date?: string | null;
@@ -104,7 +103,6 @@ export interface NonSppBill {
   category?: string;
   category_id?: number;
   nominal: number;
-  target_grade?: string; // If null, applies to specific students or all
   student_ids?: string[];
   created_at?: string;
 }
@@ -228,7 +226,6 @@ export interface SppGridRow {
   student_id: number;
   student_name: string;
   nis: string;
-  grade: string | null;
   academic_year: string;
   months: { month: number; year: number; status: string; amount_paid: number }[];
 }

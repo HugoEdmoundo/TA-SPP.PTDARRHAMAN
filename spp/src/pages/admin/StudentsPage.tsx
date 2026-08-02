@@ -34,6 +34,9 @@ export const StudentsPage: React.FC = () => {
   const [academicYearId, setAcademicYearId] = useState<number | undefined>(1);
   const [studentStatus, setStudentStatus] = useState('active');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>('');
+  const [photoCleared, setPhotoCleared] = useState(false);
 
   // Import State
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -82,10 +85,40 @@ export const StudentsPage: React.FC = () => {
     setBirthPlace('');
     setAddress('');
     setPhone('');
+    setPhotoFile(null);
+    setPhotoPreview('');
+    setPhotoCleared(false);
     const defaultAy = academicYearsList.find((a) => a.is_active)?.name || academicYearsList[0]?.name || '2025/2026';
     handleAcademicYearChange(defaultAy);
     setStudentStatus('active');
     setShowAddModal(true);
+  };
+
+  const resolvePhotoUrl = (url?: string | null) => {
+    if (!url) return '';
+    if (url.startsWith('http') || url.startsWith('data:')) return url;
+    return `${api.defaults.baseURL}${url}`;
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toastError('File Tidak Valid', 'Mohon pilih file gambar (JPG, PNG, WebP).');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toastError('File Terlalu Besar', 'Ukuran foto maksimal 2MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (ev.target?.result && typeof ev.target.result === 'string') {
+        setPhotoPreview(ev.target.result);
+      }
+    };
+    reader.readAsDataURL(file);
+    setPhotoFile(file);
   };
 
   const handleOpenEdit = (st: any) => {
@@ -96,6 +129,9 @@ export const StudentsPage: React.FC = () => {
     setBirthPlace(st.birth_place || '');
     setAddress(st.address || '');
     setPhone(st.phone || '');
+    setPhotoFile(null);
+    setPhotoPreview(resolvePhotoUrl(st.photo_url));
+    setPhotoCleared(false);
     const ayName = st.academic_year || academicYearsList[0]?.name || '2025/2026';
     setAcademicYear(ayName);
     const found = academicYearsList.find((a) => a.name === ayName || a.id === st.academic_year_id);
@@ -112,7 +148,7 @@ export const StudentsPage: React.FC = () => {
     }
     setIsSubmitting(true);
     try {
-      await api.post('/students/', {
+      const res = await api.post('/students/', {
         nis,
         full_name: fullName,
         gender,
@@ -124,8 +160,17 @@ export const StudentsPage: React.FC = () => {
         status: studentStatus,
         is_active: studentStatus === 'active',
       });
+      if (photoFile && res.data?.id) {
+        const formData = new FormData();
+        formData.append('file', photoFile);
+        await api.post(`/students/${res.data.id}/photo`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
       success('Siswa Ditambahkan', `Santri atas nama ${fullName} (${nis}) berhasil didaftarkan ke sistem.`);
       setShowAddModal(false);
+      setPhotoFile(null);
+      setPhotoPreview('');
       fetchStudents();
     } catch (err: any) {
       toastError('Gagal Menambahkan Siswa', err?.response?.data?.detail || 'NIS mungkin sudah terdaftar.');
@@ -150,9 +195,19 @@ export const StudentsPage: React.FC = () => {
         academic_year_id: academicYearId,
         status: studentStatus,
         is_active: studentStatus === 'active',
+        ...(photoCleared ? { photo_url: null } : {}),
       });
+      if (photoFile && selectedStudent.id) {
+        const formData = new FormData();
+        formData.append('file', photoFile);
+        await api.post(`/students/${selectedStudent.id}/photo`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
       success('Data Diperbarui', `Informasi santri ${fullName} berhasil disimpan.`);
       setShowEditModal(false);
+      setPhotoFile(null);
+      setPhotoPreview('');
       fetchStudents();
     } catch (err: any) {
       toastError('Gagal Memperbarui', err?.response?.data?.detail || 'Terjadi kesalahan.');
@@ -350,8 +405,23 @@ export const StudentsPage: React.FC = () => {
                   <tr key={st.id} className="hover:bg-white/60 transition-colors">
                     <td className="p-3.5 pl-5 font-mono font-bold text-obsidian">{st.nis}</td>
                     <td className="p-3.5 font-bold text-obsidian">
-                      <div>{st.full_name || st.name}</div>
-                      {st.address && <div className="text-[10px] text-slate font-normal truncate max-w-[200px]">{st.address}</div>}
+                      <div className="flex items-center gap-2.5">
+                        {st.photo_url ? (
+                          <img
+                            src={resolvePhotoUrl(st.photo_url)}
+                            alt={st.full_name || st.name}
+                            className="h-9 w-9 shrink-0 rounded-full object-cover border border-slate/15 bg-slate/10"
+                          />
+                        ) : (
+                          <span className="h-9 w-9 shrink-0 rounded-full bg-emerald-light text-emerald-primary font-black flex items-center justify-center text-xs">
+                            {(st.full_name || st.name || 'S')?.[0]?.toUpperCase() || 'S'}
+                          </span>
+                        )}
+                        <div className="min-w-0">
+                          <div className="truncate">{st.full_name || st.name}</div>
+                          {st.address && <div className="text-[10px] text-slate font-normal truncate max-w-[200px]">{st.address}</div>}
+                        </div>
+                      </div>
                     </td>
                     <td className="p-3.5 text-slate">{st.gender || '-'}</td>
                     <td className="p-3.5 font-semibold">{st.academic_year || '2025/2026'}</td>
@@ -403,6 +473,7 @@ export const StudentsPage: React.FC = () => {
                 <Input
                   type="text"
                   required
+                  maxLength={20}
                   placeholder="Misal: 2026001"
                   value={nis}
                   onChange={(e) => setNis(e.target.value)}
@@ -414,12 +485,21 @@ export const StudentsPage: React.FC = () => {
                 <Input
                   type="text"
                   required
+                  maxLength={100}
                   placeholder="Nama sesuai ijazah/akta..."
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full"
                 />
               </div>
+              <StudentPhotoField
+                preview={photoPreview}
+                onFileChange={handlePhotoChange}
+                onClear={() => {
+                  setPhotoFile(null);
+                  setPhotoPreview('');
+                }}
+              />
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Jenis Kelamin</label>
@@ -455,6 +535,7 @@ export const StudentsPage: React.FC = () => {
                   <label className="font-bold text-obsidian block mb-1">Tempat Lahir</label>
                   <Input
                     type="text"
+                    maxLength={100}
                     placeholder="Misal: Jakarta"
                     value={birthPlace}
                     onChange={(e) => setBirthPlace(e.target.value)}
@@ -465,9 +546,11 @@ export const StudentsPage: React.FC = () => {
                   <label className="font-bold text-obsidian block mb-1">No. HP / WA</label>
                   <Input
                     type="text"
+                    inputMode="numeric"
+                    maxLength={20}
                     placeholder="08123456789"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 20))}
                     className="w-full font-mono"
                   />
                 </div>
@@ -522,6 +605,7 @@ export const StudentsPage: React.FC = () => {
                 <Input
                   type="text"
                   required
+                  maxLength={20}
                   value={nis}
                   onChange={(e) => setNis(e.target.value)}
                   className="w-full font-mono"
@@ -532,11 +616,21 @@ export const StudentsPage: React.FC = () => {
                 <Input
                   type="text"
                   required
+                  maxLength={100}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full"
                 />
               </div>
+              <StudentPhotoField
+                preview={photoPreview}
+                onFileChange={handlePhotoChange}
+                onClear={() => {
+                  setPhotoFile(null);
+                  setPhotoPreview('');
+                  setPhotoCleared(true);
+                }}
+              />
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-obsidian block mb-1">Jenis Kelamin</label>
@@ -572,6 +666,7 @@ export const StudentsPage: React.FC = () => {
                   <label className="font-bold text-obsidian block mb-1">Tempat Lahir</label>
                   <Input
                     type="text"
+                    maxLength={100}
                     value={birthPlace}
                     onChange={(e) => setBirthPlace(e.target.value)}
                     className="w-full"
@@ -581,8 +676,10 @@ export const StudentsPage: React.FC = () => {
                   <label className="font-bold text-obsidian block mb-1">No. HP / WA</label>
                   <Input
                     type="text"
+                    inputMode="numeric"
+                    maxLength={20}
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 20))}
                     className="w-full font-mono"
                   />
                 </div>
@@ -754,5 +851,37 @@ export const StudentsPage: React.FC = () => {
     </div>
   );
 };
+
+const StudentPhotoField: React.FC<{
+  preview: string;
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClear: () => void;
+}> = ({ preview, onFileChange, onClear }) => (
+  <div>
+    <label className="font-bold text-obsidian block mb-1">Foto Santri</label>
+    <div className="flex items-center gap-3">
+      <div className="h-16 w-16 shrink-0 rounded-2xl overflow-hidden border border-slate/20 bg-slate/10 flex items-center justify-center">
+        {preview ? (
+          <img src={preview} alt="Foto Santri" className="h-full w-full object-cover" />
+        ) : (
+          <Users className="w-6 h-6 text-slate/50" />
+        )}
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <label className="cursor-pointer inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-emerald-light text-emerald-primary hover:bg-emerald-primary hover:text-white transition-colors w-fit">
+          <Upload className="w-3.5 h-3.5" />
+          {preview ? 'Ganti Foto' : 'Unggah Foto'}
+          <input type="file" accept="image/*" className="hidden" onChange={onFileChange} />
+        </label>
+        {preview && (
+          <button type="button" onClick={onClear} className="text-[11px] font-bold text-rose-danger hover:underline w-fit">
+            Hapus Foto
+          </button>
+        )}
+        <span className="text-[10px] text-slate">JPG/PNG/WebP, maks 2MB</span>
+      </div>
+    </div>
+  </div>
+);
 
 export default StudentsPage;

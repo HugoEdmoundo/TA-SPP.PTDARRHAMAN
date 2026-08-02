@@ -205,7 +205,7 @@ export const ManualPaymentPage: React.FC = () => {
               <span>Pembayaran Manual</span>
             </h2>
             <p className="text-xs text-slate mt-1">
-              Catat pembayaran langsung dari orang tua/wali santri yang membayar cash (atau transfer manual) di loket. Admin cukup menginput nominal ke sistem, kuitansi digital otomatis terbit.
+              Catat pembayaran langsung dari orang tua/parents santri yang membayar cash (atau transfer manual) di loket. Admin cukup menginput nominal ke sistem, kuitansi digital otomatis terbit.
             </p>
           </div>
           <Button variant="primary" size="sm" leftIcon={<Plus className="w-4 h-4" />} onClick={handleOpenAdd} className="shrink-0 w-full sm:w-auto justify-center">
@@ -630,7 +630,7 @@ export const ManualPaymentPage: React.FC = () => {
                 <Textarea
                   rows={2}
                   required
-                  placeholder="Misal: Salah input nominal / duplikasi bayar / permintaan wali..."
+                  placeholder="Misal: Salah input nominal / duplikasi bayar / permintaan parents..."
                   value={voidReason}
                   onChange={(e) => setVoidReason(e.target.value)}
                   className="w-full"

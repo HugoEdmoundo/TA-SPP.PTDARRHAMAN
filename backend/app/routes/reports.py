@@ -118,7 +118,6 @@ def get_spp_semester_report(
             idx,
             st.nis,
             st.full_name,
-            st.grade or '-',
             st.academic_year or ay.name,
             float(target_per_student),
             float(paid),
@@ -131,7 +130,7 @@ def get_spp_semester_report(
     total_rem = max(Decimal("0"), total_target - total_collected)
     pct = (total_collected / total_target * 100) if total_target > 0 else Decimal("0")
 
-    headers = ["No", "NIS", "Nama Siswa", "Kelas", "Tahun Ajaran", "Target SPP (Rp)", "Dibayar (Rp)", "Tunggakan (Rp)", "Status"]
+    headers = ["No", "NIS", "Nama Siswa", "Tahun Ajaran", "Target SPP (Rp)", "Dibayar (Rp)", "Tunggakan (Rp)", "Status"]
     period_label = f"{months[0][1]}-{months[-1][0]}-{months[-1][1]}" if months else "-"
     summary = {
         "Tahun Ajaran / Semester": f"{ay.name} / Semester {semester}",

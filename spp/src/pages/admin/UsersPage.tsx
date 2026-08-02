@@ -4,8 +4,15 @@ import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { normalizeRole } from '../../utils/role';
-import { ShieldAlert, Plus, Search, UserCheck, Shield, Key, Edit, Trash2 } from 'lucide-react';
+import { ShieldAlert, Plus, Search, UserCheck, Shield, Key, Edit, Trash2, Dices } from 'lucide-react';
 import type { User } from '../../types';
+
+const generatePassword = () => {
+  const chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let pass = '';
+  for (let i = 0; i < 8; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+  return pass;
+};
 
 export const UsersPage: React.FC = () => {
   const { user } = useAuth();
@@ -79,6 +86,7 @@ export const UsersPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await api.put(`/users/${selectedUser.id}`, {
+        username: formData.username,
         full_name: formData.full_name,
         role: formData.role,
         is_active: formData.is_active,
@@ -129,7 +137,7 @@ export const UsersPage: React.FC = () => {
   const openEditModal = (u: User) => {
     setSelectedUser(u);
     setFormData({
-      username: u.email || '',
+      username: u.username || '',
       full_name: u.full_name || u.name || '',
       password: '',
       role: normalizeRole(u.role).toLowerCase(),
@@ -142,7 +150,7 @@ export const UsersPage: React.FC = () => {
     switch (normalizeRole(role)) {
       case 'SUPERADMIN': return <Badge variant="info">Superadmin</Badge>;
       case 'ADMIN': return <Badge variant="success">Admin</Badge>;
-      case 'WALI': return <Badge variant="default">Wali</Badge>;
+      case 'WALI': return <Badge variant="default">Parents</Badge>;
       default: return <Badge variant="default">{role}</Badge>;
     }
   };
@@ -156,7 +164,7 @@ export const UsersPage: React.FC = () => {
             Manajemen Pengguna (Superadmin)
           </h1>
           <p className="text-sm text-slate font-medium mt-1">
-            Kelola akses login akun admin &amp; superadmin. Akun wali murid dikelola di menu Data Wali.
+            Kelola akses login akun admin &amp; superadmin. Akun parents dikelola di menu Data Parents.
           </p>
         </div>
         <Button
@@ -262,6 +270,7 @@ export const UsersPage: React.FC = () => {
             <Input
               type="text"
               required
+              maxLength={50}
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase() })}
               placeholder="contoh: budi_admin"
@@ -273,6 +282,7 @@ export const UsersPage: React.FC = () => {
             <Input
               type="text"
               required
+              maxLength={100}
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
               placeholder="contoh: Budi Santoso"
@@ -281,14 +291,20 @@ export const UsersPage: React.FC = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Password <span className="text-rose-danger">*</span></label>
-            <Input
-              type="password"
-              required
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="Minimal 6 karakter"
-              className="text-sm font-semibold text-obsidian"
-            />
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                required
+                minLength={6}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Minimal 6 karakter"
+                className="text-sm font-semibold text-obsidian flex-1"
+              />
+              <Button type="button" variant="outline" size="sm" leftIcon={<Dices className="w-4 h-4" />} onClick={() => setFormData({ ...formData, password: generatePassword() })}>
+                Generate
+              </Button>
+            </div>
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Role <span className="text-rose-danger">*</span></label>
@@ -313,12 +329,14 @@ export const UsersPage: React.FC = () => {
       <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Pengguna">
         <form onSubmit={handleEditUser} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate uppercase tracking-wider mb-1.5">Username (Tidak Bisa Diubah)</label>
+            <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Username <span className="text-rose-danger">*</span></label>
             <Input
               type="text"
-              disabled
+              required
+              maxLength={50}
               value={formData.username}
-              className="text-sm font-semibold text-slate-dark"
+              onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase() })}
+              className="text-sm font-semibold text-obsidian"
             />
           </div>
           <div>
@@ -326,6 +344,7 @@ export const UsersPage: React.FC = () => {
             <Input
               type="text"
               required
+              maxLength={100}
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
               className="text-sm font-semibold text-obsidian"
@@ -365,19 +384,25 @@ export const UsersPage: React.FC = () => {
         <form onSubmit={handleResetPassword} className="space-y-4">
           <div className="p-3 bg-gold-bg/30 border border-gold-accent/30 rounded-xl">
             <p className="text-xs font-medium text-obsidian">
-              Anda akan mereset password untuk <span className="font-bold">{selectedUser?.name}</span> (@{selectedUser?.email}).
+              Anda akan mereset password untuk <span className="font-bold">{selectedUser?.full_name || selectedUser?.name}</span> (@{selectedUser?.username}).
             </p>
           </div>
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Password Baru <span className="text-rose-danger">*</span></label>
-            <Input
-              type="password"
-              required
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Masukkan password baru"
-              className="text-sm font-semibold text-obsidian"
-            />
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                required
+                minLength={6}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Masukkan password baru"
+                className="text-sm font-semibold text-obsidian flex-1"
+              />
+              <Button type="button" variant="outline" size="sm" leftIcon={<Dices className="w-4 h-4" />} onClick={() => setNewPassword(generatePassword())}>
+                Generate
+              </Button>
+            </div>
           </div>
           <div className="pt-4 flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => setShowResetModal(false)}>Batal</Button>
@@ -391,7 +416,7 @@ export const UsersPage: React.FC = () => {
         <div className="space-y-4">
           <div className="p-4 bg-rose-50 border border-rose-danger/20 rounded-xl">
             <p className="text-sm font-medium text-rose-900">
-              Apakah Anda yakin ingin menonaktifkan pengguna <span className="font-bold">{selectedUser?.name}</span>? 
+              Apakah Anda yakin ingin menonaktifkan pengguna <span className="font-bold">{selectedUser?.full_name || selectedUser?.name}</span>? 
               Mereka tidak akan bisa login ke dalam sistem lagi.
             </p>
           </div>

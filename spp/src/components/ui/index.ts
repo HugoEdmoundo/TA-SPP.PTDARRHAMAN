@@ -26,6 +26,7 @@ export * from './Spinner';
 export * from './EmptyState';
 export * from './InputCurrency';
 export * from './LogoInput';
+export * from './SearchableSelect';
 export * from './ReceiptShareCard';
 export * from './ToastContext';
 export * from '../../utils';

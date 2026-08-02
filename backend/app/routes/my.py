@@ -30,7 +30,6 @@ def get_my_children(
                 "id": s.id,
                 "name": s.full_name,
                 "nis": s.nis,
-                "grade": s.grade or s.academic_year or "Umum",
             })
     return students_list
 
@@ -56,7 +55,7 @@ def get_my_child_bills(
         if child_id not in linked_ids:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Akses ditolak: Siswa ini bukan anak yang terhubung dengan akun Wali Anda.",
+                detail="Akses ditolak: Siswa ini bukan anak yang terhubung dengan akun Parents Anda.",
             )
 
     if not academic_year_id:
@@ -148,7 +147,7 @@ def get_my_child_payments(
         if child_id not in linked_ids:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Akses ditolak: Siswa ini bukan anak yang terhubung dengan akun Wali Anda.",
+                detail="Akses ditolak: Siswa ini bukan anak yang terhubung dengan akun Parents Anda.",
             )
 
     payments = session.exec(

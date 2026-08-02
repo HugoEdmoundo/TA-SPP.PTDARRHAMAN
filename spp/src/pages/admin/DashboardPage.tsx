@@ -244,10 +244,10 @@ export const DashboardPage: React.FC = () => {
                     <div>
                       <h4 className="font-bold text-rose-dark text-sm">{studentsUnpaid} Santri Belum Bayar SPP</h4>
                       <p className="text-xs text-slate mt-1 leading-relaxed">
-                        Kirim pesan pengingat WhatsApp otomatis kepada wali santri penunggak secara massal.
+                        Kirim pesan pengingat WhatsApp otomatis kepada parents santri penunggak secara massal.
                       </p>
-                      <Button variant="danger" size="sm" leftIcon={<Send className="w-3.5 h-3.5" />} className="mt-3 font-bold text-xs" onClick={() => success('Pengingat Terkirim', `Pesan pengingat WhatsApp telah dikirim ke ${studentsUnpaid} wali santri.`)}>
-                        Kirim Reminder WA ({studentsUnpaid} Wali)
+                      <Button variant="danger" size="sm" leftIcon={<Send className="w-3.5 h-3.5" />} className="mt-3 font-bold text-xs" onClick={() => success('Pengingat Terkirim', `Pesan pengingat WhatsApp telah dikirim ke ${studentsUnpaid} parents santri.`)}>
+                        Kirim Reminder WA ({studentsUnpaid} Parents)
                       </Button>
                     </div>
                   </div>
