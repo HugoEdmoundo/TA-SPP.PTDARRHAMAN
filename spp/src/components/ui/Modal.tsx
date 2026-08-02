@@ -6,6 +6,8 @@ export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: React.ReactNode;
+  subtitle?: React.ReactNode;
+  icon?: React.ReactNode;
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full';
   className?: string;
@@ -18,6 +20,8 @@ export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   title,
+  subtitle,
+  icon,
   children,
   maxWidth = 'lg',
   className,
@@ -49,11 +53,19 @@ export const Modal: React.FC<ModalProps> = ({
         {title && (
           <DialogHeader
             className={cn(
-              'flex-row items-center justify-between border-b px-6 py-4 text-left shrink-0',
+              'flex-row items-center gap-3 border-b px-6 py-4 pr-14 text-left shrink-0',
               headerClassName
             )}
           >
-            <DialogTitle className="text-base font-extrabold">{title}</DialogTitle>
+            {icon && (
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-light text-emerald-primary">
+                {icon}
+              </div>
+            )}
+            <div className="min-w-0">
+              <DialogTitle className="text-sm font-extrabold">{title}</DialogTitle>
+              {subtitle && <p className="mt-0.5 text-[11px] font-medium text-slate">{subtitle}</p>}
+            </div>
           </DialogHeader>
         )}
         {!title && <DialogTitle className="sr-only">Detail</DialogTitle>}

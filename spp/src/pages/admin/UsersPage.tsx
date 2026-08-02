@@ -4,7 +4,7 @@ import { useToast } from '../../components/ui/ToastContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../api/client';
 import { normalizeRole } from '../../utils/role';
-import { ShieldAlert, Plus, Search, UserCheck, Shield, Key, Edit, Trash2, Dices, Eye, EyeOff } from 'lucide-react';
+import { ShieldAlert, Plus, Search, UserCheck, Shield, Key, Edit, Trash2, Dices, Eye, EyeOff, UserPlus, AlertTriangle } from 'lucide-react';
 import type { User } from '../../types';
 
 const generatePassword = () => {
@@ -271,8 +271,8 @@ export const UsersPage: React.FC = () => {
       )}
 
       {/* Add Modal */}
-      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Buat Akun Baru">
-        <form onSubmit={handleAddUser} className="space-y-4">
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Buat Akun Baru" icon={<UserPlus className="w-5 h-5" />}>
+        <form onSubmit={handleAddUser} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Username <span className="text-rose-danger">*</span></label>
             <Input
@@ -336,16 +336,16 @@ export const UsersPage: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setShowAddModal(false)}>Batal</Button>
-            <Button type="submit" variant="primary" isLoading={isSubmitting} className="bg-purple-600 hover:bg-purple-700 border-none">Simpan Akun</Button>
+          <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
+            <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting} className="bg-purple-600 hover:bg-purple-700 border-none">Simpan Akun</Button>
           </div>
         </form>
       </Modal>
 
       {/* Edit Modal */}
-      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Pengguna">
-        <form onSubmit={handleEditUser} className="space-y-4">
+      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Pengguna" icon={<Edit className="w-5 h-5" />}>
+        <form onSubmit={handleEditUser} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Username <span className="text-rose-danger">*</span></label>
             <Input
@@ -390,16 +390,16 @@ export const UsersPage: React.FC = () => {
             />
             <label htmlFor="isActive" className="text-sm font-bold text-obsidian">Akun Aktif (Dapat Login)</label>
           </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setShowEditModal(false)}>Batal</Button>
-            <Button type="submit" variant="primary" isLoading={isSubmitting} className="bg-purple-600 hover:bg-purple-700 border-none">Update Profil</Button>
+          <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowEditModal(false)}>Batal</Button>
+            <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting} className="bg-purple-600 hover:bg-purple-700 border-none">Update Profil</Button>
           </div>
         </form>
       </Modal>
 
       {/* Reset Password Modal */}
-      <Modal isOpen={showResetModal} onClose={() => setShowResetModal(false)} title="Reset Password">
-        <form onSubmit={handleResetPassword} className="space-y-4">
+      <Modal isOpen={showResetModal} onClose={() => setShowResetModal(false)} title="Reset Password" icon={<Key className="w-5 h-5" />}>
+        <form onSubmit={handleResetPassword} className="flex flex-col gap-4">
           <div className="p-3 bg-gold-bg/30 border border-gold-accent/30 rounded-xl">
             <p className="text-xs font-medium text-obsidian">
               Anda akan mereset password untuk <span className="font-bold">{selectedUser?.full_name || selectedUser?.name}</span> (@{selectedUser?.username}).
@@ -432,25 +432,25 @@ export const UsersPage: React.FC = () => {
               </Button>
             </div>
           </div>
-          <div className="pt-4 flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setShowResetModal(false)}>Batal</Button>
-            <Button type="submit" variant="primary" isLoading={isSubmitting} className="bg-gold-dark hover:bg-gold-dark/90 text-white border-none">Simpan Password</Button>
+          <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowResetModal(false)}>Batal</Button>
+            <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting} className="bg-gold-dark hover:bg-gold-dark/90 text-white border-none">Simpan Password</Button>
           </div>
         </form>
       </Modal>
 
       {/* Delete/Deactivate Modal */}
-      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Konfirmasi Penonaktifan">
-        <div className="space-y-4">
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Konfirmasi Penonaktifan" icon={<AlertTriangle className="w-5 h-5" />}>
+        <div className="flex flex-col gap-4">
           <div className="p-4 bg-rose-50 border border-rose-danger/20 rounded-xl">
             <p className="text-sm font-medium text-rose-900">
               Apakah Anda yakin ingin menonaktifkan pengguna <span className="font-bold">{selectedUser?.full_name || selectedUser?.name}</span>? 
               Mereka tidak akan bisa login ke dalam sistem lagi.
             </p>
           </div>
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>Batal</Button>
-            <Button variant="danger" isLoading={isSubmitting} onClick={handleDeleteUser}>Ya, Nonaktifkan</Button>
+          <div className="mt-1 pt-4 border-t border-slate/15 flex justify-end gap-2.5">
+            <Button variant="outline" size="sm" onClick={() => setShowDeleteModal(false)}>Batal</Button>
+            <Button variant="danger" size="sm" isLoading={isSubmitting} onClick={handleDeleteUser}>Ya, Nonaktifkan</Button>
           </div>
         </div>
       </Modal>

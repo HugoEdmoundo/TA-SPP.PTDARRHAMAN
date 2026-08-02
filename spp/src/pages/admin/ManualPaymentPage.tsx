@@ -347,17 +347,13 @@ export const ManualPaymentPage: React.FC = () => {
       <Modal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title={
-          <>
-            <Plus className="w-5 h-5 text-emerald-primary" />
-            <span>Catat Pembayaran Manual</span>
-          </>
-        }
+        title="Catat Pembayaran Manual"
+        icon={<Plus className="w-5 h-5" />}
         maxWidth="lg"
       >
-            <form onSubmit={handleCreatePayment} className="flex flex-col gap-3.5 text-xs">
+            <form onSubmit={handleCreatePayment} className="flex flex-col gap-4 text-xs">
               <div>
-                <label className="font-bold text-obsidian block mb-1">Pilih Santri Pembayar *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Pilih Santri Pembayar *</label>
                 {allStudents.length === 0 ? (
                   <div className="p-3 rounded-xl bg-amber-50 text-amber-800 font-semibold">Belum ada data santri.</div>
                 ) : (
@@ -381,7 +377,7 @@ export const ManualPaymentPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Jenis Pembayaran *</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Jenis Pembayaran *</label>
                   <Select
                     value={paymentType}
                     onValueChange={(v) => setPaymentType(v as 'spp' | 'non_spp' | 'event')}
@@ -397,7 +393,7 @@ export const ManualPaymentPage: React.FC = () => {
                   </Select>
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Metode Pembayaran</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Metode Pembayaran</label>
                   <Select
                     value={paymentMethod}
                     onValueChange={(v) => setPaymentMethod(v as 'cash' | 'transfer')}
@@ -417,7 +413,7 @@ export const ManualPaymentPage: React.FC = () => {
               {paymentType === 'spp' ? (
                 <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-slate/5 border border-slate/15">
                   <div>
-                    <label className="font-bold text-obsidian block mb-1">Bulan SPP (1-12) *</label>
+                    <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Bulan SPP (1-12) *</label>
                     <Select
                       value={sppMonth != null ? String(sppMonth) : undefined}
                       onValueChange={(v) => setSppMonth(Number(v))}
@@ -433,7 +429,7 @@ export const ManualPaymentPage: React.FC = () => {
                     </Select>
                   </div>
                   <div>
-                    <label className="font-bold text-obsidian block mb-1">Tahun SPP *</label>
+                    <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Tahun SPP *</label>
                     <Select
                       value={sppYear != null ? String(sppYear) : undefined}
                       onValueChange={(v) => setSppYear(Number(v))}
@@ -451,7 +447,7 @@ export const ManualPaymentPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="p-3 rounded-xl bg-slate/5 border border-slate/15">
-                  <label className="font-bold text-obsidian block mb-1">Pilih Tagihan Belum Lunas *</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Pilih Tagihan Belum Lunas *</label>
                   {studentBills.length === 0 ? (
                     <div className="text-slate italic py-2 text-center">Santri ini tidak memiliki tagihan Non-SPP/Event yang belum lunas.</div>
                   ) : (
@@ -480,7 +476,7 @@ export const ManualPaymentPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Nominal Pembayaran (Rp) *</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nominal Pembayaran (Rp) *</label>
                   <InputCurrency
                     value={amount}
                     onChange={(val) => setAmount(val)}
@@ -488,7 +484,7 @@ export const ManualPaymentPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Infaq / Sedekah Sukarela (Rp)</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Infaq / Sedekah Sukarela (Rp)</label>
                   <InputCurrency
                     value={infaqAmount}
                     onChange={(val) => setInfaqAmount(val)}
@@ -498,7 +494,7 @@ export const ManualPaymentPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Catatan / Keterangan Loket</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Catatan / Keterangan Loket</label>
                 <Input
                   type="text"
                   placeholder="Misal: Pembayaran langsung oleh Ibu santri..."
@@ -513,7 +509,7 @@ export const ManualPaymentPage: React.FC = () => {
                 <span className="text-sm font-mono text-emerald-primary">{formatRupiah(amount + infaqAmount)}</span>
               </div>
 
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15 shrink-0">
+              <div className="flex justify-end gap-2.5 mt-1 pt-4 border-t border-slate/15 shrink-0">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
                 <Button
                   type="submit"
@@ -532,12 +528,8 @@ export const ManualPaymentPage: React.FC = () => {
       <Modal
         isOpen={showReceiptModal}
         onClose={() => setShowReceiptModal(false)}
-        title={
-          <>
-            <Printer className="w-5 h-5 text-emerald-primary" />
-            <span>Kuitansi Digital Resmi</span>
-          </>
-        }
+        title="Kuitansi Digital Resmi"
+        icon={<Printer className="w-5 h-5" />}
         maxWidth="md"
       >
             {isReceiptLoading ? (
@@ -605,12 +597,8 @@ export const ManualPaymentPage: React.FC = () => {
       <Modal
         isOpen={showVoidModal && !!selectedPayment}
         onClose={() => setShowVoidModal(false)}
-        title={
-          <span className="text-rose-danger flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5" />
-            <span>Batalkan (Void) Transaksi Pembayaran</span>
-          </span>
-        }
+        title="Batalkan (Void) Transaksi Pembayaran"
+        icon={<AlertTriangle className="w-5 h-5" />}
         maxWidth="md"
       >
             {selectedPayment && (
@@ -619,9 +607,9 @@ export const ManualPaymentPage: React.FC = () => {
               </p>
             )}
 
-            <form onSubmit={handleConfirmVoid} className="flex flex-col gap-3.5 text-xs">
+            <form onSubmit={handleConfirmVoid} className="flex flex-col gap-4 text-xs">
               <div>
-                <label className="font-bold text-obsidian block mb-1">Alasan Pembatalan / Void *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Alasan Pembatalan / Void *</label>
                 <Textarea
                   rows={2}
                   required
@@ -632,7 +620,7 @@ export const ManualPaymentPage: React.FC = () => {
                 />
               </div>
 
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
+              <div className="flex justify-end gap-2.5 mt-1 pt-4 border-t border-slate/15">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowVoidModal(false)}>Batal</Button>
                 <Button type="submit" variant="danger" size="sm" isLoading={isSubmitting} disabled={!voidReason.trim()}>
                   Konfirmasi Void Transaksi

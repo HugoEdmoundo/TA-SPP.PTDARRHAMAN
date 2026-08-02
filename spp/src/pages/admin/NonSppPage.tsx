@@ -328,18 +328,14 @@ export const NonSppPage: React.FC = () => {
       <Modal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title={
-          <>
-            <Plus className="w-5 h-5 text-emerald-primary" />
-            <span>Terbitkan Tagihan Non-SPP Baru</span>
-          </>
-        }
+        title="Terbitkan Tagihan Non-SPP Baru"
+        icon={<Plus className="w-5 h-5" />}
         maxWidth="lg"
       >
-            <form onSubmit={handleCreateBill} className="flex flex-col gap-3.5 text-xs">
+            <form onSubmit={handleCreateBill} className="flex flex-col gap-4 text-xs">
               <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Kategori Tagihan *</label>
                   <Select value={category} onValueChange={(v) => handleCategoryChange(v, true)}>
                     <SelectTrigger className="font-semibold">
                       <SelectValue placeholder="Pilih kategori tagihan" />
@@ -357,7 +353,7 @@ export const NonSppPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Judul / Label Tagihan *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Judul / Label Tagihan *</label>
                 <Input
                   type="text"
                   required
@@ -369,7 +365,7 @@ export const NonSppPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Nominal per Siswa (Rp) *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nominal per Siswa (Rp) *</label>
                 <InputCurrency
                   value={amount}
                   onChange={(val) => setAmount(val)}
@@ -378,7 +374,7 @@ export const NonSppPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Deskripsi Tambahan</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Deskripsi Tambahan</label>
                 <Textarea
                   rows={2}
                   placeholder="Opsional: Keterangan singkat mengenai tagihan..."
@@ -431,7 +427,7 @@ export const NonSppPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15 shrink-0">
+              <div className="flex justify-end gap-2.5 mt-1 pt-4 border-t border-slate/15 shrink-0">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)}>Batal</Button>
                 <Button type="submit" variant="primary" size="sm" disabled={selectedStudentIds.length === 0 || amount <= 0} isLoading={isSubmitting}>
                   Terbitkan untuk {selectedStudentIds.length} Santri
@@ -444,18 +440,14 @@ export const NonSppPage: React.FC = () => {
       <Modal
         isOpen={showEditModal && !!selectedBill}
         onClose={() => setShowEditModal(false)}
-        title={
-          <>
-            <Edit2 className="w-5 h-5 text-emerald-primary" />
-            <span>Edit Tagihan Non-SPP</span>
-          </>
-        }
+        title="Edit Tagihan Non-SPP"
+        icon={<Edit2 className="w-5 h-5" />}
         maxWidth="md"
       >
-            <form onSubmit={handleUpdateBill} className="flex flex-col gap-3.5 text-xs">
+            <form onSubmit={handleUpdateBill} className="flex flex-col gap-4 text-xs">
               <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="font-bold text-obsidian block mb-1">Kategori Tagihan *</label>
+                  <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Kategori Tagihan *</label>
                   <Select value={category} onValueChange={(v) => handleCategoryChange(v, false)}>
                     <SelectTrigger className="font-semibold">
                       <SelectValue placeholder="Pilih kategori tagihan" />
@@ -473,7 +465,7 @@ export const NonSppPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Judul / Label Tagihan *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Judul / Label Tagihan *</label>
                 <Input
                   type="text"
                   required
@@ -484,7 +476,7 @@ export const NonSppPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Nominal (Rp) *</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Nominal (Rp) *</label>
                 <InputCurrency
                   value={amount}
                   onChange={(val) => setAmount(val)}
@@ -493,7 +485,7 @@ export const NonSppPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-obsidian block mb-1">Deskripsi Tambahan</label>
+                <label className="block text-xs font-bold text-obsidian uppercase tracking-wider mb-1.5">Deskripsi Tambahan</label>
                 <Textarea
                   rows={2}
                   value={description}
@@ -501,7 +493,7 @@ export const NonSppPage: React.FC = () => {
                 />
               </div>
 
-              <div className="flex justify-end gap-2.5 mt-2 pt-3 border-t border-slate/15">
+              <div className="flex justify-end gap-2.5 mt-1 pt-4 border-t border-slate/15">
                 <Button type="button" variant="outline" size="sm" onClick={() => setShowEditModal(false)}>Batal</Button>
                 <Button type="submit" variant="primary" size="sm" isLoading={isSubmitting}>Simpan Perubahan</Button>
               </div>
