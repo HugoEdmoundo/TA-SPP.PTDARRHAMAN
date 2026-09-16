@@ -19,6 +19,8 @@ venv/
 .env.docker
 .env.local
 .env.*.local
+.env.*
+!.env.example
 
 # Uploads
 uploads/
@@ -38,3 +40,13 @@ uploads/
 # OS
 Thumbs.db
 Desktop.ini
+
+# Windows / Office temp & lock files
+~$*
+*.docx.build
+*.docx.block
+
+# TA working documents (not versioned)
+.docs/
+scratch/
+download.png
