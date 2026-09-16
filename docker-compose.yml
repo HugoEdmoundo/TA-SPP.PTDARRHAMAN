@@ -18,19 +18,15 @@ services:
     networks:
       - ta_network
 
-  # ─── 2. Frontend Service (Vite React SPA + Nginx Reverse Proxy) ───
+  # ─── 2. Frontend Service (TanStack Start + Nitro SSR Server) ───
   frontend:
     build:
-      context: ./spp
+      context: ./frontend
       dockerfile: Dockerfile
-      args:
-        # Dikosongkan agar Axios menggunakan relative URL (/students/, /spp/, dll)
-        # yang akan di-proxy secara transparan oleh Nginx ke service backend:8000
-        - VITE_API_URL=
     container_name: ta_frontend
     restart: always
     ports:
-      - "3000:80"
+      - "3000:3000"
     depends_on:
       - backend
     networks:
